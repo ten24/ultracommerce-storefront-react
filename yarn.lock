@@ -1722,19 +1722,19 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@slatwall/slatwall-sdk@1.1.9-alpha":
-  "integrity" "sha512-/f3WmE5xxkit4SRftT12h5p2UK5PGK7Z2F1m8YEFC9b1MIij4xYpuHAj70eTybA9bnPff5T+K3T9viLZNuLqTA=="
-  "resolved" "https://registry.npmjs.org/@slatwall/slatwall-sdk/-/slatwall-sdk-1.1.9-alpha.tgz"
-  "version" "1.1.9-alpha"
+"@slatwall/slatwall-sdk@1.2.0":
+  "integrity" "sha512-sxMQPBxnOxqBxkrbWcGNjLWIUfkDgPifXRsETjNGdqLKlzIOQGQY6gytM6ZJMq8kKoF9/gayyzv7LYdKN9GdNw=="
+  "resolved" "https://registry.npmjs.org/@slatwall/slatwall-sdk/-/slatwall-sdk-1.2.0.tgz"
+  "version" "1.2.0"
   dependencies:
     "axios" "^0.21.1"
     "lodash" "^4.17.21"
     "qs" "^6.9.6"
 
-"@slatwall/slatwall-storefront-react@^0.2.0":
-  "integrity" "sha512-3Zp+2DOqB9HrUNIGrjZ5tRo28lI7l9MYIJDMXcoUiNoykxBdHTYZ0glgEvT512k857A1S1HSh1B5ZqapCqa3Tw=="
-  "resolved" "https://registry.npmjs.org/@slatwall/slatwall-storefront-react/-/slatwall-storefront-react-0.2.0.tgz"
-  "version" "0.2.0"
+"@slatwall/slatwall-storefront-react@^1.0.0":
+  "integrity" "sha512-EUE2gUOHWSWe2x2qPZbMMP1uxvUHpZUEjGtYFpfKJzpXsAHcI6x9HOyJoro50rkqCoASBeX/SNrtxkiSwx0xLA=="
+  "resolved" "https://registry.npmjs.org/@slatwall/slatwall-storefront-react/-/slatwall-storefront-react-1.0.0.tgz"
+  "version" "1.0.0"
   dependencies:
     "@babel/core" "^7.14.6"
     "@rollup/plugin-json" "^4.1.0"
