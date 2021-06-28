@@ -1,7 +1,7 @@
 {
-  "name": "@slatwall/slatwall-storefront-react",
+  "name": "sample-storefront",
   "version": "0.1.0",
-  "description": "Slatwall Storefront component library.",
+  "description": "Slatwall Storefront",
   "author": "Slatwall Inc. <contact@slatwallcommerce.com> (https://www.slatwallcommerce.com)",
   "license": "MIT",
   "bugs": {
@@ -12,13 +12,14 @@
     "url": "git+https://github.com/ten24/slatwall-storefront-react.git"
   },
   "homepage": "https://www.slatwallcommerce.com/resources",
-  "peerDependencies": {
+  "dependencies": {
     "@contentful/rich-text-react-renderer": "^14.1.3",
-    "bootstrap": "^5.0.2",
-    "bootstrap-icons": "^1.4.1",
     "@sentry/react": "^6.7.2",
     "@sentry/tracing": "^6.7.2",
     "@slatwall/slatwall-sdk": "1.1.9-alpha",
+    "@slatwall/slatwall-storefront-react": "^0.1.0",
+    "bootstrap": "^5.0.2",
+    "bootstrap-icons": "^1.4.1",
     "dayjs": "^1.10.5",
     "formik": "^2.2.9",
     "glob": "^7.1.7",
@@ -58,8 +59,8 @@
   "scripts": {
     "analyze": "source-map-explorer 'build/static/js/*.js'",
     "start": "export PORT=3006; react-scripts start",
-    "build": "rollup -c",
-    "build-watch": "rollup -c -w",
+    "build:prod": "rm -rf build; rm -rf dev; npm run mt; react-scripts build; mv build prod; rm .env.production; react-scripts build; mv build dev; mv prod build; git checkout .env.production",
+    "build": "npm run mt; react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "mt": "node buildtools/i18n.js",
@@ -84,30 +85,7 @@
     ]
   },
   "devDependencies": {
-    "@babel/cli": "^7.14.5",
     "@babel/core": "^7.14.6",
-    "@babel/plugin-proposal-class-properties": "^7.14.5",
-    "@babel/plugin-syntax-jsx": "^7.14.5",
-    "@babel/preset-env": "^7.14.7",
-    "@babel/preset-react": "^7.14.5",
-    "@rollup/plugin-babel": "^5.3.0",
-    "@rollup/plugin-commonjs": "^19.0.0",
-    "@rollup/plugin-image": "^2.0.6",
-    "@rollup/plugin-node-resolve": "^13.0.0",
-    "@rollup/plugin-url": "^6.0.0",
-    "npm-run-all": "^4.1.5",
-    "prettier": "^2.3.1",
-    "react": "^17.0.2",
-    "react-scripts": "4.0.3",
-    "rollup": "^2.52.2",
-    "rollup-plugin-delete": "^2.0.0",
-    "rollup-plugin-peer-deps-external": "^2.2.4",
-    "rollup-plugin-postcss": "^4.0.0",
-    "rollup-plugin-scss": "^2.6.1"
-  },
-  "dependencies": {
-    "@babel/core": "^7.14.6",
-    "@rollup/plugin-json": "^4.1.0",
     "node-sass": "^6.0.0"
   }
 }
