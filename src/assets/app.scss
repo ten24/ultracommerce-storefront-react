@@ -4,25 +4,31 @@
 //Bootstrap icon
 @import 'bootstrap-icons/font/bootstrap-icons.css';
 
+// Custom Colors
+@import './custom/custom-colors';
+
 // Bootstrap-5
-@import '../../node_modules/bootstrap/scss/bootstrap.scss';
+@import 'bootstrap/scss/bootstrap';
 
 // for slick slider
 @import 'slick-carousel/slick/slick.css';
 @import 'slick-carousel/slick/slick-theme.css';
 
 //Custom variable
-@import './components/variables.scss';
+@import '@slatwall/slatwall-storefront-react/src/assets/components/variables.scss';
 
 // Custom Styles
 
-@import './components/header.scss';
-@import './components/productListing.scss';
+@import '@slatwall/slatwall-storefront-react/src/assets/components/header.scss';
+@import '@slatwall/slatwall-storefront-react/src/assets/components/productListing.scss';
 
-@import './components/home.scss';
-@import './components/blog.scss';
-@import './components/button';
-@import './components/common.scss';
-@import './components/about.scss';
-@import './components/checkout.scss';
-@import './components/dropdown';
+@import '@slatwall/slatwall-storefront-react/src/assets/components/home.scss';
+@import '@slatwall/slatwall-storefront-react/src/assets/components/blog.scss';
+@import '@slatwall/slatwall-storefront-react/src/assets/components/button';
+@import '@slatwall/slatwall-storefront-react/src/assets/components/common.scss';
+@import '@slatwall/slatwall-storefront-react/src/assets/components/about.scss';
+@import '@slatwall/slatwall-storefront-react/src/assets/components/checkout.scss';
+@import '@slatwall/slatwall-storefront-react/src/assets/components/dropdown';
+
+// Custom Styles
+@import './custom/custom-client';

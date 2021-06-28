@@ -17,7 +17,7 @@
     "@sentry/react": "^6.7.2",
     "@sentry/tracing": "^6.7.2",
     "@slatwall/slatwall-sdk": "1.1.9-alpha",
-    "@slatwall/slatwall-storefront-react": "^0.1.0",
+    "@slatwall/slatwall-storefront-react": "^0.2.0",
     "bootstrap": "^5.0.2",
     "bootstrap-icons": "^1.4.1",
     "dayjs": "^1.10.5",
