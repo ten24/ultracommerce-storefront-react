@@ -1,0 +1,92 @@
+.steps {
+  display: flex;
+  width: 100%;
+}
+.step-item {
+  flex-basis: 0;
+  flex-grow: 1;
+  transition: $step-transition;
+  text: {
+    align: center;
+    decoration: none !important;
+  }
+  &:first-child .step-progress {
+    @include border-radius($step-bar-border-radius);
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+  &:last-child .step-progress {
+    @include border-radius($step-bar-border-radius);
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+}
+.step-progress {
+  position: relative;
+  width: 100%;
+  height: $step-bar-height;
+}
+.step-count {
+  position: absolute;
+  top: -(($step-count-size / 2) - 0.0625rem);
+  left: 50%;
+  width: $step-count-size;
+  height: $step-count-size;
+  margin-left: -($step-count-size / 2);
+  border-radius: 50%;
+  font-size: $step-count-font-size;
+  line-height: $step-count-size;
+}
+.step-label {
+  padding-top: ($step-count-size / 2) + 0.75rem;
+  > i {
+    margin: {
+      top: -0.25rem;
+      right: 0.425rem;
+    }
+    font-size: 1.2em;
+    vertical-align: middle;
+  }
+}
+@include media-breakpoint-down('sm') {
+  .step-label {
+    font-size: 1;
+    > i {
+      display: none;
+    }
+  }
+}
+
+// Dark skin
+.steps-dark {
+  .step-item {
+    color: $link-color;
+  }
+  .step-count,
+  .step-progress {
+    color: $color-white;
+    background-color: $color-gray;
+  }
+  // .step-item:hover {
+  //   color:orange;
+  // }
+  .step-item.active {
+    &.current {
+      color: $link-color;
+      pointer-events: none;
+    }
+    .step-count,
+    .step-progress {
+      color: $color-white;
+      background-color: $link-color;
+    }
+  }
+}
+
+.checkout-button {
+  color: $color-white;
+}
+
+.checkout-button *:hover {
+  color: $color-white;
+}

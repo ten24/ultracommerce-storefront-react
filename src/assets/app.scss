@@ -1,0 +1,28 @@
+//font jost fontfamily
+@import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&display=swap');
+
+//Bootstrap icon
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+
+// Bootstrap-5
+@import '../../node_modules/bootstrap/scss/bootstrap.scss';
+
+// for slick slider
+@import 'slick-carousel/slick/slick.css';
+@import 'slick-carousel/slick/slick-theme.css';
+
+//Custom variable
+@import './components/variables.scss';
+
+// Custom Styles
+
+@import './components/header.scss';
+@import './components/productListing.scss';
+
+@import './components/home.scss';
+@import './components/blog.scss';
+@import './components/button';
+@import './components/common.scss';
+@import './components/about.scss';
+@import './components/checkout.scss';
+@import './components/dropdown';
