@@ -27,3 +27,11 @@ https://www.slatwallcommerce.com/user-guide/
 Get insight into our future plans and when new features and functionality will be released.
 
 https://www.slatwallcommerce.com/slatwall-roadmap/
+
+## Examples
+
+### Slatwall Storefront
+
+See an example of these templates.
+
+https://github.com/ten24/slatwall-storefront-react/tree/develop-starter
