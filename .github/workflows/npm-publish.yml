@@ -28,6 +28,8 @@ jobs:
       - name: Install Dependencies
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: npm install
-      - run: npm publish --access public
+      - run: |
+          npm run build
+          npm publish --access private
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
