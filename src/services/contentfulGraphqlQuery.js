@@ -33,7 +33,7 @@ const homeSliderQuery = `{
 
 const homePopularProduct = `
 {
-  productsPickerCollection {
+  slatwallProductsCollection(limit: 1, where: {slug: "featured-products"}) {
     items {
       title
       products
@@ -126,6 +126,7 @@ const headerQuery = `{
   }
 }
 `
+
 const getPagesQuery = params => {
   let slug = `"${params}"`
   const pageQuery = `{
@@ -133,14 +134,36 @@ const getPagesQuery = params => {
     items {
       title
       seoDesc
+      customBody {
+        json
+      }
       sectionsCollection {
         items {
+          ... on SlatwallProducts {
+            products
+            title
+          }
+          ... on ComponentLink {
+            title
+            linkUrl
+            displayInNavigation
+            bootstrapIconClass
+          }
+          ... on ComponentText {
+            title
+          }
           ... on ComponentHero {
             title
             slug 
             summary ${richTextQuery}
             image {
               url
+            }
+            ctaLink {
+              ... on ComponentLink {
+                title
+                linkUrl
+              }
             }
           }
         }
@@ -155,6 +178,9 @@ const CategoryQuery = `{
    contentCollection(limit: 1, where: {slug: "categories"}) {
     items {
       title
+      associatedImage{
+        url
+      }
       customBody ${richTextQuery}
     }
   }
@@ -163,6 +189,9 @@ const ProductTypeQuery = `{
    contentCollection(limit: 1, where: {slug: "product-types"}) {
     items {
       title
+      associatedImage{
+        url
+      }
       customBody ${richTextQuery}
     }
   }
@@ -184,4 +213,5 @@ const getFooterQuery = `{
     }
   }
 }`
+
 export { homeSliderQuery, homePopularProduct, blogQuery, getBlogCategory, headerQuery, myAccountQuery, getPagesQuery, CategoryQuery, ProductTypeQuery, getFooterQuery }

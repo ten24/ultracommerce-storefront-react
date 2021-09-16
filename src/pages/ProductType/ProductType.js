@@ -1,58 +1,35 @@
-import { Redirect, useHistory, useParams } from 'react-router-dom'
-import { Layout, ProductTypeList, Listing } from '../../components'
+import { useHistory, useParams } from 'react-router-dom'
+import { Layout, ProductTypeList, Listing, PageHeader } from '../../components'
 import { Helmet } from 'react-helmet'
-import { useGetEntity } from '../../hooks/useAPI'
-import { useSelector } from 'react-redux'
-import { getProductTypeRoute } from '../../selectors/configurationSelectors'
-import { augmentProductType } from '../../utils'
-import { useEffect } from 'react'
+import { useProductType } from '../../hooks'
 
 const ProductType = () => {
-  const productTypeRoute = useSelector(getProductTypeRoute)
-
-  let { id } = useParams()
+  const { id } = useParams()
   const history = useHistory()
-  const [productTypeRequest, setProductTypeRequest] = useGetEntity()
-  const [productTypeListRequest, setProductTypeListRequest] = useGetEntity()
-  useEffect(() => {
-    const unload = history.listen(location => {
-      const urlTitle = location.pathname.split('/').reverse()[0]
-      const hasData = !!productTypeListRequest.data.filter(pt => pt.urlTitle === urlTitle).length
-      if (!hasData && productTypeListRequest.data.length > 0) {
-        setProductTypeRequest({ ...productTypeRequest, data: {}, isFetching: false, isLoaded: false, params: { urlTitle }, makeRequest: true })
-        setProductTypeListRequest({ ...productTypeListRequest, data: [], isFetching: false, isLoaded: false, params: {}, makeRequest: false })
-      } else {
-      }
-    })
-    return () => {
-      unload()
-    }
-  }, [history, setProductTypeRequest, productTypeRequest, setProductTypeListRequest, productTypeListRequest])
-
-  if (!productTypeRequest.isFetching && !productTypeRequest.isLoaded) {
-    setProductTypeRequest({ ...productTypeRequest, isFetching: true, isLoaded: false, entity: 'productType', params: { urlTitle: id }, makeRequest: true })
-  }
-  if (!productTypeRequest.isFetching && productTypeRequest.isLoaded && Object.keys(productTypeRequest.data).length === 0) {
-    return <Redirect to="/404" />
-  }
-  if (!productTypeListRequest.isFetching && !productTypeListRequest.isLoaded && productTypeRequest.isLoaded) {
-    setProductTypeListRequest({ ...productTypeListRequest, data: [], isFetching: true, isLoaded: false, entity: 'productType', params: { 'f:productTypeIDPath:like': `%${productTypeRequest.data.productTypeID}%`, 'p:show': 250, includeSettingsInList: true }, makeRequest: true })
-  }
-  const productTypeData = augmentProductType(id, productTypeListRequest.data)
-
+  const { productTypeRequest, productTypeData, productTypeListRequest, crumbCalculator, productTypeRoute, isError, errorMessage } = useProductType()
   return (
     <Layout>
-      <Helmet title={productTypeRequest.data.htmlTitle} />
-      {productTypeData?.childProductTypes?.length > 0 && (
-        <ProductTypeList
-          onSelect={urlTitle => {
-            history.push(`/${productTypeRoute}/${urlTitle}`)
-          }}
-          data={productTypeData}
-        />
+      {productTypeRequest.isLoaded && <Helmet title={productTypeRequest.data?.settings?.productHTMLTitleString} />}
+      <PageHeader title={productTypeData?.productTypeName} crumbs={crumbCalculator()} />
+      {isError && (
+        <div className="container bg-light box-shadow-lg rounded-lg p-5">
+          <div className="row">
+            <div className="alert alert-info" role="alert">
+              {errorMessage}
+            </div>
+          </div>
+        </div>
       )}
+
+      <ProductTypeList
+        isFetching={productTypeListRequest.isFetching || !productTypeRequest.isLoaded}
+        onSelect={urlTitle => {
+          history.push(`/${productTypeRoute}/${urlTitle}`)
+        }}
+        data={productTypeData}
+      />
       {productTypeData?.childProductTypes?.length === 0 && (
-        <Listing preFilter={{ productType_id: productTypeRequest.data.productTypeID }} hide={'productType'}>
+        <Listing preFilter={{ productType_slug: id }} hide={'productType'}>
           <div className="container d-lg-flex justify-content-between py-2 py-lg-3">
             <h5 className="h4 text-dark mb-0 font-accent">{productTypeRequest.data.title}</h5>
           </div>

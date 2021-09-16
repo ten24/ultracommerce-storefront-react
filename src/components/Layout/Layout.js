@@ -1,10 +1,14 @@
 import { Footer } from '..'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import { Helmet } from 'react-helmet'
+import { useSelector } from 'react-redux'
 
 const Layout = ({ classNameList, children }) => {
+  const siteName = useSelector(state => state.configuration.site.siteName)
   return (
     <>
+      <Helmet title={siteName} />
       <ToastContainer />
       <div className={`${classNameList} footer-height`}>{children}</div>
       <Footer />

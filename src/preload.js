@@ -9,29 +9,39 @@ const data = {
     { URLKeyType: 'Address', URLKey: 'ad' },
     { URLKeyType: 'Attribute', URLKey: 'att' },
   ],
-  enforceVerifiedAccountFlag: false,
   cmsProvider: 'slatwallCMS',
+  enforceVerifiedAccountFlag: false,
   products: {
     fallbackImageCall: false,
+    loginRequiredForPrice: false,
+  },
+  productSearch: {
+    propertyIdentifierList: '',
+    includeSKUCount: true,
+    applySiteFilter: false,
+    applyStockFilter: false,
+    includePagination: true,
+    includePotentialFilters: true,
+  },
+  myAccount: {
+    mostRecentCount: 3,
   },
   shopByManufacturer: {
     slug: '/brands',
     showInMenu: true,
-    gridSize: 1000,
-    maxCount: 1000,
+    gridSize: 3,
+    maxCount: 12,
   },
-  myAccount: {
-    mostRecentCount: 3,
+  seo: {
+    title: 'Slatwall',
+    titleMeta: '',
   },
   filtering: {
     productTypeBase: 'merchandise',
     requireKeyword: true,
     filterDataShowCounts: 5,
   },
-  seo: {
-    title: 'Slatwall',
-    titleMeta: '',
-  },
+
   footer: {
     formLink: '',
   },

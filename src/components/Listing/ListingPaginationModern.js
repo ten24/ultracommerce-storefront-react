@@ -10,35 +10,38 @@ const ListingPaginationModern = ({ currentPage = 1, setPage, count = 0 }) => {
         {currentPage > 1 && (
           <li className="page-item">
             <div
-              className="page-link"
-              href=""
+              className="page-link clickable"
               aria-label="Previous"
               onClick={evt => {
                 evt.preventDefault()
                 setPage(currentPage - 1)
               }}
             >
-              <span aria-hidden="true">&laquo;</span>
+              <span aria-hidden="true" className="me-1">
+                &laquo;
+              </span>
               <span className="sr-only">{t('frontend.pagination.previous')}</span>
             </div>
           </li>
         )}
-        <li class="page-item">
-          <span className="">{currentPage}</span>
+        <li className="page-item">
+          <span className="paginationTxtClr">{currentPage}</span>
         </li>
 
         {count === 12 && (
           <li className="page-item">
             <div
-              className="page-link"
+              className="page-link clickable"
               aria-label="Next"
               onClick={evt => {
                 evt.preventDefault()
                 setPage(currentPage + 1)
               }}
             >
-              <span aria-hidden="true">&raquo;</span>
               <span className="sr-only">{t('frontend.pagination.next')}</span>
+              <span aria-hidden="true" className="ms-1">
+                &raquo;
+              </span>
             </div>
           </li>
         )}

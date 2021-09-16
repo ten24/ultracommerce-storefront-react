@@ -1,47 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { getCountries, getStateCodeOptionsByCountryCode } from '../../../actions/'
-import { useFormik } from 'formik'
+import { getStateCodeOptionsByCountryCode } from '../../../actions/'
 import { SwRadioSelect, SwSelect } from '../..'
 import { useTranslation } from 'react-i18next'
-let initialValues = {
-  name: '',
-  company: '',
-  streetAddress: '',
-  street2Address: '',
-  city: '',
-  stateCode: '',
-  emailAddress: '',
-  postalCode: '',
-  countryCode: 'US',
-  accountAddressName: '',
-  saveAddress: false,
-  blindShip: false,
-}
+import { useBillingAddress } from '../../../hooks'
+
 const BillingAddress = ({ onSave }) => {
   const dispatch = useDispatch()
-  const isFetching = useSelector(state => state.content.isFetching)
   const countryCodeOptions = useSelector(state => state.content.countryCodeOptions)
   const stateCodeOptions = useSelector(state => state.content.stateCodeOptions)
-  const [isEdit, setEdit] = useState(true)
   const { t } = useTranslation()
-
-  const formik = useFormik({
-    enableReinitialize: false,
-    initialValues: initialValues,
-    onSubmit: values => {
-      setEdit(!isEdit)
-      onSave(values)
-    },
-  })
-  useEffect(() => {
-    if (countryCodeOptions.length === 0 && !isFetching) {
-      dispatch(getCountries())
-    }
-    if (!stateCodeOptions[formik.values.countryCode] && !isFetching) {
-      dispatch(getStateCodeOptionsByCountryCode(formik.values.countryCode))
-    }
-  }, [dispatch, formik, stateCodeOptions, countryCodeOptions, isFetching])
+  const { formik, isEdit } = useBillingAddress({ onSave })
 
   return (
     <>
@@ -130,9 +99,9 @@ const BillingAddress = ({ onSave }) => {
         <div className="row">
           <div className="col-sm-12">
             <div className="form-group">
-              <div className="custom-control custom-checkbox">
+              <div className="custom-control custom-checkbox mt-1">
                 <input className="custom-control-input" type="checkbox" id="saveAddress" checked={formik.values.saveAddress} onChange={formik.handleChange} />
-                <label className="custom-control-label" htmlFor="saveAddress">
+                <label className="custom-control-label ms-1" htmlFor="saveAddress">
                   {t('frontend.account.save_to')}
                 </label>
               </div>
@@ -162,25 +131,24 @@ const PaymentAddressSelector = ({ onSelect, onSave, selectedAccountID, addressTi
 
   return (
     <>
-      <h2 className="h6 pt-1 pb-3 mb-3 border-bottom">{t('addressTitle')}</h2>
+      <h2 className="h6 pt-1 pb-3 mb-3 border-bottom">{t('frontend.account.address.billingAddress')}</h2>
       {accountAddresses && (
-        <div className="row">
+        <div className="row mb-2">
           <div className="col-sm-12">
-            <SwRadioSelect
-              options={accountAddresses.map(({ accountAddressName, accountAddressID, address: { streetAddress } }) => {
-                return { name: `${accountAddressName} - ${streetAddress}`, value: accountAddressID }
-              })}
-              onChange={value => {
-                setShowAddress(false)
-                onSelect(value)
-              }}
-              customLabel={t('frontend.checkout.receive_option')}
-              selectedValue={selectedAccountID}
-              displayNew={true}
-            />
-            <button className="btn btn-secondary mt-2" onClick={() => setShowAddress(true)}>
-              New Address
-            </button>
+            {!showAddress && (
+              <SwRadioSelect
+                options={accountAddresses.map(({ accountAddressName, accountAddressID, address: { streetAddress } }) => {
+                  return { name: `${accountAddressName} - ${streetAddress}`, value: accountAddressID }
+                })}
+                onChange={value => {
+                  setShowAddress(false)
+                  onSelect(value)
+                }}
+                customLabel={t('frontend.checkout.receive_option')}
+                selectedValue={selectedAccountID}
+                displayNew={true}
+              />
+            )}
           </div>
         </div>
       )}
@@ -193,6 +161,15 @@ const PaymentAddressSelector = ({ onSelect, onSave, selectedAccountID, addressTi
             onSave(values)
           }}
         />
+      )}
+      {showAddress ? (
+        <button className="btn btn-secondary" onClick={() => setShowAddress(false)}>
+          Cancel
+        </button>
+      ) : (
+        <button className="btn btn-secondary" onClick={() => setShowAddress(true)}>
+          New Address
+        </button>
       )}
     </>
   )

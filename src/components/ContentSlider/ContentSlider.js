@@ -6,8 +6,8 @@ import { getMainBannerSlides } from '../../selectors/contentSelectors'
 
 const ContentSlider = () => {
   const homeMainBanner = useSelector(getMainBannerSlides)
-  const { convertToFullPath } = useUtilities()
   const { t } = useTranslation()
+  let { eventHandlerForWSIWYG, convertToFullPath } = useUtilities()
 
   return (
     <div className="hero content-slider">
@@ -22,12 +22,15 @@ const ContentSlider = () => {
             {homeMainBanner.map(({ customBody, title, associatedImage, linkUrl, linkLabel }, key) => {
               return (
                 <div key={title} className={key === 0 ? 'carousel-item active' : 'carousel-item'}>
-                  <img src={convertToFullPath(associatedImage)} className="d-block w-100" alt="carouselImage" />
+                  <img src={convertToFullPath(associatedImage, 'custom/assets/files/associatedimage/')} className="d-block w-100" alt="carouselImage" />
                   <div className="carousel-caption d-none d-md-block">
-                    <a target="blank" href={linkUrl ? linkUrl : '#'} className="link-button">
-                      <h5 className="text-white">{linkLabel}</h5>
+                    <a onClick={eventHandlerForWSIWYG} href={linkUrl ? linkUrl : '#'} className="link-button">
+                      <h1 className="text-white display-2 fw-bold">{linkLabel}</h1>
                     </a>
-                    {customBody}
+                    <p onClick={eventHandlerForWSIWYG} dangerouslySetInnerHTML={{ __html: customBody }} />
+                    <a onClick={eventHandlerForWSIWYG} href={linkUrl ? linkUrl : '#'} className="btn btn-primary btn-lg text-white px-4 rounded-pill mt-4">
+                      Shop Now
+                    </a>
                   </div>
                 </div>
               )

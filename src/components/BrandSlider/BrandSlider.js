@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useGetEntity } from '../../hooks/'
 import { useEffect } from 'react'
-import { getBrandRoute, getShopBy } from '../../selectors/'
+import { getBrandRoute } from '../../selectors/'
 
 const BandSlide = ({ brandLogo, urlTitle = '', title, customPath = '/custom/assets/files/associatedimage/' }) => {
   const brand = useSelector(getBrandRoute)
@@ -14,7 +14,7 @@ const BandSlide = ({ brandLogo, urlTitle = '', title, customPath = '/custom/asse
     <div className="repeater">
       <div className="card-body">
         <Link to={`/${brand}/${urlTitle}`}>
-          <SWImage className="img-fluid img-placeholder d-block m-auto image_container" customPath={customPath} src={brandLogo} alt={title} type="brand" />
+          <SWImage className="img-fluid  d-block m-auto rounded-circle shadow-sm" customPath={customPath} src={brandLogo} alt={title} type="brand" />
         </Link>
       </div>
     </div>
@@ -24,7 +24,7 @@ const BandSlide = ({ brandLogo, urlTitle = '', title, customPath = '/custom/asse
 const BrandSlider = ({ params }) => {
   const { t } = useTranslation()
   let [request, setRequest] = useGetEntity()
-  const shopBy = useSelector(getShopBy)
+  const shopByManufacturer = useSelector(state => state.configuration.shopByManufacturer)
   useEffect(() => {
     let didCancel = false
     if (!request.isFetching && !request.isLoaded && !didCancel) {
@@ -63,26 +63,31 @@ const BrandSlider = ({ params }) => {
       },
     ],
   }
+  if (!request?.data?.length) {
+    return null
+  }
   return (
-    <div className="container">
-      <header className="section-title">
-        <h2>{t('frontend.home.shop_brands')}</h2>
-      </header>
-      <div className="card border-0 bg-transparent">
-        <Slider {...settings}>
-          {request.isLoaded &&
-            request.data.map(slide => {
-              return <BandSlide key={slide.brandID} {...slide} customPath="/custom/assets/images/brand/logo/" brandLogo={slide.imageFile} />
-            })}
-        </Slider>
+    <section className="content-spacer bg-light-blue">
+      <div className="container">
+        <header className="section-title">
+          <h2>{t('frontend.home.shop_brands')}</h2>
+        </header>
+        <div className="card border-0 bg-transparent">
+          <Slider {...settings}>
+            {request.isLoaded &&
+              request.data.map(slide => {
+                return <BandSlide key={slide.brandID} {...slide} customPath="/custom/assets/images/brand/logo/" brandLogo={slide.imageFile} />
+              })}
+          </Slider>
+        </div>
+        <div className="text-center mt-5">
+          {/* TODO: need to navigate */}
+          <Link className="btn btn-primary" to={shopByManufacturer.slug}>
+            View All Brands
+          </Link>
+        </div>
       </div>
-      <div className="text-center mt-3">
-        {/* TODO: need to navigate */}
-        <Link className="btn btn-primary" to={shopBy.linkUrl}>
-          {t('frontend.home.more_brands')}
-        </Link>
-      </div>
-    </div>
+    </section>
   )
 }
 

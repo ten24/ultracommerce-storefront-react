@@ -42,7 +42,7 @@ const ShippingSlide = ({ currentStep }) => {
             }}
           />
         )}
-        {selectedFulfillmentMethod.fulfillmentMethod.fulfillmentMethodType === 'shipping' && selectedAccountID.length > 0 && <ShippingMethodPicker />}
+        {selectedFulfillmentMethod.fulfillmentMethod.fulfillmentMethodType === 'shipping' && <ShippingMethodPicker />}
       </Overlay>
       <SlideNavigation currentStep={currentStep} nextActive={!orderRequirementsList.includes('fulfillment')} />
     </>

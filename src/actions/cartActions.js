@@ -96,6 +96,7 @@ export const addToCart = (skuID, quantity = 1) => {
       .then(response => {
         if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
         if (response.isSuccess()) {
+          toast.success('Added to Cart')
           dispatch(receiveCart(response.success().cart))
         } else {
           dispatch(receiveCart())
@@ -228,6 +229,7 @@ export const updateItemQuantity = (skuID, quantity = 1) => {
     await SlatwalApiService.cart.updateItemQuantity(payload).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
       if (response.isSuccess()) {
+        toast.success('Quantity Update')
         dispatch(receiveCart(response.success().cart))
       } else {
         dispatch(receiveCart())

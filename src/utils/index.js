@@ -1,4 +1,3 @@
-import { useRef, useEffect } from 'react'
 import jwt_decode from 'jwt-decode'
 import queryString from 'query-string'
 
@@ -46,25 +45,6 @@ export const skuIdsToSkuCodes = (idList, productOptionGroups) => {
     )
     .flat()
 }
-
-export const usePrevious = value => {
-  const ref = useRef()
-  useEffect(() => {
-    ref.current = value
-  })
-  return ref.current
-}
-
-export const groupBy = (arr, criteria) => {
-  return arr.reduce((obj, item) => {
-    var key = typeof criteria === 'function' ? criteria(item) : item[criteria]
-    if (!obj.hasOwnProperty(key)) {
-      obj[key] = []
-    }
-    obj[key].push(item)
-    return obj
-  }, {})
-}
 export const parseErrorMessages = error => {
   if (error instanceof Object) {
     return Object.keys(error)
@@ -94,7 +74,7 @@ export const organizeProductTypes = (parents, list) => {
 }
 export const augmentProductType = (parent, data) => {
   let parents = data.filter(productType => {
-    return productType.urlTitle === parent
+    return productType.urlTitle.toLowerCase() === parent.toLowerCase()
   })
   parents = organizeProductTypes(parents, data)
 
@@ -103,8 +83,36 @@ export const augmentProductType = (parent, data) => {
   }
   return parents
 }
+
+export const groupBy = (xs, key) => {
+  return xs.reduce(function (rv, x) {
+    ;(rv[x[key]] = rv[x[key]] || []).push(x)
+    return rv
+  }, {})
+}
 export const processQueryParameters = params => {
   let qParams = queryString.parse(params, { arrayFormat: 'separator', arrayFormatSeparator: ',' })
   Object.keys(qParams).forEach(key => (qParams[key] = Array.isArray(qParams[key]) ? qParams[key].join() : qParams[key]))
   return qParams
+}
+export const sorting = (array, order, key) => {
+  array.sort(function (a, b) {
+    var A = a[key],
+      B = b[key]
+
+    if (order.indexOf(A) > order.indexOf(B)) {
+      return 1
+    } else {
+      return -1
+    }
+  })
+
+  return array
+}
+export const getOptionByCode = (filteredOptions, optionGroupCode, optionCode) => {
+  return filteredOptions
+    .filter(optionGroup => optionGroupCode === optionGroup.optionGroupCode)
+    .map(optionGroup => optionGroup.options.filter(option => optionCode === option.optionCode))
+    .flat()
+    .shift()
 }

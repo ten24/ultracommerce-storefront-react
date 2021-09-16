@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from 'react'
-// import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 
 import { AccountLayout, ListingPagination, AccountToolBar } from '../../'
 import { useTranslation } from 'react-i18next'
-import { useFormatCurrency, useGetAllOrders, useFormatDateTime } from '../../../hooks/'
+import { useFormatCurrency, useFormatDateTime, useOrderHistoryList } from '../../../hooks/'
 
 const OrderStatus = ({ type = 'info', text }) => {
   return <span className={`badge bg-${type} m-0`}>{text}</span>
@@ -17,38 +15,24 @@ const OrderListItem = props => {
   const { orderNumber, orderID, createdDateTime, orderStatusType_typeName, calculatedTotal } = props
   return (
     <tr>
-      <td className="py-3">
+      <th>
         <Link className="nav-link-style font-weight-medium font-size-sm" to={`/my-account/orders/${orderID}`}>
           {orderNumber}
         </Link>
         <br />
-      </td>
-      <td className="py-3">{formateDate(createdDateTime)}</td>
-      <td className="py-3">
+      </th>
+      <td>{formateDate(createdDateTime)}</td>
+      <td>
         <OrderStatus text={orderStatusType_typeName} />
       </td>
-      <td className="py-3">{formatCurrency(calculatedTotal)}</td>
+      <td>{formatCurrency(calculatedTotal)}</td>
     </tr>
   )
 }
 
 const OrderHistoryList = () => {
-  const [keyword, setSearchTerm] = useState('')
-  let [orders, setRequest] = useGetAllOrders()
   const { t } = useTranslation()
-  const search = (currentPage = 1) => {
-    setRequest({ ...orders, params: { currentPage, pageRecordsShow: 10, keyword }, makeRequest: true, isFetching: true, isLoaded: false })
-  }
-
-  useEffect(() => {
-    let didCancel = false
-    if (!orders.isFetching && !orders.isLoaded && !didCancel) {
-      setRequest({ ...orders, isFetching: true, isLoaded: false, params: { pageRecordsShow: 10, keyword }, makeRequest: true })
-    }
-    return () => {
-      didCancel = true
-    }
-  }, [orders, keyword, setRequest])
+  const { search, setSearchTerm, keyword, orders, totalPages } = useOrderHistoryList({})
 
   return (
     <>
@@ -59,7 +43,7 @@ const OrderHistoryList = () => {
         <table className="table table-striped table-bordered ">
           <thead>
             <tr>
-              <th>{t('frontend.account.order.heading')} #</th>
+              <th>{t('frontend.account.order.heading')}</th>
               <th>{t('frontend.account.order.date')}</th>
               <th>{t('frontend.account.order.status')}</th>
               <th> {t('frontend.account.order.total')}</th>
@@ -74,7 +58,7 @@ const OrderHistoryList = () => {
         </table>
       </div>
 
-      <ListingPagination recordsCount={orders.data.records} currentPage={orders.data.currentPage} totalPages={Math.ceil(orders.data.records / 10)} setPage={search} />
+      <ListingPagination recordsCount={orders.data.records} currentPage={orders.data.currentPage} totalPages={totalPages} setPage={search} />
     </>
   )
 }

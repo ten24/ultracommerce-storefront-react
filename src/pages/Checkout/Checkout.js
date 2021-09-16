@@ -1,33 +1,17 @@
-import { PageHeader, Layout, CheckoutSideBar, StepsHeader, getCurrentStep, ShippingSlide, PaymentSlide, ReviewSlide } from '../../components'
-import { useSelector } from 'react-redux'
-import { Redirect, Route, Switch, useHistory, useLocation, useRouteMatch } from 'react-router-dom'
+import { PageHeader, Layout, CheckoutSideBar, StepsHeader, ShippingSlide, PaymentSlide, ReviewSlide } from '../../components'
+import { Redirect, Route, Switch, useRouteMatch } from 'react-router-dom'
 import './checkout.css'
-import { isAuthenticated } from '../../utils'
-import { useEffect } from 'react'
+import { useCheckout } from '../../hooks/'
+import { useTranslation } from 'react-i18next'
 
 const Checkout = () => {
   let match = useRouteMatch()
-  const loc = useLocation()
-  const history = useHistory()
-  const path = loc.pathname.split('/').reverse()[0].toLowerCase()
-  const currentStep = getCurrentStep(path)
-  const { verifiedAccountFlag, isFetching, accountID } = useSelector(state => state.userReducer)
-  const enforceVerifiedAccountFlag = useSelector(state => state.configuration.enforceVerifiedAccountFlag)
-
-  useEffect(() => {
-    if (!isAuthenticated()) {
-      history.push(`/my-account?redirect=${loc.pathname}`)
-    }
-  }, [history, loc])
-
-  if (enforceVerifiedAccountFlag && !verifiedAccountFlag && isAuthenticated() && !isFetching && accountID.length > 0) {
-    return <Redirect to="/account-verification" />
-  }
-
+  let { currentStep } = useCheckout()
+  const { t } = useTranslation()
   return (
     <Layout>
-      <PageHeader />
-      <div className="container pb-5 mb-2 mb-md-4">
+      <PageHeader title={t('frontend.header.checkout')} />
+      <div className="container pb-5 mb-2 mb-md-4 mt-4">
         <div className="row">
           <section className="col-lg-8">
             {/* <!-- Steps--> */}

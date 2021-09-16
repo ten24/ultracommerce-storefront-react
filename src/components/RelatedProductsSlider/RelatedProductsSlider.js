@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { SlatwalApiService } from '../../services'
-import { renameKeysInArrayOfObjects } from '../../utils'
 import { useTranslation } from 'react-i18next'
 import Slider from 'react-slick'
 import { ProductCard } from '..'
@@ -16,13 +15,13 @@ const RelatedProductsSlider = ({ productID, slidesToShow = 4 }) => {
     if (!relatedProducts.isLoaded) {
       SlatwalApiService.products.getRelatedProducts({ productID }).then(response => {
         if (response.isSuccess() && !didCancel) {
-          let newProducts = response.success().relatedProducts
-
-          renameKeysInArrayOfObjects(newProducts, 'relatedProduct_', '')
+          const products = response.success().relatedProducts.map(sku => {
+            return { ...sku, productName: sku.relatedProduct_productName, productCode: sku.relatedProduct_productCode, urlTitle: sku.relatedProduct_urlTitle, brandName: sku.relatedProduct_brand_brandName, brandUrlTitle: sku.relatedProduct_brand_urlTitle, imageFile: sku.relatedProduct_defaultSku_imageFile, skuID: sku.relatedProduct_defaultSku_skuID, skuCode: sku.relatedProduct_defaultSku_skuCode }
+          })
           setRelatedProducts({
             ...relatedProducts,
             isLoaded: true,
-            products: newProducts,
+            products: products,
           })
         } else {
           setRelatedProducts({
@@ -69,27 +68,25 @@ const RelatedProductsSlider = ({ productID, slidesToShow = 4 }) => {
     ],
   }
   return (
-    <div className="container">
-      <hr />
-      <header className="section-title">
-        <h3>{t('frontend.product.related')}</h3>
-      </header>
-      <div className="card border-0 bg-transparent">
-        <Slider {...settings}>
-          {relatedProducts.isLoaded &&
-            relatedProducts.products.map(slide => {
-              return (
-                <div className="repeater" key={slide.defaultSku_skuID}>
-                  {/*Fixed the slider design issue */}
-                  <div className="card-body">
-                    <ProductCard {...slide} imageFile={slide.defaultSku_imageFile} skuID={slide.defaultSku_skuID} listPrice={slide.defaultSku_listPrice} key={slide.defaultSku_skuID} />
+    <section className="content-spacer">
+      <div className="container">
+        <header className="section-title mb-5 pb-2">
+          <h2 className="mb-5">{t('frontend.product.related')}</h2>
+        </header>
+        <div className="card border-0 bg-transparent">
+          <Slider {...settings}>
+            {relatedProducts.isLoaded &&
+              relatedProducts.products.map(product => {
+                return (
+                  <div className="repeater" key={product.productCode}>
+                    <ProductCard {...product} />
                   </div>
-                </div>
-              )
-            })}
-        </Slider>
+                )
+              })}
+          </Slider>
+        </div>
       </div>
-    </div>
+    </section>
   )
 }
 export { RelatedProductsSlider }

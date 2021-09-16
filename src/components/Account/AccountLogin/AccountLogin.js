@@ -1,30 +1,12 @@
-import { login } from '../../../actions/'
-import { useDispatch } from 'react-redux'
-import { useFormik } from 'formik'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { useRouteMatch } from 'react-router-dom'
-import * as Yup from 'yup'
+import { useLoginForm } from '../../../hooks'
 
 const LoginForm = () => {
-  const dispatch = useDispatch()
   let match = useRouteMatch()
   const { t } = useTranslation()
-
-  const formik = useFormik({
-    initialValues: {
-      loginEmail: '',
-      loginPassword: '',
-    },
-    validateOnChange: false,
-    validationSchema: Yup.object().shape({
-      loginEmail: Yup.string().email('Invalid email').required('Required'),
-      loginPassword: Yup.string().required('Required'),
-    }),
-    onSubmit: values => {
-      dispatch(login(values.loginEmail, values.loginPassword, t('frontend.account.login_success'), t('frontend.account.login_failure')))
-    },
-  })
+  const { formik } = useLoginForm()
 
   return (
     <>
@@ -35,9 +17,7 @@ const LoginForm = () => {
           </div>
           <hr />
           <h2>{t('frontend.account.sign_in')}</h2>
-          <p>
-            {t('frontend.account.no_account')} <Link to={`${match.path}/createAccount`}>{t('frontend.account.here')}</Link>.
-          </p>
+
           <form onSubmit={formik.handleSubmit}>
             <div className="row">
               <div className="mb-3">
@@ -50,9 +30,17 @@ const LoginForm = () => {
                 <input value={formik.values.loginPassword} onBlur={formik.handleBlur} onChange={formik.handleChange} autoComplete="current-password" className="form-control" type="password" id="loginPassword" />
                 {formik.errors.loginPassword && formik.touched.loginPassword && <span className="form-error-msg">{formik.errors.loginPassword}</span>}
               </div>
-              <Link to={`${match.path}/forgotPassword`} className="nav-link-inline font-size-sm">
+              <Link to={`${match.path}/forgotPassword`} className="nav-link-inline font-size-sm link">
                 {t('frontend.account.forgot_password')}
               </Link>
+            </div>
+            <div className="row my-2">
+              <p>
+                {t('frontend.account.no_account')}
+                <Link className="link mx-1" to={`${match.path}/createAccount`}>
+                  {t('frontend.account.here')}
+                </Link>
+              </p>
             </div>
             <button className="btn btn-primary btn-lg mt-3" type="submit">
               {t('frontend.account.sign_in')}

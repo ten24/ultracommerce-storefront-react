@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useHistory, useLocation } from 'react-router'
-import { getWishLists, getPageContent } from '../../actions/'
+import { getWishLists, getPageContent, getContentByType } from '../../../actions'
 
-const CMSWrapper = ({ children }) => {
+const useCMSWrapper = () => {
   const dispatch = useDispatch()
   const { pathname } = useLocation('home')
   const history = useHistory()
@@ -16,10 +16,11 @@ const CMSWrapper = ({ children }) => {
       basePath = basePath.length ? basePath : 'home'
       dispatch(getWishLists())
       dispatch(
-        getPageContent(
+        getContentByType(
           {
             'f:urlTitlePath:like': `header%`,
           },
+          'header',
           'header'
         )
       )
@@ -32,10 +33,11 @@ const CMSWrapper = ({ children }) => {
         )
       )
       dispatch(
-        getPageContent(
+        getContentByType(
           {
             'f:urlTitlePath:like': `footer%`,
           },
+          'footer',
           'footer'
         )
       )
@@ -49,7 +51,8 @@ const CMSWrapper = ({ children }) => {
       )
       setIsLoaded(true)
     }
-  }, [dispatch, history, pathname, isLoaded])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     const unload = history.listen(location => {
@@ -70,9 +73,10 @@ const CMSWrapper = ({ children }) => {
     return () => {
       unload()
     }
-  }, [dispatch, history, setCurrentPath, currentPath])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
-  return <>{children}</>
+  return {}
 }
 
-export { CMSWrapper }
+export { useCMSWrapper }

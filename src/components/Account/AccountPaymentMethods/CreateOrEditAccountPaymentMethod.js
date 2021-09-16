@@ -4,6 +4,8 @@ import { useRedirect } from '../../../hooks/'
 import { SwSelect, AccountAddressForm, AccountLayout, AccountContent } from '../../'
 import { addPaymentMethod } from '../../../actions/userActions'
 import { useTranslation } from 'react-i18next'
+import { useState } from 'react'
+import { SwRadioSelect } from '../../SwRadioSelect/SwRadioSelect'
 
 const months = Array.from({ length: 12 }, (_, i) => {
   return { key: i + 1, value: i + 1 }
@@ -17,9 +19,10 @@ const years = Array(10)
 const CreateOrEditAccountPaymentMethod = ({ customBody, contentTitle }) => {
   const accountAddresses = useSelector(state => state.userReducer.accountAddresses)
   const [redirect, setRedirect] = useRedirect({ location: '/my-account/cards' })
+  const [showNewAddressForm, setShowNewAddressForm] = useState(false)
+
   const dispatch = useDispatch()
   const { t } = useTranslation()
-
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
@@ -27,34 +30,38 @@ const CreateOrEditAccountPaymentMethod = ({ customBody, contentTitle }) => {
       paymentMethodType: 'creditCard',
       creditCardNumber: ``,
       nameOnCreditCard: '',
-      expirationMonth: new Date().getMonth() + 1,
+      expirationMonth: new Date().getMonth() + 2,
       expirationYear: new Date().getFullYear().toString().substring(2),
       securityCode: '',
-      'billingAccountAddress.accountAddressID': '',
-      'billingAddress.countryCode': 'US',
-      'billingAddress.name': '',
-      'billingAddress.company': '',
-      'billingAddress.phoneNumber': '',
-      'billingAddress.emailAddress': '',
-      'billingAddress.streetAddress': '',
-      'billingAddress.street2Address': '',
-      'billingAddress.city': '',
-      'billingAddress.stateCode': '',
-      'billingAddress.postalCode': '',
+      billingAccountAddress: {
+        accountAddressID: '',
+      },
+      billingAddress: {
+        countryCode: 'US',
+        name: '',
+        company: '',
+        phoneNumber: '',
+        emailAddress: '',
+        streetAddress: '',
+        street2Address: '',
+        city: '',
+        stateCode: '',
+        postalCode: '',
+      },
     },
     onSubmit: values => {
       // TODO: Dispatch Actions
-      if (values['billingAccountAddress.accountAddressID'].length) {
-        delete values['billingAddress.countryCode']
-        delete values['billingAddress.name']
-        delete values['billingAddress.company']
-        delete values['billingAddress.phoneNumber']
-        delete values['billingAddress.emailAddress']
-        delete values['billingAddress.streetAddress']
-        delete values['billingAddress.street2Address']
-        delete values['billingAddress.city']
-        delete values['billingAddress.stateCode']
-        delete values['billingAddress.postalCode']
+      if (values.billingAccountAddress.accountAddressID.length) {
+        delete values.billingAddress.countryCode
+        delete values.billingAddress.name
+        delete values.billingAddress.company
+        delete values.billingAddress.phoneNumber
+        delete values.billingAddress.emailAddress
+        delete values.billingAddress.streetAddress
+        delete values.billingAddress.street2Address
+        delete values.billingAddress.city
+        delete values.billingAddress.stateCode
+        delete values.billingAddress.postalCode
       }
 
       dispatch(addPaymentMethod(values))
@@ -62,6 +69,7 @@ const CreateOrEditAccountPaymentMethod = ({ customBody, contentTitle }) => {
       setRedirect({ ...redirect, shouldRedirect: true })
     },
   })
+  let validCreditCard = formik.values.nameOnCreditCard.length > 0 && formik.values.creditCardNumber.length > 0 && formik.values.securityCode.length > 0
   return (
     <AccountLayout title={'Add Account Payment Method'}>
       <AccountContent customBody={customBody} contentTitle={contentTitle} />
@@ -120,17 +128,40 @@ const CreateOrEditAccountPaymentMethod = ({ customBody, contentTitle }) => {
             <hr className="my-4" />
           </div>
 
-          <div className="row">
-            <div className="col-sm-12">
-              <div className="col-md-6 pl-0">
-                <div className="form-group">
-                  <label htmlFor="accountAddressID">{t('frontend.account.billing_address')}</label>
-                  <SwSelect id="billingAccountAddress.accountAddressID" value={formik.values['billingAccountAddress.accountAddressID']} onChange={formik.handleChange} options={accountAddresses} />
+          {validCreditCard && (
+            <div className="row">
+              <div className="col-sm-12">
+                <div className="col-md-6 pl-0">
+                  <div className="form-group">
+                    <label htmlFor="accountAddressID">{t('frontend.account.billing_address')}</label>
+                    <SwRadioSelect
+                      onChange={value => {
+                        formik.setFieldValue('billingAccountAddress.accountAddressID', value)
+                        setShowNewAddressForm(false)
+                      }}
+                      options={accountAddresses.map(({ accountAddressName, accountAddressID, address: { streetAddress } }) => {
+                        return { name: `${accountAddressName} - ${streetAddress}`, value: accountAddressID }
+                      })}
+                      selectedValue={formik.values.billingAccountAddress.accountAddressID}
+                    />
+                    {!showNewAddressForm && (
+                      <button
+                        className="btn btn-secondary mt-2"
+                        onClick={e => {
+                          e.preventDefault()
+                          setShowNewAddressForm(true)
+                          formik.setFieldValue('billingAccountAddress.accountAddressID', '')
+                        }}
+                      >
+                        New Address
+                      </button>
+                    )}
+                  </div>
                 </div>
+                {showNewAddressForm && <AccountAddressForm formik={formik} />}
               </div>
-              {!formik.values['billingAccountAddress.accountAddressID'] && <AccountAddressForm formik={formik} />}
             </div>
-          </div>
+          )}
         </div>
         <div className="row">
           <hr className="mt-4 mb-4" />

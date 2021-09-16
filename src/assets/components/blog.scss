@@ -8,15 +8,6 @@
   text-decoration-color: $orange;
 }
 
-.blog-catogory > h3:before {
-  content: '';
-  position: absolute;
-  left: 0;
-  bottom: -1px;
-  width: 60px;
-  height: 2px;
-  background: $link-color;
-}
 
 .recent-image {
   width: 80;

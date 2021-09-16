@@ -16,14 +16,13 @@ const Crumb = ({ urlTitle, title }) => {
 const BreadCrumb = ({ crumbs, includeHome = true, brand = [] }) => {
   const { t } = useTranslation()
   return (
-    <div className="order-lg-2 mb-3 mb-lg-0 pt-lg-2">
+    <div className="d-block mb-3 mb-lg-0 pt-lg-2">
       {crumbs && (
         <nav aria-label="breadcrumb">
-          <ol className="breadcrumb flex-lg-nowrap justify-content-center justify-content-lg-start">
+          <ol className="breadcrumb">
             {includeHome && (
-              <li className="breadcrumb-item ">
-                <Link className="text-nowrap" to="/">
-                  <i className="far fa-home" />
+              <li className="breadcrumb-item">
+                <Link to="/">
                   {t('frontend.core.home')}
                 </Link>
               </li>

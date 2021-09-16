@@ -1,21 +1,31 @@
 import React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { getAllSidebars } from '../../selectors'
 
 const Sidebar = () => {
   let history = useHistory()
   let loc = useLocation()
   const path = loc.pathname.split('/').reverse()[0]
   // Get All contnent of type sidebar
-  let allSidebar = useSelector(getAllSidebars)
-  allSidebar = allSidebar
-    .map(content => {
-      return content.key.includes(`${path}/`) ? content : null
-    })
-    .filter(item => {
-      return item
-    })
+  let allSidebar = useSelector(state => {
+    return Object.keys(state.content)
+      .map(key => {
+        if (state.content[key] && state.content[key].setting && state.content[key].settings.contentTemplateFile === 'sidebar.cfm') {
+          state.content[key].key = key
+          return state.content[key]
+        }
+        return null
+      })
+      .filter(item => {
+        return item
+      })
+      .map(content => {
+        return content.key.includes(`${path}/`) ? content : null
+      })
+      .filter(item => {
+        return item
+      })
+  })
   return (
     <aside className="col-lg-4 pt-4 pt-lg-0">
       <div className="rounded-lg box-shadow-lg p-4 mb-5">

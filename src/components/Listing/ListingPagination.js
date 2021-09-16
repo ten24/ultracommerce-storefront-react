@@ -89,7 +89,7 @@ const ListingPagination = ({ recordsCount, pageNeighbours = 2, currentPage, tota
             return (
               <li key={page} className="page-item">
                 <div
-                  className="page-link"
+                  className="page-link clickable"
                   aria-label="Previous"
                   onClick={evt => {
                     evt.preventDefault()
@@ -105,7 +105,7 @@ const ListingPagination = ({ recordsCount, pageNeighbours = 2, currentPage, tota
             return (
               <li key={page} className="page-item">
                 <div
-                  className="page-link"
+                  className="page-link clickable"
                   aria-label="Next"
                   onClick={evt => {
                     evt.preventDefault()
@@ -120,7 +120,7 @@ const ListingPagination = ({ recordsCount, pageNeighbours = 2, currentPage, tota
           return (
             <li key={page} className={`page-item${currentPage === page && ' active'}`}>
               <div
-                className="page-link"
+                className="page-link clickable"
                 onClick={evt => {
                   evt.preventDefault()
                   const newPage = Math.max(0, Math.min(page, totalPages))

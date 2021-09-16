@@ -3,14 +3,12 @@ import { toast } from 'react-toastify'
 import { useTranslation } from 'react-i18next'
 import { SlatwalApiService } from '../../../services'
 import { PromptLayout, SWForm, SWInput } from '../../'
-import { useRedirect } from '../../../hooks'
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 import { getErrorMessage } from '../../../utils'
 
 const ForgotPassword = () => {
   const { t } = useTranslation()
-  // eslint-disable-next-line no-unused-vars
-  const [redirect, setRedirect] = useRedirect({ location: '/my-account' })
+  const history = useHistory()
 
   const formik = useFormik({
     initialValues: {
@@ -21,7 +19,7 @@ const ForgotPassword = () => {
         if (response.isSuccess()) {
           if (!response.success().failureActions.length) {
             toast.success('Success')
-            setRedirect({ shouldRedirect: true })
+            history.push(`/my-account`)
           }
           toast.error(getErrorMessage(response.success().errors))
         } else {
@@ -34,7 +32,9 @@ const ForgotPassword = () => {
     <PromptLayout>
       <SWForm formik={formik} title="Forgot Password" primaryButtontext="Send Me Reset Email">
         <SWInput required={true} formik={formik} token="emailAddress" label="Email Address" type="email" />
-        <Link to="/my-account">{t('frontend.account.back_to_login')}</Link>
+        <Link className="link" to="/my-account">
+          {t('frontend.account.back_to_login')}
+        </Link>
       </SWForm>
     </PromptLayout>
   )

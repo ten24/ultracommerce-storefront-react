@@ -27,7 +27,7 @@ const AccountToolBar = ({ term, updateTerm, search }) => {
           </div>
         </div>
         {/* <a href="##" className="btn btn-outline-secondary">
-          <i className="far fa-file-alt mr-2"></i> {t('frontend.account.request_statement')}
+          <i className="bi bi-file-alt mr-2"></i> {t('frontend.account.request_statement')}
         </a> */}
       </div>
     </div>

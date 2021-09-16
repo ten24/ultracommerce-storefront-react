@@ -101,6 +101,6 @@ export const getAllFooterContentSelector = createSelector(getAllContent, (conten
       return item
     })
     .sort((a, b) => {
-      return a.sortOrder - b.sortOrder
+      return a?.sortOrder - b?.sortOrder
     })
 })

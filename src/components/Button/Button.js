@@ -7,14 +7,9 @@ const Button = ({ disabled = false, classList = 'btn btn-primary btn-block', isL
   const { t } = useTranslation()
   return (
     <button type="button" disabled={disabled} className={classList} onClick={onClick}>
+      {isLoading && <span className="spinner-border spinner-border-sm mx-2" role="status" aria-hidden="true" />}
       {children && children}
       {!children && t(label)}
-      {isLoading && (
-        <>
-          <span> </span>
-          <i className="far fa fa-spinner fa fa-spin font-size-lg mr-2" />
-        </>
-      )}
     </button>
   )
 }

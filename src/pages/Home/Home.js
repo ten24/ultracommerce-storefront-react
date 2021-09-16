@@ -1,53 +1,48 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { ContentSlider, ProductSlider, BrandSlider, ContentColumns, Layout, LatestNews, ContentBlock } from '../../components'
+import { ContentSlider, ProductSliderWithConfig, BrandSlider, ContentColumns, Layout, LatestNews, ContentBlock, ActionBanner } from '../../components'
 import { useTranslation } from 'react-i18next'
-
 function Home() {
   const content = useSelector(state => state.content)
-  const popularProducts = content['home/popularProducts'] ? content['home/popularProducts'].customBody : ''
-  const productCategories = content['home/category'] ? content['home/category'].customBody : ''
-  const productTypes = content['home/productType'] ? content['home/productType'].customBody : ''
-  const latestBlogPost = content['home/recentBlogPost'] ? content['home/recentBlogPost'].customBody : ''
+  const popularProducts = content['home/popularProducts'] || {}
+  const contentColumns = content['home/content-columns'] || {}
+  const callToAction = content['home/calltoaction']
   const { t } = useTranslation()
   return (
     <Layout>
       <ContentSlider />
       <section className="content-spacer">
-        <ProductSlider
-          title={popularProducts?.title || t('frontend.home.featured.heading')}
+        <ProductSliderWithConfig
+          title={popularProducts?.title || t('frontend.home.popular_products')}
           params={{
             'f:publishedFlag': 1,
-            'f:productCode:in': popularProducts?.products.map(data => data).join(','),
+            'f:productFeaturedFlag': 1,
           }}
         />
+        {/* <ProductSliderWithList
+          title={popularProducts?.title || t('frontend.home.popular_products')}
+          params={{
+            'f:publishedFlag': 1,
+          }}
+          productList={popularProducts.products}
+        /> */}
       </section>
-      <section className="mb-5">
-        {(productCategories || productTypes) && (
-          <ContentColumns title={t('frontend.home.shopby_category')}>
-            <div className="row justify-content-center">
-              {productCategories && (
-                <div className="col-md-4">
-                  <ContentBlock list={productCategories} title={t('frontend.home.browse_category')} />
+      {contentColumns?.columns && contentColumns?.columns?.length > 0 && (
+        <ContentColumns title={contentColumns.title}>
+          <div className="row justify-content-center">
+            {contentColumns.columns.map(column => {
+              return (
+                <div className={`col-lg-${12 / contentColumns.columns.length} pr-4-lg`}>
+                  <ContentBlock {...column} />
                 </div>
-              )}
-              {productTypes && (
-                <div className="col-md-4">
-                  <ContentBlock list={productTypes} title={t('frontend.home.browse_productTypes')} />
-                </div>
-              )}
-            </div>
-          </ContentColumns>
-        )}
-      </section>
-      <section className="content-spacer bg-light-blue">
-        <BrandSlider params={{ 'f:brandFeatured': 1 }} />
-      </section>
-      {latestBlogPost && (
-        <section className="content-spacer">
-          <LatestNews list={latestBlogPost} />
-        </section>
+              )
+            })}
+          </div>
+        </ContentColumns>
       )}
+      <BrandSlider params={{ 'f:brandFeatured': 1 }} />
+      <LatestNews />
+      <ActionBanner data={callToAction} />
     </Layout>
   )
 }

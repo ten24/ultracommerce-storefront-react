@@ -24,7 +24,7 @@ const ListingGrid = ({ isFetching, pageRecords }) => {
   const { t } = useTranslation()
 
   return (
-    <div className="col-lg-9">
+    <div className="col">
       {isFetching && (
         <>
           <ListingGridLoader /> <ListingGridLoader /> <ListingGridLoader />
@@ -33,19 +33,23 @@ const ListingGrid = ({ isFetching, pageRecords }) => {
       <div className="row">
         {!isFetching &&
           pageRecords.length > 0 &&
-          pageRecords.map(({ product_urlTitle, product_productID, product_productName, sku_imageFile, listPrice, sku_skuID, skuPrice }, index) => {
+          pageRecords.map((product, index) => {
             return (
-              <div key={sku_skuID + `${index}`} className="col-lg-4 col-md-6 mb-4">
-                <ProductCard urlTitle={product_urlTitle} productID={product_productID} productName={product_productName} calculatedSalePrice={skuPrice} listPrice={listPrice} skuID={sku_skuID} imageFile={sku_imageFile} />
+              <div key={`${product.productName}${index}`} className="col-xl-4 col-lg-6 col-md-6 mb-4">
+                <ProductCard {...product} />
               </div>
             )
           })}
       </div>
       {!isFetching && pageRecords.length === 0 && (
-        <div className="col">
-          {t('frontend.product.noProductsFound')}
-          <br />
-          {t('frontend.product.needAssistance')} <Link to="/contact">{t('frontend.nav.contact')}</Link>
+        <div className="col text-center p-5 bg-light">
+          <h3>{t('frontend.product.noProductsFound')}</h3>
+          <p>
+            {t('frontend.product.needAssistance')}{' '}
+            <Link to="/contact">
+              <u>{t('frontend.nav.contact')}</u>
+            </Link>
+          </p>
         </div>
       )}
     </div>

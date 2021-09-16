@@ -1,12 +1,13 @@
 import React, { Suspense, useEffect } from 'react'
-import { Switch, Route } from 'react-router-dom'
+import { Switch, Route, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { Loading, CMSWrapper, ScrollToTop, Header } from './components'
+import { Loading, Header } from './components'
 import { getConfiguration } from './actions'
-import { Blog, NotFound, Home, Cart, MyAccount, ProductListing, Checkout, ProductDetail, Brand, ContentPage, Product, ProductType, Category, Account, OrderConfirmation, BlogPost, Manufacturer, ErrorFallback, Contact } from './pages'
+import { Blog, NotFound, Home, Cart, MyAccount, Search, Checkout, ProductDetail, Brand, ContentPage, Product, ProductType, Category, Account, OrderConfirmation, BlogPost, Manufacturer, ErrorFallback, Contact } from './pages'
 import logo from './assets/images/logo.svg'
 import mobileLogo from './assets/images/logo-mobile.svg'
 import { ErrorBoundary } from 'react-error-boundary'
+import { useCMSWrapper, useScrollToTop } from './hooks'
 
 const pageComponents = {
   Blog,
@@ -15,7 +16,7 @@ const pageComponents = {
   Cart,
   Manufacturer,
   MyAccount,
-  ProductListing,
+  Search,
   ProductDetail,
   NotFound,
   ContentPage,
@@ -33,24 +34,29 @@ const pageComponents = {
 //https://itnext.io/react-router-transitions-with-lazy-loading-2faa7a1d24a
 export default function App() {
   const routing = useSelector(state => state.configuration.router)
+  const loc = useLocation()
   const shopByManufacturer = useSelector(state => state.configuration.shopByManufacturer)
+  // eslint-disable-next-line no-unused-vars
+  const cms = useCMSWrapper()
+  // eslint-disable-next-line no-unused-vars
+  const scroll = useScrollToTop()
 
   const dispatch = useDispatch()
   useEffect(() => {
     dispatch(getConfiguration())
-  }, [dispatch])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   return (
     <Suspense fallback={<Loading />}>
       <Header logo={logo} mobileLogo={mobileLogo} />
       <ErrorBoundary
+        key={loc.pathname}
         FallbackComponent={ErrorFallback}
         onReset={() => {
           // reset the state of your app so the error doesn't happen again
         }}
       >
-        <ScrollToTop />
         {/* <SEO /> */}
-        <CMSWrapper />
         <Switch>
           <Route path="/404" component={NotFound} />
           <Route path="/Error" component={ErrorFallback} />
@@ -61,9 +67,8 @@ export default function App() {
             })}
           <Route path="/order-confirmation" component={OrderConfirmation} />
           <Route path={shopByManufacturer.slug} component={Manufacturer} />
-          <Route path="/products" component={ProductListing} />
-          <Route path="/product" component={ProductListing} />
-          <Route path="/search" component={ProductListing} />
+          <Route path="/shop" component={Search} />
+          <Route path="/product-type/:id" component={ProductType} />
           <Route path="/my-account" component={MyAccount} />
           <Route path="/checkout" component={Checkout} />
           <Route path="/checkout/:id" component={Checkout} />

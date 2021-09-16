@@ -5,7 +5,7 @@ import { getUser } from '../../actions/userActions'
 
 import { isAuthenticated } from '../../utils'
 import queryString from 'query-string'
-import { Layout, CreateAccount, ForgotPassword, AccountCarts, AccountLogin, AccountOverview, AccountProfile, AccountFavorites, AccountAddresses, CreateOrEditAccountAddress, AccountOrderDetail, AccountPaymentMethods, AccountOrderHistory, CreateOrEditAccountPaymentMethod } from '../../components'
+import { Layout, CreateAccount, ForgotPassword, AccountCarts, AccountLogin, AccountOverview, AccountProfile, AccountFavorites, AccountAddresses, CreateOrEditAccountAddress, AccountOrderDetail, AccountPaymentMethods, AccountOrderHistory, CreateOrEditAccountPaymentMethod, UpdatePassword } from '../../components'
 
 // eslint-disable-next-line no-unused-vars
 const pageComponents = {
@@ -68,6 +68,9 @@ const MyAccount = () => {
           </Route>
           <Route path={`${match.path}/profile`}>
             <AccountProfile />
+          </Route>
+          <Route path={`${match.path}/updatePassword`}>
+            <UpdatePassword />
           </Route>
           <Route path={match.path}>{isAuthenticated() && <AccountOverview />}</Route>
         </Switch>

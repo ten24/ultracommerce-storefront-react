@@ -16,7 +16,7 @@ const AccountSidebar = () => {
     <>
       <div className="col-md-4 col-lg-3">
         <nav className="navbar flex-column align-items-start navbar-expand-md navbar-light bg-light p-2 mb-5 text-left">
-          <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span className="navbar-toggler-icon"></span>
           </button>
           <div className="collapse navbar-collapse w-100" id="navbarNav">
@@ -59,7 +59,7 @@ const AccountHeader = () => {
           setdisableButton(true)
           dispatch(logout(t('frontend.account.logout_success'), t('frontend.account.logout_failure')))
         }}
-        className="btn btn-light lead btn-link"
+        className="btn link-btn btn-link"
       >
         {t('frontend.core.logout')}
       </button>

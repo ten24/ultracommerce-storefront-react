@@ -3,7 +3,7 @@ const PickupLocationDetails = ({ pickupLocation }) => {
   const { t } = useTranslation()
   return (
     <>
-      <h3 className="h6">{t('frontend.checkout.fulfilment.pickup.location')}:</h3>
+      <h6 className="h6">{t('frontend.checkout.fulfilment.pickup.location')}:</h6>
       <p>{pickupLocation.locationName}</p>
     </>
   )

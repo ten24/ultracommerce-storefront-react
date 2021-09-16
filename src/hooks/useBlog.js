@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getBlogCatagories, getBlogPostData, getBlogPosts } from '../services'
+import { ContentfulService, KontentService } from '../services'
 import { useSelector } from 'react-redux'
 
 export const useGetBlogPosts = () => {
@@ -8,7 +8,13 @@ export const useGetBlogPosts = () => {
   useEffect(() => {
     if (request.makeRequest) {
       if (cmsProvider === 'contentful') {
-        getBlogPosts(request.params)
+        ContentfulService.getBlogPosts(request.params)
+          .then(response => {
+            setRequest({ data: response, isFetching: false, isLoaded: true, makeRequest: false, params: {} })
+          })
+          .catch(thrown => {})
+      } else if (cmsProvider === 'kontent') {
+        KontentService.getBlogPosts(request.params)
           .then(response => {
             setRequest({ data: response, isFetching: false, isLoaded: true, makeRequest: false, params: {} })
           })
@@ -27,7 +33,13 @@ export const useGetBlogPost = () => {
   useEffect(() => {
     if (request.makeRequest) {
       if (cmsProvider === 'contentful') {
-        getBlogPostData(request.params)
+        ContentfulService.getBlogPostData(request.params)
+          .then(response => {
+            setRequest({ data: response, isFetching: false, isLoaded: true, makeRequest: false, params: {} })
+          })
+          .catch(thrown => {})
+      } else if (cmsProvider === 'kontent') {
+        KontentService.getBlogPostData(request.params)
           .then(response => {
             setRequest({ data: response, isFetching: false, isLoaded: true, makeRequest: false, params: {} })
           })
@@ -48,14 +60,20 @@ export const useGetBlogCatagories = () => {
     if (request.makeRequest) {
       if (cmsProvider === 'contentful') {
         // simple no extra buisnes logic
-        getBlogCatagories(request.params)
+        ContentfulService.getBlogCatagories(request.params)
           .then(data => {
             setRequest({ data: data, isFetching: false, isLoaded: true, makeRequest: false, params: {} })
           })
           .catch(thrown => {})
+      } else if (cmsProvider === 'kontent') {
+        KontentService.getBlogCatagories(request.params)
+          .then(data => {
+            setRequest({ data: data, isFetching: false, isLoaded: true, makeRequest: false, params: {} })
+          })
+          .catch(thrown => {})
+      } else if (cmsProvider === 'slatwallCMS') {
+        // we can add our own function with buisness logic
       }
-    } else if (cmsProvider === 'slatwallCMS') {
-      // we can add our own function with buisness logic
     }
   }, [request, setRequest, cmsProvider])
 

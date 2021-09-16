@@ -31,3 +31,13 @@ export const getProductTypeRoute = createSelector(getRoutes, routes => {
       return item
     })[0]
 })
+
+export const getCategoryRoute = createSelector(getRoutes, routes => {
+  return routes
+    .map(route => {
+      return route.URLKeyType === 'Category' ? route.URLKey : null
+    })
+    .filter(item => {
+      return item
+    })[0]
+})

@@ -4,7 +4,7 @@ const GiftCardPayment = () => {
 
   return (
     <>
-      <h1>{t('frontend.checkout.payment.giftCard.title')}</h1>
+      <h4>{t('frontend.checkout.payment.giftCard.title')}</h4>
     </>
   )
 }

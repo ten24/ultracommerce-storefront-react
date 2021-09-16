@@ -5,8 +5,8 @@ const ShippingAddressDetails = ({ shippingAddress, shippingAddressNickname }) =>
   const { t } = useTranslation()
   return (
     <>
-      <h3 className="h6">{t('frontend.checkout.shipping_address')}</h3>
-      <p>
+      <h6 className="h6">{t('frontend.checkout.shipping_address')}</h6>
+      <p className="mb-1">
         {shippingAddressNickname && (
           <>
             {shippingAddressNickname}
@@ -16,7 +16,7 @@ const ShippingAddressDetails = ({ shippingAddress, shippingAddressNickname }) =>
         {name} <br />
         {streetAddress} <br />
         {`${city}, ${stateCode} ${postalCode}`} <br />
-        {emailAddress && emailAddress}
+        <span className="text-truncate text-dark d-block">{emailAddress && emailAddress}</span>
       </p>
     </>
   )

@@ -31,6 +31,7 @@ const OrderConfirmation = () => {
   if (!isAuthenticated()) {
     return <Redirect to={'/my-account'} />
   }
+
   return (
     <Layout>
       <div className="bg-light p-0">
@@ -43,7 +44,20 @@ const OrderConfirmation = () => {
           <div>
             <div className="bg-light p-4 text-center">
               <h1 className="display-4">{t('frontend.order.thank_you')}</h1>
-              {orders.data && orders.data.ordersOnAccount && orders.data.ordersOnAccount.length > 0 && <h2>{`${t('frontend.order.key')} #${orders.data.ordersOnAccount[0].orderNumber}`}</h2>}
+              {orders.data && orders.data.ordersOnAccount && orders.data.ordersOnAccount.length > 0 && (
+                <h1>
+                  {`${t('frontend.order.key')} `}
+                  <button
+                    className="btn btn-link p-0 m-0 align-center link-btn"
+                    onClick={e => {
+                      e.preventDefault()
+                      history.push(`/my-account/orders/${orders.data.ordersOnAccount[0].orderID}`)
+                    }}
+                  >
+                    <h2>{`#${orders.data.ordersOnAccount[0].orderNumber}`} </h2>
+                  </button>
+                </h1>
+              )}
             </div>
             <div
               dangerouslySetInnerHTML={{
@@ -54,7 +68,7 @@ const OrderConfirmation = () => {
               <div className="row justify-content-center">
                 <div className="col col-md-4">
                   <button
-                    className="btn btn-link w-100 mb-3 align-center"
+                    className="btn btn-link w-100 mb-3 align-center link-btn"
                     onClick={e => {
                       e.preventDefault()
                       history.push('/my-account')

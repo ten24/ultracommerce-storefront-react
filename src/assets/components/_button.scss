@@ -1,3 +1,18 @@
+.btn {
+  border-radius: 50rem;
+  padding: 0.5rem 1.5rem;
+}
+
+.btn-primary {
+  color: $white;
+  background-color: $color-orange;
+  border-color: $color-orange;
+}
+
+.btn-primary:hover {
+  color: $white;
+}
+
 .link-button {
   background-color: transparent;
   border: none;
@@ -10,8 +25,9 @@
 }
 
 .link-button:hover {
-  color: $orange;
+  color: $color-orange;
 }
+
 .btn-wishlist {
   background-color: transparent;
   border: none;
@@ -20,4 +36,28 @@
   padding-right: 8px;
   padding-top: 10px;
   font-size: 22px;
+}
+
+.btn-primary:hover {
+  background-color: $link-color;
+  border-color: $link-color;
+}
+
+.btn-dark {
+  color: $card-shadow;
+  background-color: $dark;
+  border-color: $dark;
+}
+.link-btn {
+  color: $link-color;
+}
+.btn.link-btn:hover,
+.btn.link-btn:focus {
+  color: $color-orange;
+}
+
+.form-control:focus,
+.btn-check:focus + .btn,
+.btn:focus {
+  box-shadow: none;
 }

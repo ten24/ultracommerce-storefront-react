@@ -1,11 +1,31 @@
-//import './spinner.scss'
 const Spinner = () => {
   return (
-    <div className="spinner">
-      <div className="double-bounce1"></div>
-      <div className="double-bounce2"></div>
+    <div className="sk-wrapper">
+      <div className="sk-chase">
+        <div className="sk-chase-dot"></div>
+        <div className="sk-chase-dot"></div>
+        <div className="sk-chase-dot"></div>
+        <div className="sk-chase-dot"></div>
+        <div className="sk-chase-dot"></div>
+        <div className="sk-chase-dot"></div>
+      </div>
     </div>
   )
 }
 
-export { Spinner }
+const OverlaySpinner = () => {
+  return (
+    <div className="sk-overlay">
+      <div className="sk-chase">
+        <div className="sk-chase-dot"></div>
+        <div className="sk-chase-dot"></div>
+        <div className="sk-chase-dot"></div>
+        <div className="sk-chase-dot"></div>
+        <div className="sk-chase-dot"></div>
+        <div className="sk-chase-dot"></div>
+      </div>
+    </div>
+  )
+}
+
+export { Spinner, OverlaySpinner }

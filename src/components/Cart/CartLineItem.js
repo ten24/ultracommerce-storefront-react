@@ -1,57 +1,45 @@
 import { ProductPrice, ProductImage } from '../../components'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { updateItemQuantity, removeItem } from '../../actions/'
-import { useFormatCurrency } from '../../hooks/'
-import { getProductRoute } from '../../selectors/'
-import queryString from 'query-string'
+import { useCartLineItem, useFormatCurrency } from '../../hooks/'
 
 const CartLineItem = ({ orderItemID, isDisabled = false, setRemoveitem = () => {} }) => {
-  const { isFetching, orderItems } = useSelector(state => state.cart)
-  const dispatch = useDispatch()
   const [formatCurrency] = useFormatCurrency({})
-  const productRouting = useSelector(getProductRoute)
   const { t } = useTranslation()
-
-  const orderItem = orderItems.filter(orderItem => {
-    return orderItem.orderItemID === orderItemID
-  })
-  const { price, quantity, sku, extendedPriceAfterDiscount } = orderItem[0]
-  const { skuID, skuCode, product, imageFile, skuPrices = [] } = sku
-  const listPrice = skuPrices.map(price => price.listPrice).sort((a, b) => a - b)[0] || 0
-  const { productName, urlTitle, brand } = product
-
-  const isBackordered = false
-
+  const dispatch = useDispatch()
+  const { orderItem, listPrice, productRouting, isFetching, isBackordered } = useCartLineItem(orderItemID)
   return (
-    <div className="row border-bottom p-3">
+    <div className="row border-bottom py-3">
       <div className="col-sm-2 col-3">
-        <Link className="d-inline-block mx-auto mr-sm-4 image-width" to={urlTitle}>
-          <ProductImage skuID={skuID} imageFile={imageFile} customClass="img-fluid img-placeholder  m-auto image_container" />
+        <Link className="d-inline-block mx-auto mr-sm-4 image-width" to={`/${productRouting}/${orderItem.sku.product.urlTitle}`}>
+          <ProductImage skuID={orderItem.sku.skuID} imageFile={orderItem.sku.imageFile} fallbackFileName={orderItem.sku.product.imageFallbackFileName} customClass="img-fluid  m-auto image_container" />
         </Link>
       </div>
       <div className="col-sm-4 col-9">
         <h5>
           <Link
             to={{
-              pathname: `/${productRouting}/${urlTitle}`,
-              search: queryString.stringify({ skuid: skuID }, { arrayFormat: 'comma' }),
-              state: { ...product },
+              pathname: `/${productRouting}/${orderItem.sku.product.urlTitle}`,
+              state: { ...orderItem.sku.product },
             }}
+            className="link"
           >
-            {productName}
+            {orderItem.sku.product.productName}
           </Link>
         </h5>
         <div className="font-size-sm">
-          {`${brand && brand.brandName} `}
-          <span className="text-muted mr-2">{skuCode}</span>
+          <span className="text-muted mr-2"> {orderItem.sku.product.brand && `${orderItem.sku.product.brand.brandName} `}</span>
+        </div>
+        <div className="font-size-sm">
+          <span className="text-muted mr-2">{orderItem.sku.skuCode}</span>
         </div>
       </div>
       <div className="col-sm-12 col-md-6 d-none d-sm-block">
         <div className="row">
           <div className="col-sm-3">
-            <ProductPrice salePrice={listPrice} listPrice={price} salePriceSuffixKey="frontend.core.each" accentSalePrice={false} />
+            <ProductPrice type="cart" salePrice={orderItem.price} listPrice={listPrice} salePriceSuffixKey="frontend.core.each" accentSalePrice={false} />
           </div>
           {isBackordered && (
             <div className="col-sm-3">
@@ -66,23 +54,26 @@ const CartLineItem = ({ orderItemID, isDisabled = false, setRemoveitem = () => {
                   className="form-control"
                   type="number"
                   id="quantity4"
-                  defaultValue={quantity}
-                  disabled={isFetching}
-                  onChange={e => {
-                    dispatch(updateItemQuantity(skuID, e.target.value))
+                  defaultValue={orderItem.quantity}
+                  disabled={isFetching && orderItem.sku.skuID}
+                  onBlur={e => {
+                    dispatch(updateItemQuantity(orderItem.sku.skuID, e.target.value))
                   }}
+                  // onClick={e => {
+                  //   dispatch(updateItemQuantity(orderItem.sku.skuID, e.target.value))
+                  // }}
                 />
               </div>
               <div className="col-sm-4">
                 <h6>
                   <span className="text-muted">
-                    <strong>{formatCurrency(extendedPriceAfterDiscount)}</strong>
+                    <strong>{formatCurrency(orderItem.extendedPriceAfterDiscount)}</strong>
                   </span>
                 </h6>
               </div>
               <div className="col-sm-1">
                 <span
-                  className="bi bi-trash"
+                  className="bi bi-trash clickable"
                   disabled={isFetching}
                   onClick={event => {
                     setRemoveitem(true)
@@ -93,14 +84,20 @@ const CartLineItem = ({ orderItemID, isDisabled = false, setRemoveitem = () => {
               </div>
             </>
           ) : (
-            <div className="col-sm-3">{quantity}</div>
+            <>
+              <div className="col-sm-3">
+                <small>{t('frontend.cart.quantity')}</small> {orderItem.quantity}
+              </div>
+              <div className="col-sm-4">
+                <h6>
+                  <span className="text-muted">
+                    <strong>{formatCurrency(orderItem.extendedPriceAfterDiscount)}</strong>
+                  </span>
+                </h6>
+              </div>
+            </>
           )}
         </div>
-        {isFetching && (
-          <div className="alert alert-success p-2 my-2">
-            <small> {t('frontend.cart.quantityUpdate')}</small>
-          </div>
-        )}
       </div>
     </div>
   )
