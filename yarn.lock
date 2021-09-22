@@ -1821,14 +1821,14 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@slatwall/slatwall-sdk@1.2.0":
-  "integrity" "sha512-sxMQPBxnOxqBxkrbWcGNjLWIUfkDgPifXRsETjNGdqLKlzIOQGQY6gytM6ZJMq8kKoF9/gayyzv7LYdKN9GdNw=="
-  "resolved" "https://registry.npmjs.org/@slatwall/slatwall-sdk/-/slatwall-sdk-1.2.0.tgz"
-  "version" "1.2.0"
+"@slatwall/slatwall-sdk@1.2.1":
+  "integrity" "sha512-LvXAc25xA4n987LUEwDwflWPHcbx/2wWqk0ylNIqiItb2jj+y7JLW/Nz804FN0JmYyEj2Fw7N0tDB+qu/1W+zA=="
+  "resolved" "https://registry.npmjs.org/@slatwall/slatwall-sdk/-/slatwall-sdk-1.2.1.tgz"
+  "version" "1.2.1"
   dependencies:
     "axios" "^0.21.1"
     "lodash" "^4.17.21"
-    "qs" "^6.9.6"
+    "qs" "^6.10.1"
 
 "@surma/rollup-plugin-off-main-thread@^1.1.1":
   "integrity" "sha512-yBMPqmd1yEJo/280PAMkychuaALyQ9Lkb5q1ck3mjJrFuEobIfhnQ4J3mbvBoISmR3SWMWV+cGB/I0lCQee79A=="
@@ -10287,7 +10287,7 @@
   "resolved" "https://registry.npmjs.org/q/-/q-1.5.1.tgz"
   "version" "1.5.1"
 
-"qs@^6.9.6":
+"qs@^6.10.1":
   "integrity" "sha512-M528Hph6wsSVOBiYUnGf+K/7w0hNshs/duGsNXPUCLH5XAqjEtiPGwNONLV0tBH8NoGb0mvD5JubnUTrujKDTg=="
   "resolved" "https://registry.npmjs.org/qs/-/qs-6.10.1.tgz"
   "version" "6.10.1"

@@ -16,7 +16,7 @@
     "@contentful/rich-text-react-renderer": "^15.3.3",
     "@sentry/react": "^6.12.0",
     "@sentry/tracing": "^6.12.0",
-    "@slatwall/slatwall-sdk": "1.2.0",
+    "@slatwall/slatwall-sdk": "1.2.1",
     "bootstrap": "^5.1.1",
     "bootstrap-icons": "^1.5.0",
     "dayjs": "^1.10.6",
