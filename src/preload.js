@@ -1,57 +1,24 @@
+import { default as preload } from '@slatwall/slatwall-storefront-react/src/preload'
 const data = {
-  site: { hibachiInstanceApplicationScopeKey: '', siteName: '', siteID: '', siteCode: process.env.REACT_APP_SITE_CODE },
-  router: [
-    { URLKeyType: 'Product', URLKey: 'product' },
-    { URLKeyType: 'ProductType', URLKey: 'products' },
-    { URLKeyType: 'Category', URLKey: 'cat' },
-    { URLKeyType: 'Brand', URLKey: 'brand' },
-    { URLKeyType: 'Account', URLKey: 'ac' },
-    { URLKeyType: 'Address', URLKey: 'ad' },
-    { URLKeyType: 'Attribute', URLKey: 'att' },
-  ],
-  enforceVerifiedAccountFlag: false,
-  cmsProvider: 'slatwallCMS',
-  products: {
-    fallbackImageCall: false,
-  },
+  ...preload,
+  site: { hibachiInstanceApplicationScopeKey: '', siteName: process.env.REACT_APP_NAME, siteID: '', siteCode: process.env.REACT_APP_SITE_CODE },
   shopByManufacturer: {
     slug: '/brands',
     showInMenu: true,
-    gridSize: 1000,
-    maxCount: 1000,
-  },
-  myAccount: {
-    mostRecentCount: 3,
-  },
-  filtering: {
-    productTypeBase: 'merchandise',
-    requireKeyword: true,
-    filterDataShowCounts: 5,
+    gridSize: 3,
+    maxCount: 12,
   },
   seo: {
-    title: 'Slatwall',
+    title: 'Storefront',
     titleMeta: '',
   },
   footer: {
     formLink: '',
   },
   theme: {
+    ...preload.theme,
     host: process.env.REACT_APP_HOST_URL,
-    basePath: 'custom/client/assets/images/',
     primaryColor: '#2478CC',
-  },
-  formatting: {
-    dateFormat: 'MMM DD, YYYY',
-    timeFormat: 'HH:MM a',
-  },
-  analytics: {
-    tagManager: {
-      gtmId: '',
-    },
-    googleAnalytics: {
-      id: '',
-    },
-    reportWebVitals: false,
   },
   forms: {
     contact: '',
