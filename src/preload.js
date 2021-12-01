@@ -1,5 +1,18 @@
 const data = {
-  site: { hibachiInstanceApplicationScopeKey: '', siteName: '', siteID: '', siteCode: process.env.REACT_APP_SITE_CODE },
+  site: {
+    hibachiInstanceApplicationScopeKey: '',
+    siteName: '',
+    siteID: '',
+    defaultCountry: 'US',
+    siteCode: process.env.REACT_APP_SITE_CODE,
+    hibachiConfig: {
+      currencies: { GBP: { currencySymbol: '£', formatMask: '' }, USD: { currencySymbol: '$', formatMask: '' } },
+      currencyCode: 'USD',
+      rbLocale: 'en_us',
+      vatCountries: 'GB',
+    },
+  },
+
   router: [
     { URLKeyType: 'Product', URLKey: 'product' },
     { URLKeyType: 'ProductType', URLKey: 'products' },
@@ -15,13 +28,33 @@ const data = {
     fallbackImageCall: false,
     loginRequiredForPrice: false,
   },
-  productSearch: {
-    propertyIdentifierList: '',
-    includeSKUCount: true,
-    applySiteFilter: false,
-    applyStockFilter: false,
-    includePagination: true,
-    includePotentialFilters: true,
+  listings: {
+    productListing: {
+      isSales: true,
+      viewMode: 'grid',
+      headings: [
+        { heading: 'Product Name', value: 'product_productName' },
+        { heading: 'Sku Code', value: 'sku_skuCode' },
+      ],
+      params: {
+        propertyIdentifierList: '',
+        includeSKUCount: true,
+        includeResizedImages: false,
+        applySiteFilter: false,
+        applyStockFilter: false,
+        includePagination: true,
+        includePotentialFilters: true,
+      },
+      filters: {
+        brand_slug: '',
+        orderBy: '',
+        pageSize: '12',
+        currentPage: '1',
+        keyword: '',
+        productType_slug: '',
+        category_slug: '',
+      },
+    },
   },
   myAccount: {
     mostRecentCount: 3,
@@ -55,6 +88,7 @@ const data = {
     timeFormat: 'HH:MM a',
   },
   analytics: {
+    showCookieBanner: true,
     tagManager: {
       gtmId: '',
     },
