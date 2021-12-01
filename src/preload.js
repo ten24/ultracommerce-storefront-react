@@ -1,17 +1,7 @@
 import { default as preload } from '@slatwall/slatwall-storefront-react/src/preload'
 const data = {
   ...preload,
-  site: { hibachiInstanceApplicationScopeKey: '', siteName: process.env.REACT_APP_NAME, siteID: '', siteCode: process.env.REACT_APP_SITE_CODE },
-  shopByManufacturer: {
-    slug: '/brands',
-    showInMenu: true,
-    gridSize: 3,
-    maxCount: 12,
-  },
-  seo: {
-    title: 'Storefront',
-    titleMeta: '',
-  },
+  site: { ...preload.site, hibachiInstanceApplicationScopeKey: '', siteName: process.env.REACT_APP_NAME, siteID: '', defaultCountry: 'US', siteCode: process.env.REACT_APP_SITE_CODE },
   footer: {
     formLink: '',
   },

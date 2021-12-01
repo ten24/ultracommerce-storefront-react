@@ -1,11 +1,10 @@
 import React, { Suspense, useEffect } from 'react'
 import { Switch, Route, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { Loading, Header } from '@slatwall/slatwall-storefront-react/components'
+import { Loading, Footer, Header } from '@slatwall/slatwall-storefront-react/components'
 import { getConfiguration } from '@slatwall/slatwall-storefront-react/actions'
-import { Blog, NotFound, Cart, MyAccount, Search, Checkout, ProductDetail, Brand, ContentPage, Product, ProductType, Category, Account, OrderConfirmation, BlogPost, Manufacturer, ErrorFallback, Contact } from '@slatwall/slatwall-storefront-react/pages'
+import { Blog, NotFound, Search, Cart, MyAccount, Checkout, ProductDetail, Brand, ContentPage, Product, ProductType, Category, Account, OrderConfirmation, BlogPost, Manufacturer, ErrorFallback, Contact } from '@slatwall/slatwall-storefront-react/pages'
 import logo from './assets/images/logo.svg'
-import mobileLogo from './assets/images/logo-mobile.svg'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useCMSWrapper, useScrollToTop } from '@slatwall/slatwall-storefront-react/hooks'
 import Home from './pages/Home/Home'
@@ -15,9 +14,9 @@ const pageComponents = {
   Home,
   Checkout,
   Cart,
+  Search,
   Manufacturer,
   MyAccount,
-  Search,
   ProductDetail,
   NotFound,
   ContentPage,
@@ -34,22 +33,23 @@ const pageComponents = {
 
 //https://itnext.io/react-router-transitions-with-lazy-loading-2faa7a1d24a
 export default function App() {
-  const routing = useSelector(state => state.configuration.router)
   const loc = useLocation()
+  const routing = useSelector(state => state.configuration.router)
   const shopByManufacturer = useSelector(state => state.configuration.shopByManufacturer)
   // eslint-disable-next-line no-unused-vars
   const cms = useCMSWrapper()
   // eslint-disable-next-line no-unused-vars
   const scroll = useScrollToTop()
-
   const dispatch = useDispatch()
   useEffect(() => {
     dispatch(getConfiguration())
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch])
+  useEffect(() => {
+    console.table({ Client: process.env.REACT_APP_VERSION || 'missing', Core: process.env.REACT_APP_CORE_VERSION || 'missing', SDK: process.env.REACT_APP_SDK_VERSION || 'missing' })
   }, [])
   return (
     <Suspense fallback={<Loading />}>
-      <Header logo={logo} mobileLogo={mobileLogo} />
+      <Header logo={logo} mobileLogo={logo} />
       <ErrorBoundary
         key={loc.pathname}
         FallbackComponent={ErrorFallback}
@@ -80,6 +80,7 @@ export default function App() {
           <Route exact path="/" component={Home} />
           <Route path="" component={ContentPage} />
         </Switch>
+        <Footer />
       </ErrorBoundary>
     </Suspense>
   )

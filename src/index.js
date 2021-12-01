@@ -9,22 +9,27 @@ import { Provider } from 'react-redux'
 import store from './createStore'
 import App from './App'
 import './assets/theme'
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-icons/font/bootstrap-icons.css'
 import TagManager from 'react-gtm-module'
 import devData from './preload'
 import * as Sentry from '@sentry/react'
 import { Integrations } from '@sentry/tracing'
+import { AnalyticsManager } from '@slatwall/slatwall-storefront-react/components'
+
+const release = process.env.REACT_APP_NAME + '@' + process.env.REACT_APP_VERSION
+const dsn = process.env.REACT_APP_SENTRY_DSN
+const tracesSampleRate = process.env.REACT_APP_SENTRY_SAMPLE_RATE || 0.5
 
 const history = createBrowserHistory()
 
-if (process.env.NODE_ENV === 'production') {
-  TagManager.initialize({
-    gtmId: devData.analytics.tagManager.gtmId,
-  })
+if (devData.analytics.tagManager.gtmId) TagManager.initialize({ gtmId: devData.analytics.tagManager.gtmId })
+if (dsn)
   Sentry.init({
-    dsn: process.env.REACT_APP_SENTRY_DSN,
-    release: process.env.REACT_APP_NAME + '@' + process.env.REACT_APP_VERSION,
+    dsn,
+    release,
+    beforeSend: event => {
+      if (!window['Statistics-Allowed']) return null
+      return event
+    },
     integrations: [
       new Integrations.BrowserTracing({
         // Can also use reactRouterV3Instrumentation or reactRouterV4Instrumentation
@@ -33,15 +38,16 @@ if (process.env.NODE_ENV === 'production') {
     ],
     // We recommend adjusting this value in production, or using tracesSampler
     // for finer control
-    tracesSampleRate: process.env.REACT_APP_SENTRY_SAMPLE_RATE || 0.5,
+    tracesSampleRate,
   })
-}
+
 ReactDOM.render(
   // <React.StrictMode>
 
   <Provider store={store}>
     <Router>
       <App />
+      <AnalyticsManager />
     </Router>
   </Provider>,
   // </React.StrictMode>
