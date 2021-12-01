@@ -46,14 +46,14 @@ const OrderListItem = props => {
   )
 }
 
-const AccountCarts = ({ customBody, crumbs, title, contentTitle }) => {
+const AccountCarts = ({ contentBody, crumbs, title, contentTitle }) => {
   const { keyword, setSearchTerm, search, orders, totalPages } = useAccountCarts({})
   const { t } = useTranslation()
 
   return (
     <AccountLayout title={title}>
-      <AccountContent customBody={customBody} contentTitle={contentTitle} />
-      <h2 className="h3 mb-3">{t('frontend.account.carts')}</h2>
+      <AccountContent />
+
       {orders.data.ordersOnAccount?.length === 0 && (
         <div className="alert alert-info" role="alert">
           {t('frontend.account.carts_none')}

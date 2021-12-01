@@ -1,4 +1,3 @@
-import { Footer } from '..'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { Helmet } from 'react-helmet'
@@ -11,7 +10,6 @@ const Layout = ({ classNameList, children }) => {
       <Helmet title={siteName} />
       <ToastContainer />
       <div className={`${classNameList} footer-height`}>{children}</div>
-      <Footer />
     </>
   )
 }

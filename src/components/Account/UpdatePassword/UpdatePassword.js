@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { SlatwalApiService } from '../../../services'
 import { AccountContent, AccountLayout } from '../../'
 
-const UpdatePassword = ({ path, heading, redirectLocation = '/my-account/profile', customBody, contentTitle, action = 'Update Password' }) => {
+const UpdatePassword = ({ path, heading, redirectLocation = '/my-account/profile', contentBody, contentTitle, action = 'Update Password' }) => {
   const { t } = useTranslation()
   const [redirect, setRedirect] = useRedirect({ location: redirectLocation })
   const formik = useFormik({
@@ -37,7 +37,7 @@ const UpdatePassword = ({ path, heading, redirectLocation = '/my-account/profile
   })
   return (
     <AccountLayout title={`Add ${action}`}>
-      <AccountContent customBody={customBody} contentTitle={contentTitle} />
+      <AccountContent contentBody={contentBody} contentTitle={contentTitle} />
       <form onSubmit={formik.handleSubmit}>
         <h2>{heading}</h2>
         <div className="row">

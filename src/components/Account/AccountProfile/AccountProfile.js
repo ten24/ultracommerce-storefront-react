@@ -3,14 +3,13 @@ import { useTranslation } from 'react-i18next'
 import { useAccountProfile } from '../../../hooks'
 import { Link } from 'react-router-dom'
 
-const AccountProfile = ({ crumbs, title, customBody, contentTitle }) => {
+const AccountProfile = ({ crumbs, title, contentBody, contentTitle }) => {
   const { t } = useTranslation()
-  const { formik, updatePassword } = useAccountProfile()
+  const { formik } = useAccountProfile()
 
   return (
     <AccountLayout crumbs={crumbs} title={title}>
-      <h2 className="h3 mb-2">{t('frontend.account.myProfile')}</h2>
-      <AccountContent customBody={customBody} contentTitle={contentTitle} />
+      <AccountContent />
 
       <form onSubmit={formik.handleSubmit}>
         <div className="row">
@@ -29,7 +28,7 @@ const AccountProfile = ({ crumbs, title, customBody, contentTitle }) => {
           <div className="col-sm-6 mt-1">
             <div className="form-group">
               <label htmlFor="accountEmailAddress">{t('frontend.account.email')}</label>
-              <input className="form-control" type="accountEmailAddress" id="accountEmailAddress" value={formik.values.accountEmailAddress} onChange={formik.handleChange} disabled="" />
+              <input className="form-control" type="email" id="accountEmailAddress" value={formik.values.accountEmailAddress} onChange={formik.handleChange} disabled="disabled" />
             </div>
           </div>
           {/* <div className="col-sm-4">

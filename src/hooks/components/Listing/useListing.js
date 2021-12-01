@@ -1,13 +1,14 @@
 import { useHistory, useLocation } from 'react-router-dom'
 import queryString from 'query-string'
-import { useGetProductsWithPagination } from '../../../hooks/'
-import { processQueryParameters } from '../../../utils'
+import { getErrorMessage, processQueryParameters } from '../../../utils'
 import { useSelector } from 'react-redux'
+import { useDeepCompareEffect } from 'react-use'
+import { SlatwalApiService, axios } from '../../../services'
+import { useState } from 'react'
 
 const buildPath = params => {
   return queryString.stringify(params, { arrayFormat: 'comma' })
 }
-const initialData = { brand_slug: '', orderBy: '', pageSize: '12', currentPage: '1', keyword: '', productType_slug: '' }
 
 const useReconcile = ({ option, brand, attribute, category, priceRange, productType }) => {
   const loc = useLocation()
@@ -27,11 +28,11 @@ const useReconcile = ({ option, brand, attribute, category, priceRange, productT
 
   if (category && category !== {}) {
     ;[category].forEach(filter => {
-      queryStringParams = evaluation({ filter, qs: queryStringParams, facetIdentifier: 'name', facetKey: `category` })
+      queryStringParams = evaluation({ filter, qs: queryStringParams, facetIdentifier: 'slug', facetKey: `category_slug` })
     })
   } else {
     Object.keys(queryStringParams)
-      .filter(paramKey => paramKey === 'category')
+      .filter(paramKey => paramKey === 'category_slug')
       .forEach(keyToDelete => {
         delete queryStringParams[keyToDelete]
       })
@@ -83,16 +84,56 @@ const useReconcile = ({ option, brand, attribute, category, priceRange, productT
 }
 
 const useListing = preFilter => {
+  let [isFetching, setFetching] = useState(true)
+  let [records, setRecords] = useState([])
+  let [total, setTotal] = useState(0)
+  let [pageSize, setPageSize] = useState(12)
+  let [totalPages, setTotalPages] = useState(1)
+  let [potentialFilters, setPotentialFilters] = useState({})
+  let [error, setError] = useState({ isError: false, message: '' })
+
   const loc = useLocation()
-  const productSearch = useSelector(state => state.configuration.productSearch)
+  const productSearch = useSelector(state => state.configuration.listings.productListing.params)
+  const initialData = useSelector(state => state.configuration.listings.productListing.filters)
 
   let history = useHistory()
   let params = processQueryParameters(loc.search)
   params = { ...initialData, ...params, ...preFilter }
-  const returnFacetList = !!params['brand_slug'] || !!params['productType_slug'] ? 'brand,option,attribute,sorting,priceRange,productType' : 'brand,sorting,productType'
+  const returnFacetList = !!params['brand_slug'] || !!params['productType_slug'] ? 'brand,option,category,attribute,sorting,priceRange,productType' : 'brand,sorting,productType'
 
-  const cachedFilters = JSON.stringify({ ...params, ...productSearch, returnFacetList })
-  let { isFetching, records, potentialFilters, total, totalPages, error } = useGetProductsWithPagination(cachedFilters)
+  const payload = { ...params, ...productSearch, returnFacetList }
+
+  useDeepCompareEffect(() => {
+    let source = axios.CancelToken.source()
+    setFetching(true)
+    SlatwalApiService.products.search(payload, {}, source).then(response => {
+      if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) setError({ isError: true, message: getErrorMessage(response.success().errors) })
+      if (response.isSuccess()) {
+        const data = response.success().data
+        const products = data.products.map(sku => {
+          return { ...sku, salePrice: sku.skuPrice, productName: sku.product_productName, urlTitle: sku.product_urlTitle, productCode: sku.product_productCode, imageFile: sku.sku_imageFile, skuID: sku.sku_skuID, skuCode: sku.sku_skuCode }
+        })
+        setRecords(products)
+        setPotentialFilters(data.potentialFilters)
+        setTotal(data.total)
+        setTotalPages(Math.ceil(data.total / data.pageSize))
+        setError({ isError: false, message: '' })
+      } else {
+        setRecords([])
+        setPotentialFilters({})
+        setTotal(0)
+        setPageSize(12)
+        setTotalPages(1)
+        setError({ isError: true, message: 'Something was wrong' })
+      }
+      setFetching(false)
+    })
+
+    return () => {
+      source.cancel()
+    }
+  }, [payload])
+
   const { shouldUpdate, queryStringParams } = useReconcile({ ...potentialFilters })
   const setPage = pageNumber => {
     params['currentPage'] = pageNumber
@@ -146,7 +187,7 @@ const useListing = preFilter => {
     })
   }
 
-  return { records, potentialFilters, isFetching, total, totalPages, error, setSort, updateAttribute, setPage, setKeyword, params }
+  return { records, pageSize, potentialFilters, isFetching, total, totalPages, error, setSort, updateAttribute, setPage, setKeyword, params }
 }
 
 export { useListing }

@@ -1,8 +1,5 @@
-import { ProductCard } from '../'
+import { ProductCard, NoProductFound } from '../'
 import ContentLoader from 'react-content-loader'
-
-import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
 
 const ListingGridLoader = props => (
   <ContentLoader viewBox="0 0 1200 500" className="listingGridLoader" {...props}>
@@ -21,8 +18,6 @@ const ListingGridLoader = props => (
 )
 
 const ListingGrid = ({ isFetching, pageRecords }) => {
-  const { t } = useTranslation()
-
   return (
     <div className="col">
       {isFetching && (
@@ -30,28 +25,18 @@ const ListingGrid = ({ isFetching, pageRecords }) => {
           <ListingGridLoader /> <ListingGridLoader /> <ListingGridLoader />
         </>
       )}
-      <div className="row">
+      <div className="product-grid">
         {!isFetching &&
           pageRecords.length > 0 &&
           pageRecords.map((product, index) => {
             return (
-              <div key={`${product.productName}${index}`} className="col-xl-4 col-lg-6 col-md-6 mb-4">
+              <div key={`${product.productName}${index}`} className="mb-4">
                 <ProductCard {...product} />
               </div>
             )
           })}
       </div>
-      {!isFetching && pageRecords.length === 0 && (
-        <div className="col text-center p-5 bg-light">
-          <h3>{t('frontend.product.noProductsFound')}</h3>
-          <p>
-            {t('frontend.product.needAssistance')}{' '}
-            <Link to="/contact">
-              <u>{t('frontend.nav.contact')}</u>
-            </Link>
-          </p>
-        </div>
-      )}
+      {!isFetching && pageRecords.length === 0 && <NoProductFound />}
     </div>
   )
 }

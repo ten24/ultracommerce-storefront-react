@@ -1,12 +1,15 @@
+import { useSelector } from 'react-redux'
 import { useFormatDateTime, useFormatCurrency, useSingleAccountOrderDetails } from '../../../hooks/'
-import { ShippingAddressDetails, BillingAddressDetails, TermPaymentDetails, GiftCardDetails, CCDetails, PickupLocationDetails } from '../../'
+import { ShippingAddressDetails, BillingAddressDetails, TermPaymentDetails, GiftCardDetails, CCDetails, ExternalPaymentDetails, PickupLocationDetails } from '../../'
 import { useTranslation } from 'react-i18next'
+import { isVatCountry } from '../../../selectors'
 
 const OrderDetails = ({ orderInfo, orderFulfillments, orderPayments }) => {
   const [formateDate] = useFormatDateTime({})
   const [formatCurrency] = useFormatCurrency({})
+  const showVat = useSelector(isVatCountry)
   const { t } = useTranslation()
-  const { billingAddressDetails, shippingAddressDetails, pickupLocationDetails, termPaymentDetails, creditCardPaymentDetails, paymentMethodType, fulfillmentMethodType } = useSingleAccountOrderDetails({ orderInfo, orderFulfillments, orderPayments })
+  const { billingAddressDetails, shippingAddressDetails, pickupLocationDetails, termPaymentDetails, externalPaymentDetails, creditCardPaymentDetails, paymentMethodType, fulfillmentMethodType } = useSingleAccountOrderDetails({ orderInfo, orderFulfillments, orderPayments })
   return (
     <div className="row align-items-start mb-5 mr-3">
       <div className="col-md-7">
@@ -14,7 +17,6 @@ const OrderDetails = ({ orderInfo, orderFulfillments, orderPayments }) => {
           <div className="col-6 d-flex flex-column justify-content-between">
             {fulfillmentMethodType === 'shipping' && <ShippingAddressDetails className="" shippingAddress={shippingAddressDetails} shippingAddressNickname={''} />}
             {fulfillmentMethodType === 'pickup' && <PickupLocationDetails className="" pickupLocation={pickupLocationDetails} />}
-            <br />
             <h6 className="h6">{t('frontend.account.order.datePlaced')}</h6>
             <p>{formateDate(orderInfo.orderOpenDateTime)}</p>
           </div>
@@ -23,6 +25,8 @@ const OrderDetails = ({ orderInfo, orderFulfillments, orderPayments }) => {
             {paymentMethodType === 'termPayment' && <TermPaymentDetails termPayment={termPaymentDetails} />}
             {paymentMethodType === 'giftCard' && <GiftCardDetails />}
             {paymentMethodType === 'creditCard' && <CCDetails creditCardPayment={creditCardPaymentDetails} />}
+            {paymentMethodType === 'external' && <ExternalPaymentDetails payment={externalPaymentDetails} />}
+            
           </div>
         </div>
       </div>
@@ -45,12 +49,22 @@ const OrderDetails = ({ orderInfo, orderFulfillments, orderPayments }) => {
                 <strong>{formatCurrency(orderInfo.calculatedFulfillmentTotal)}</strong>
               </span>
             </li>
-            <li className="list-group-item">
-              {t('frontend.cart.tax')}
-              <span className="float-end">
-                <strong>{formatCurrency(orderInfo.calculatedTaxTotal)}</strong>
-              </span>
-            </li>
+            {showVat && (
+              <li className="list-group-item">
+                {t('frontend.cart.vat')}
+                <span className="float-end">
+                  <strong>{formatCurrency(orderInfo.calculatedVATTotal)}</strong>
+                </span>
+              </li>
+            )}
+            {!showVat && (
+              <li className="list-group-item">
+                {t('frontend.cart.tax')}
+                <span className="float-end">
+                  <strong>{formatCurrency(orderInfo.calculatedTaxTotal)}</strong>
+                </span>
+              </li>
+            )}
             {orderInfo.calculatedDiscountTotal > 0 && (
               <li className="list-group-item">
                 {t('frontend.cart.discount')}

@@ -116,3 +116,22 @@ export const getOptionByCode = (filteredOptions, optionGroupCode, optionCode) =>
     .flat()
     .shift()
 }
+export const getContentByType = (content = [], code = '') => {
+  return content.filter(con => con?.contentElementType_systemCode === code)
+}
+export const getAllChildrenContentByType = (content = [], code = '') => {
+  const response = []
+  content.forEach(con => {
+    if (con?.contentElementType_systemCode === code) {
+      response.push(con)
+    }
+    if (con.children.length) {
+      const children = getAllChildrenContentByType(con.children, code)
+      response.push(...children)
+    }
+  })
+  response.sort((a, b) => {
+    return a.sortOrder - b.sortOrder
+  })
+  return response
+}

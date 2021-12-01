@@ -51,11 +51,11 @@ const ProductDetails = ({ sku, product }) => {
       
       {product.categories.length > 0 && (
         <div className="row">
-          <div className="col">
+          <div className="col category-links">
             <strong className="mb-2 text-muted text-uppercase small">{t('frontend.product.category')}: </strong>
               {product.categories.map( (category) =>
                 <Link key={category.categoryID} className="link text-decoration-none" to={`/${categoryRoute}/${category.urlTitle}`}>
-                {category.categoryName + " "}
+                {category.categoryName}
               </Link>
               )}
               

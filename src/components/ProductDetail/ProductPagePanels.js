@@ -7,7 +7,10 @@ const ProductPagePanels = ({ product = {}, attributeSets = [] }) => {
 
   const filteredAttributeSets = attributeSets
     .map(set => {
-      return { ...set, attributes: set.attributes.filter(attr => attr.attributeCode in product).sort((a, b) => a.sortOrder - b.sortOrder) }
+      return {
+        ...set,
+        attributes: set.attributes.filter(attr => attr.attributeCode in product).sort((a, b) => a.sortOrder - b.sortOrder),
+      }
     })
     .filter(set => set.attributes.length)
 
@@ -25,7 +28,8 @@ const ProductPagePanels = ({ product = {}, attributeSets = [] }) => {
               <div id={`${set.attributeSetCode}panel`} className="accordion-collapse collapse show" aria-labelledby={set.attributeSetCode}>
                 <div className="accordion-body">
                   <div className="row" style={{ fontSize: 15, letterSpacing: 0.3 }}>
-                    {set.attributes.map(({ attributeName, attributeCode }, index) => {
+                    {set?.attributes?.map(({ attributeName, attributeCode }, index) => {
+                      if (!isBoolean(product[attributeCode]) && product[attributeCode]?.trim()?.length === 0) return null
                       return (
                         <div key={attributeCode} className="col-6">
                           <div className="row">
@@ -51,7 +55,7 @@ const ProductPagePanels = ({ product = {}, attributeSets = [] }) => {
           <div id="questionspanel" className="accordion-collapse collapse show" aria-labelledby="questions">
             <div className="accordion-body">
               <p>{t('frontend.product.questions.detail')}</p>
-              <Link to="/contact">{t('frontend.nav.contact')}</Link>{' '}
+              <Link to="/contact">{t('frontend.nav.contact')}</Link>
             </div>
           </div>
         </div>

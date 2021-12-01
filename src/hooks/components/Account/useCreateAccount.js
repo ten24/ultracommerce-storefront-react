@@ -46,7 +46,9 @@ const useCreateAccount = () => {
             toast.success('Success')
             dispatch(getUser())
             dispatch(getWishLists())
-            history.push(`/my-account`)
+            if (history.location.search.includes('redirect')) {
+              history.replace(`/my-account${history.location.search}`)
+            }
           }
         } else {
           toast.error('Error')

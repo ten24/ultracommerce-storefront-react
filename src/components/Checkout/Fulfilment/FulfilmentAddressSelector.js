@@ -19,6 +19,13 @@ const BillingAddress = ({ onSave, onCancel }) => {
         <div className="row mt-3">
           <div className="col-sm-6">
             <div className="form-group">
+              <label htmlFor="name">{t('frontend.account.name')}</label>
+              <input disabled={!isEdit} className="form-control" type="text" id="name" value={formik.values.name} onChange={formik.handleChange} />
+              {formik.errors.name && <span className="form-error-msg">{formik.errors.name}</span>}
+            </div>
+          </div>
+          <div className="col-sm-6">
+            <div className="form-group">
               <label htmlFor="checkout-country">{t('frontend.account.countryCode')}</label>
               <SwSelect
                 id="countryCode"
@@ -31,13 +38,6 @@ const BillingAddress = ({ onSave, onCancel }) => {
                 }}
                 options={countryCodeOptions}
               />
-            </div>
-          </div>
-          <div className="col-sm-6">
-            <div className="form-group">
-              <label htmlFor="name">{t('frontend.account.name')}</label>
-              <input disabled={!isEdit} className="form-control" type="text" id="name" value={formik.values.name} onChange={formik.handleChange} />
-              {formik.errors.name && <span className="form-error-msg">{formik.errors.name}</span>}
             </div>
           </div>
         </div>
@@ -100,12 +100,16 @@ const BillingAddress = ({ onSave, onCancel }) => {
             </div>
           </div>
           <div className="col-sm-6">
-            <div className="form-group"></div>
+            <div className="form-group">
+              <label htmlFor="phoneNumber">{t('frontend.account.phoneNumber')} </label>
+              <input className="form-control" type="text" id="phoneNumber" value={formik.values['phoneNumber']} onChange={formik.handleChange} />
+              {formik.errors.emailAddress && <span className="form-error-msg">{formik.errors.emailAddress}</span>}
+            </div>
           </div>
         </div>
 
         <div className="row">
-          <div className="col-sm-12">
+          <div className="col-sm-6">
             <div className="form-group">
               <div className="custom-control custom-checkbox mt-1">
                 <input className="custom-control-input" type="checkbox" id="saveAddress" checked={formik.values.saveAddress} onChange={formik.handleChange} />
@@ -114,18 +118,25 @@ const BillingAddress = ({ onSave, onCancel }) => {
                 </label>
               </div>
             </div>
-          </div>
-        </div>
 
-        <div className="d-lg-flex justify-content-end mt-2">
-          <button className="btn btn-primary " onClick={formik.handleSubmit}>
-            <span className="d-inline">{t('frontend.core.save')}</span>
-          </button>
-          {onCancel && (
-            <button className="btn btn-secondary mx-2" onClick={onCancel}>
-              <span className="d-inline">{t('frontend.account.address.cancel')}</span>
+            {/* only display nickname field if "save address" is checked */}
+            {!!formik.values.saveAddress && (
+              <div className="form-group">
+                <label htmlFor="accountAddressName">{t('frontend.account.nickname')}</label>
+                <input className="form-control" type="text" id="accountAddressName" value={formik.values.accountAddressName} onChange={formik.handleChange} />
+              </div>
+            )}
+          </div>
+          <div className="col-sm-6 d-flex justify-content-end align-items-start mt-2">
+            <button className="btn btn-primary " onClick={formik.handleSubmit}>
+              <span className="d-inline">{t('frontend.core.save')}</span>
             </button>
-          )}
+            {onCancel && (
+              <button className="btn btn-secondary mx-2" onClick={onCancel}>
+                <span className="d-inline">{t('frontend.account.address.cancel')}</span>
+              </button>
+            )}
+          </div>
         </div>
       </form>
     </>
@@ -207,7 +218,6 @@ const FulfilmentAddressSelector = ({ onSelect, onSave, selectedAccountID, addres
       )}
       {showNewAddress && (
         <>
-          <h3 className="h6 pt-1">{t('frontend.checkout.addAddress')}</h3>
           <BillingAddress
             isShipping={isShipping}
             setShowAddress={showAddress}

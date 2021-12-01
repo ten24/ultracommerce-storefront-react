@@ -14,7 +14,7 @@ const OrderConfirmation = () => {
   let dispatch = useDispatch()
   let loc = useLocation()
   let history = useHistory()
-  const { customBody = '' } = useSelector(state => state.content[loc.pathname.substring(1)]) || {}
+  const { contentBody = '' } = useSelector(state => state.content[loc.pathname.substring(1)]) || {}
 
   useEffect(() => {
     let didCancel = false
@@ -61,7 +61,7 @@ const OrderConfirmation = () => {
             </div>
             <div
               dangerouslySetInnerHTML={{
-                __html: customBody,
+                __html: contentBody,
               }}
             />
             <div className="container">

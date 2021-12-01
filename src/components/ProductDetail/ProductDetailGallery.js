@@ -10,20 +10,20 @@ const ProductDetailGallery = ({ productID, skuID, imageFile }) => {
   const { sliders, slider1, slider2, filterImages, isFetching } = useProductDetailGallery({ productID, skuID, imageFile })
   if (isFetching || !productID) return null
   return (
-    <div className="row" data-mdb-zoom-effect="true" data-mdb-auto-height="true">
+    <div className="row" data-mdb-zoom-effect="true" data-mdb-auto-height="primaryProductImage">
       <div className="preview-item active mb-3" id="first">
         <Slider arrows={false} asNavFor={sliders.nav2} ref={slider => (slider1.current = slider)}>
           {!!filterImages &&
-            filterImages.map(({ RESIZEDIMAGEPATHS, ORIGINALFILENAME }) => {
-              return <SWImage key={ORIGINALFILENAME} customPath="/" src={RESIZEDIMAGEPATHS[2]} className="image-zoom w-100 mx-auto" alt="Product" style={{ maxWidth: '500px' }} />
+            filterImages.map(({ RESIZEDIMAGEPATHS, ORIGINALFILENAME }, index) => {
+              return <SWImage key={`${ORIGINALFILENAME}-${index}`} customPath="/" src={RESIZEDIMAGEPATHS[0]} className="image-zoom w-100 mx-auto" alt="Product" style={{ maxWidth: '500px' }} />
             })}
         </Slider>
       </div>
-      <div className="slider_container" id="first">
-        {!!filterImages && (
+      <div className="slider_container" id="primaryProductImageRow">
+        {!!filterImages && filterImages.length > 1 && (
           <Slider arrows={false} infinite={filterImages.length > 4} asNavFor={sliders.nav1} ref={slider => (slider2.current = slider)} slidesToShow={4} swipeToSlide={true} focusOnSelect={true}>
-            {filterImages.map(({ RESIZEDIMAGEPATHS, ORIGINALFILENAME }) => {
-              return <SWImage key={ORIGINALFILENAME} customPath="/" src={RESIZEDIMAGEPATHS[2]} className="w-100 mx-auto clickable" alt="Product" style={{ maxWidth: '100px' }} />
+            {filterImages.map(({ RESIZEDIMAGEPATHS, ORIGINALFILENAME }, index) => {
+              return <SWImage key={`${ORIGINALFILENAME}-${index}`} customPath="/" src={RESIZEDIMAGEPATHS[1]} className="w-100 mx-auto clickable" alt="Product" style={{ maxWidth: '100px' }} />
             })}
           </Slider>
         )}

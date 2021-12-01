@@ -1,11 +1,10 @@
 import { useSelector } from 'react-redux'
 import { Redirect } from 'react-router'
 import { Link } from 'react-router-dom'
-import { SlideNavigation, CartLineItem, GiftCardDetails, PickupLocationDetails, ShippingAddressDetails, TermPaymentDetails, BillingAddressDetails, CCDetails } from '../..'
+import { SlideNavigation, CartLineItem, GiftCardDetails, PickupLocationDetails, ShippingAddressDetails, TermPaymentDetails, BillingAddressDetails, CCDetails, ExternalPaymentDetails, CashPaymentDetails } from '../..'
 import { fulfillmentSelector, shippingAddressSelector, orderPayment, billingAddressNickname, shippingAddressNicknameSelector, shippingMethodSelector, pickupLocationSelector } from '../../../selectors/orderSelectors'
 import { useTranslation } from 'react-i18next'
 import { useCheckoutUtilities } from '../../../hooks'
-import { CashPaymentDetails } from './CashPaymentDetails'
 
 const ReviewSlide = ({ currentStep }) => {
   const cart = useSelector(state => state.cart)
@@ -16,9 +15,9 @@ const ReviewSlide = ({ currentStep }) => {
   const pickupLocation = useSelector(pickupLocationSelector)
   let billingNickname = useSelector(billingAddressNickname)
   const { t } = useTranslation()
-  const { SHIPPING_CODE, PICKUP_CODE, CREDIT_CARD_CODE, GIFT_CARD_CODE, TERM_PAYMENT_CODE, CASH_PAYMENT_CODE } = useCheckoutUtilities()
-
+  const { SHIPPING_CODE, PICKUP_CODE, CREDIT_CARD_CODE, GIFT_CARD_CODE, TERM_PAYMENT_CODE, CASH_PAYMENT_CODE, EXTERNAL_PAYMENT_CODE } = useCheckoutUtilities()
   let shippingAddressNickname = useSelector(shippingAddressNicknameSelector)
+
   if (cart.isPlaced) {
     return <Redirect to={'/order-confirmation'} />
   }
@@ -66,6 +65,11 @@ const ReviewSlide = ({ currentStep }) => {
         {payment.paymentMethod.paymentMethodType === CASH_PAYMENT_CODE && (
           <div className="col-md-4">
             <CashPaymentDetails cashPayment={payment} />
+          </div>
+        )}
+        {payment.paymentMethod.paymentMethodType === EXTERNAL_PAYMENT_CODE && (
+          <div className="col-md-4">
+            <ExternalPaymentDetails payment={payment} />
           </div>
         )}
       </div>

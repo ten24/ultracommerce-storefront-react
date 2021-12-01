@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 
-import { AccountLayout, ListingPagination, AccountToolBar } from '../../'
+import { AccountLayout, AccountContent, ListingPagination, AccountToolBar } from '../../'
 import { useTranslation } from 'react-i18next'
 import { useFormatCurrency, useFormatDateTime, useOrderHistoryList } from '../../../hooks/'
 
@@ -36,7 +36,8 @@ const OrderHistoryList = () => {
 
   return (
     <>
-      <h2 className="h3 ">{t('frontend.account.order.recent_orders')}</h2>
+      <AccountContent />
+      
       <AccountToolBar term={keyword} updateTerm={setSearchTerm} search={search} />
 
       <div className="table-responsive font-size-md">

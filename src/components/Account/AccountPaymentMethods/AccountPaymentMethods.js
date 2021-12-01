@@ -11,7 +11,7 @@ const AccountPaymentMethods = () => {
   return (
     <AccountLayout>
       <AccountContent />
-      <h2 className="h3 mb-3">{t('frontend.account.payment_method.title')}</h2>
+      
       {accountPaymentMethods.length === 0 && (
         <div className="alert alert-info" role="alert">
           {t('frontend.account.payment_methods.none')}

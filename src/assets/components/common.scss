@@ -1,5 +1,5 @@
 .breadcrumb li a {
-    text-decoration: none;
+  text-decoration: none;
 }
 
 label {
@@ -273,7 +273,6 @@ a:hover * {
   outline: none;
 }
 
-
 .custom-control-label::before,
 .custom-file-label,
 .custom-select {
@@ -294,3 +293,46 @@ a:hover * {
 .mw-50px {
   max-width: 50px;
 }
+
+.react-cookie-law-dialog {
+  bottom: 0;
+  top: unset !important;
+}
+.pageSidebar {
+  background-color: #fff;
+  max-width: 22rem;
+  width: 100%;
+}
+.box-shadow-lg {
+  box-shadow: 0 0.3rem 1.525rem -0.375rem rgba(0, 0, 0, 0.1);
+}
+.rounded-lg {
+  border-radius: 0.4375rem;
+}
+.rounded-lg {
+  border-radius: 0.4375rem;
+}
+
+.max-height-img {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 50vh;
+  max-height: 300px;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+// for IE browsers only
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) { 
+  .max-height-img img {
+    height: auto;
+  }
+}
+
+.custom-card .max-height-img {
+  max-height: 200px;
+} 

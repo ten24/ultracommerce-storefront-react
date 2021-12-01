@@ -1,12 +1,13 @@
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { useRouteMatch } from 'react-router-dom'
+import { useRouteMatch, useLocation } from 'react-router-dom'
 import { useLoginForm } from '../../../hooks'
 
 const LoginForm = () => {
   let match = useRouteMatch()
   const { t } = useTranslation()
   const { formik } = useLoginForm()
+  const location = useLocation()
 
   return (
     <>
@@ -37,7 +38,7 @@ const LoginForm = () => {
             <div className="row my-2">
               <p>
                 {t('frontend.account.no_account')}
-                <Link className="link mx-1" to={`${match.path}/createAccount`}>
+                <Link className="link mx-1" to={`${match.path}/createAccount${location.search}`}>
                   {t('frontend.account.here')}
                 </Link>
               </p>

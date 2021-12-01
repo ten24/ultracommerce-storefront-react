@@ -5,7 +5,6 @@ import { useBlogPage } from '../../hooks'
 const Blog = () => {
   const { request, currentPage, countOnPage, setPage } = useBlogPage()
   const { t } = useTranslation()
-
   return (
     <Layout>
       <div className="bg-light p-5 mb-4 text-center">

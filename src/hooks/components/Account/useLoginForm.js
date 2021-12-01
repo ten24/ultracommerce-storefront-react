@@ -40,8 +40,8 @@ const useLoginForm = () => {
           dispatch(getWishLists())
           toast.success(t('frontend.account.auth.success'))
         } else {
-          let errorMessage = response.success() && Object.keys(response.success()?.errors || {}).length ? getErrorMessage(response.success().errors) : t('frontend.account.auth.failure')
-          toast.error(errorMessage)
+          let errorMessage = response.isSuccess() && response.success() && Object.keys(response.success()?.errors || {}).length ? getErrorMessage(response.success().errors) : t('frontend.account.auth.failure')
+          if (errorMessage) toast.error(errorMessage)
           dispatch(errorLogin())
         }
         formik.setSubmitting(false)

@@ -23,8 +23,12 @@ const Cart = () => {
         <h1 className="display-4">{t('frontend.cart.title')}</h1>
       </div>
       <div className="container my-5">
-      {orderItems && orderItems.length === 0 && <div className="text-center p-3"><h3>{t('frontend.cart.empty_cart')}</h3></div>}
-      {isFetching && removeitem && <div className="alert alert-success">{t('frontend.cart.removeCartItem')}</div>}
+        {orderItems && orderItems.length === 0 && (
+          <div className="text-center p-3">
+            <h3>{t('frontend.cart.empty_cart')}</h3>
+          </div>
+        )}
+        {isFetching && removeitem && <div className="alert alert-success">{t('frontend.cart.removeCartItem')}</div>}
         <div className="row">
           <div className="col-lg-8 col-md-12">
             {orderItems && orderItems.length > 0 && (
@@ -37,9 +41,15 @@ const Cart = () => {
                       </div>
                       <div className="col-sm-12 col-md-6 d-none d-md-block">
                         <div className="row">
-                          <div className="col-sm-3"><small>{t('frontend.product.price')}</small></div>
-                          <div className="col-sm-3"><small>{t('frontend.cart.quantity')}</small></div>
-                          <div className="col-sm-4"><small>{t('frontend.cart.total')}</small></div>
+                          <div className="col-sm-3">
+                            <small>{t('frontend.product.price')}</small>
+                          </div>
+                          <div className="col-sm-4">
+                            <small>{t('frontend.cart.quantity')}</small>
+                          </div>
+                          <div className="col-sm-4">
+                            <small>{t('frontend.cart.total')}</small>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -59,28 +69,28 @@ const Cart = () => {
               </>
             )}
           </div>
-          {orderItems && orderItems.length !== 0 &&
-          <div className="col-lg-4 col-md-12">
-            <div className="row">
-              <div className="col-sm-12">
-                <OrderSummary />
-              </div>
-              <CartPromoBox />
-              <div className="ps-2 pe-2">
-                <button
-                  className="col-md-12 btn btn-primary w-100 mt-2 "
-                  disabled={disableInteraction}
-                  onClick={e => {
-                    e.preventDefault()
-                    history.push('/checkout')
-                  }}
-                >
-                  {t('frontend.order.to_checkout')}
-                </button>
+          {orderItems && orderItems.length !== 0 && (
+            <div className="col-lg-4 col-md-12">
+              <div className="row">
+                <div className="col-sm-12">
+                  <OrderSummary />
+                </div>
+                <CartPromoBox />
+                <div className="ps-2 pe-2">
+                  <button
+                    className="col-md-12 btn btn-primary w-100 mt-2 "
+                    disabled={disableInteraction}
+                    onClick={e => {
+                      e.preventDefault()
+                      history.push('/checkout')
+                    }}
+                  >
+                    {t('frontend.order.to_checkout')}
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-          }
+          )}
         </div>
       </div>
     </Layout>

@@ -18,7 +18,6 @@ const ListingGridLoader = props => (
 )
 
 const Grid = ({ isFetching, products = [] }) => {
-  console.log('products', products)
   return (
     <div className="row mx-n2">
       {isFetching && (
@@ -27,9 +26,9 @@ const Grid = ({ isFetching, products = [] }) => {
         </>
       )}
       {!isFetching &&
-        products.map(product => {
+        products.map((product, index) => {
           return (
-            <div key={product.productID} className="col-md-4 col-sm-6 px-2 mb-4">
+            <div key={`${product.productID}${index}`} className="col-md-4 col-sm-6 px-2 mb-4">
               <ProductCard {...product} />
             </div>
           )

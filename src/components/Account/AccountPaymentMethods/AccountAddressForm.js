@@ -1,108 +1,238 @@
-import { SwSelect } from '../../'
+import { SwSelect, TextInput } from '../../'
 import { useTranslation } from 'react-i18next'
-import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { getCountries, getStateCodeOptionsByCountryCode } from '../../../actions/contentActions'
+import { useDeepCompareEffect } from 'react-use'
+import { useEffect, useState } from 'react'
+import * as Yup from 'yup'
 
-const AccountAddressForm = ({ formik }) => {
+const AccountAddressForm = ({ billingAddress, setBillingAddress }) => {
   const { t } = useTranslation()
   const dispatch = useDispatch()
   const countryCodeOptions = useSelector(state => state.content.countryCodeOptions)
   const stateCodeOptions = useSelector(state => state.content.stateCodeOptions)
-  const isFetching = useSelector(state => state.content.isFetching)
+  const [billingAddressErrors, setBillingAddressErrors] = useState({})
 
-  useEffect(() => {
-    if (countryCodeOptions.length === 0 && !isFetching) {
+  useDeepCompareEffect(() => {
+    if (countryCodeOptions.length < 1) {
       dispatch(getCountries())
     }
-    if (!stateCodeOptions[formik.values.billingAddress.countryCode] && !isFetching) {
-      dispatch(getStateCodeOptionsByCountryCode(formik.values.billingAddress.countryCode))
-    }
-  }, [dispatch, formik, stateCodeOptions, countryCodeOptions, isFetching])
+  }, [dispatch, countryCodeOptions])
+  useEffect(() => {
+    dispatch(getStateCodeOptionsByCountryCode(billingAddress.countryCode))
+  }, [dispatch, billingAddress?.countryCode])
+
+  const requiredValidation = ({ value, name, msg }) => {
+    Yup.string()
+      .required(msg)
+      .validate(value, { abortEarly: false })
+      .then(() => {
+        let newErrors = { ...billingAddressErrors }
+        delete newErrors[name]
+        setBillingAddressErrors(newErrors)
+      })
+      .catch(err => {
+        setBillingAddressErrors(
+          err.inner.reduce((acc, { message }) => {
+            return {
+              ...acc,
+              [name]: { path: name, message },
+            }
+          }, billingAddressErrors)
+        )
+      })
+  }
   return (
     <>
       <h5 className="mt-4 mb-2">{t('frontend.account.address.billingAddress')}</h5>
       <div className="row">
         <div className="col-md-6">
           <div className="form-group">
-            <label htmlFor="billingAddress.countryCode">{t('frontend.account.countryCode')}</label>
+            <label htmlFor="countryCode">{t('frontend.account.countryCode')}</label>
             <SwSelect
-              id="billingAddress.countryCode"
-              name="billingAddress.countryCode"
-              value={formik.values.billingAddress.countryCode}
+              id="countryCode"
+              value={billingAddress.countryCode}
               onChange={e => {
                 e.preventDefault()
-                dispatch(getStateCodeOptionsByCountryCode(e.target.value))
-                formik.handleChange(e)
+                const { value } = e.target
+                dispatch(getStateCodeOptionsByCountryCode(value))
+                setBillingAddress({
+                  ...billingAddress,
+                  countryCode: e.target.value,
+                })
               }}
               options={countryCodeOptions}
+              onBlur={value => requiredValidation({ value, name: 'countryCode', msg: t('frontend.core.required') })}
             />
+            {!!billingAddressErrors.countryCode && <span className="form-error-msg">{billingAddressErrors.countryCode}</span>}
           </div>
         </div>
         <div className="col-md-6">
-          <div className="form-group">
-            <label htmlFor="billingAddress.name">{t('frontend.account.name')}</label>
-            <input className="form-control" name="billingAddress.name" type="text" id="billingAddress.name" value={formik.values.billingAddress.name} onChange={formik.handleChange} />
-          </div>
+          <TextInput
+            name={billingAddress.name}
+            label={t('frontend.account.name')}
+            value={billingAddress.name}
+            isError={!!billingAddressErrors?.name}
+            errorMessage={billingAddressErrors?.name?.message}
+            onChange={value => {
+              setBillingAddress({
+                ...billingAddress,
+                name: value,
+              })
+            }}
+            onBlur={value => requiredValidation({ value, name: 'name', msg: t('frontend.core.required') })}
+          />
         </div>
         <div className="col-md-6">
-          <div className="form-group">
-            <label htmlFor="billingAddress.company">{t('frontend.account.company')}</label>
-            <input className="form-control" name="billingAddress.company" type="text" id="billingAddress.company" value={formik.values.billingAddress.company} onChange={formik.handleChange} />
-          </div>
+          <TextInput
+            name={billingAddress.company}
+            label={t('frontend.account.company')}
+            value={billingAddress.company}
+            isError={!!billingAddressErrors?.company}
+            errorMessage={billingAddressErrors?.company?.message}
+            onChange={value => {
+              setBillingAddress({
+                ...billingAddress,
+                company: value,
+              })
+            }}
+            onBlur={value => requiredValidation({ value, name: 'company', msg: t('frontend.core.required') })}
+          />
         </div>
         <div className="col-md-6">
-          <div className="form-group">
-            <label htmlFor="billingAddress.phoneNumber">{t('frontend.account.phoneNumber')}</label>
-            <input className="form-control" name="billingAddress.phoneNumber" type="text" id="billingAddress.phoneNumber" value={formik.values.billingAddress.phoneNumber} onChange={formik.handleChange} />
-          </div>
+          <TextInput
+            name={billingAddress.phoneNumber}
+            label={t('frontend.account.phoneNumber')}
+            value={billingAddress.phoneNumber}
+            isError={!!billingAddressErrors?.phoneNumber}
+            errorMessage={billingAddressErrors?.phoneNumber?.message}
+            onChange={value => {
+              setBillingAddress({
+                ...billingAddress,
+                phoneNumber: value,
+              })
+            }}
+            onBlur={value => requiredValidation({ value, name: 'phoneNumber', msg: t('frontend.core.required') })}
+          />
         </div>
         <div className="col-md-6">
-          <div className="form-group">
-            <label htmlFor="billingAddress.emailAddress">{t('frontend.account.emailAddress')}</label>
-            <input className="form-control" name="billingAddress.emailAddress" type="email" id="billingAddress.emailAddress" value={formik.values.billingAddress.emailAddress} onChange={formik.handleChange} />
-          </div>
+          <TextInput
+            name={billingAddress.emailAddress}
+            label={t('frontend.account.emailAddress')}
+            value={billingAddress.emailAddress}
+            isError={!!billingAddressErrors?.emailAddress}
+            errorMessage={billingAddressErrors?.emailAddress?.message}
+            onChange={value => {
+              setBillingAddress({
+                ...billingAddress,
+                emailAddress: value,
+              })
+            }}
+            onBlur={value => {
+              return null
+            }}
+          />
         </div>
         <div className="col-md-6">
-          <div className="form-group">
-            <label htmlFor="billingAddress.streetAddress">{t('frontend.account.streetAddress')}</label>
-            <input className="form-control" name="billingAddress.streetAddress" type="text" id="billingAddress.streetAddress" value={formik.values.billingAddress.streetAddress} onChange={formik.handleChange} />
-          </div>
+          <TextInput
+            name={billingAddress.streetAddress}
+            label={t('frontend.account.streetAddress')}
+            value={billingAddress.streetAddress}
+            isError={!!billingAddressErrors?.streetAddress}
+            errorMessage={billingAddressErrors?.streetAddress?.message}
+            onChange={value => {
+              setBillingAddress({
+                ...billingAddress,
+                streetAddress: value,
+              })
+            }}
+            onBlur={value => requiredValidation({ value, name: 'streetAddress', msg: t('frontend.core.required') })}
+          />
         </div>
         <div className="col-md-6">
-          <div className="form-group">
-            <label htmlFor="billingAddress.street2Address">{t('frontend.account.street2Address')}</label>
-            <input className="form-control" name="billingAddress.street2Address" type="text" id="billingAddress.street2Address" value={formik.values.billingAddress.street2Address} onChange={formik.handleChange} />
-          </div>
+          <TextInput
+            name={billingAddress.street2Address}
+            label={t('frontend.account.street2Address')}
+            value={billingAddress.street2Address}
+            isError={!!billingAddressErrors?.street2Address}
+            errorMessage={billingAddressErrors?.street2Address?.message}
+            onChange={value => {
+              setBillingAddress({
+                ...billingAddress,
+                street2Address: value,
+              })
+            }}
+            onBlur={value => requiredValidation({ value, name: 'street2Address', msg: t('frontend.core.required') })}
+          />
         </div>
         <div className="col-md-6">
-          <div className="form-group">
-            <label htmlFor="billingAddress.city">{t('frontend.account.city')}</label>
-            <input className="form-control" name="billingAddress.city" type="text" id="billingAddress.city" value={formik.values.billingAddress.city} onChange={formik.handleChange} />
-          </div>
+          <TextInput
+            name={billingAddress.city}
+            label={t('frontend.account.city')}
+            value={billingAddress.city}
+            isError={!!billingAddressErrors?.city}
+            errorMessage={billingAddressErrors?.city?.message}
+            onChange={value => {
+              setBillingAddress({
+                ...billingAddress,
+                city: value,
+              })
+            }}
+            onBlur={value => requiredValidation({ value, name: 'city', msg: t('frontend.core.required') })}
+          />
         </div>
-        {stateCodeOptions[formik.values.billingAddress.countryCode] && stateCodeOptions[formik.values.billingAddress.countryCode].length > 0 && (
-          <div className="col-md-3">
-            <div className="form-group">
-              <label htmlFor="billingAddress.stateCode">{t('frontend.account.stateCode')}</label>
-              <SwSelect
-                id="billingAddress.stateCode"
-                name="billingAddress.stateCode"
-                value={formik.values.billingAddress.stateCode}
-                onChange={e => {
-                  e.preventDefault()
-                  formik.setFieldValue('billingAddress.stateCode', e.target.value)
-                }}
-                options={stateCodeOptions[formik.values.billingAddress.countryCode]}
-              />
-            </div>
-          </div>
-        )}
         <div className="col-md-3">
-          <div className="form-group">
-            <label htmlFor="billingAddress.postalCode">{t('frontend.account.postalCode')}</label>
-            <input className="form-control" name="billingAddress.postalCode" type="text" id="billingAddress.postalCode" value={formik.values.billingAddress.postalCode} onChange={formik.handleChange} />
-          </div>
+          {stateCodeOptions[billingAddress.countryCode] && stateCodeOptions[billingAddress.countryCode].length > 0 && (
+            <div className="form-group">
+              <label htmlFor="stateCode">{t('frontend.account.stateCode')}</label>
+              <SwSelect
+                id="stateCode"
+                value={billingAddress.stateCode}
+                onChange={e => {
+                  setBillingAddress({
+                    ...billingAddress,
+                    stateCode: e.target.value,
+                  })
+                }}
+                onBlur={value => requiredValidation({ value, name: 'stateCode', msg: t('frontend.core.required') })}
+                options={stateCodeOptions[billingAddress.countryCode]}
+              />
+              {!!billingAddressErrors.stateCode && <span className="form-error-msg">{billingAddressErrors.stateCode}</span>}
+            </div>
+          )}
+
+          {(!stateCodeOptions[billingAddress.countryCode] || stateCodeOptions[billingAddress.countryCode].length < 1) && (
+            <TextInput
+              name={billingAddress.stateCode}
+              label={t('frontend.account.stateCode')}
+              value={billingAddress.stateCode}
+              isError={!!billingAddressErrors?.stateCode}
+              errorMessage={billingAddressErrors?.stateCode?.message}
+              onChange={value => {
+                setBillingAddress({
+                  ...billingAddress,
+                  stateCode: value,
+                })
+              }}
+              onBlur={value => requiredValidation({ value, name: 'stateCode', msg: t('frontend.core.required') })}
+            />
+          )}
+        </div>
+        <div className="col-md-3">
+          <TextInput
+            name={billingAddress.postalCode}
+            label={t('frontend.account.postalCode')}
+            value={billingAddress.postalCode}
+            isError={!!billingAddressErrors?.postalCode}
+            errorMessage={billingAddressErrors?.postalCode?.message}
+            onChange={value => {
+              setBillingAddress({
+                ...billingAddress,
+                postalCode: value,
+              })
+            }}
+            onBlur={value => requiredValidation({ value, name: 'postalCode', msg: t('frontend.core.required') })}
+          />
         </div>
       </div>
     </>

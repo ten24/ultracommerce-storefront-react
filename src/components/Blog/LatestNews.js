@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
+import { SimpleImage } from '..'
 import { useGetBlogPosts, useUtilities } from '../../hooks'
 import { useFormatDate } from '../../hooks/useFormatDate'
 
@@ -30,7 +31,7 @@ function LatestNews() {
             return (
               <div key={data.postTitle} className="col-md-4">
                 <article className="blog-card card border-0 shadow m-3">
-                  <figure className="overflow-hidden m-0">{data.postImage ? <img src={data.postImage.url} className="img-fluid blog-image d-block w-100 zoom-in" alt={data.postTitle} /> : <div className="img-fluid blog-image" />}</figure>
+                  <figure className="overflow-hidden m-0">{data.postImage ? <SimpleImage src={data.postImage.url} className="img-fluid blog-image d-block w-100 zoom-in" alt={data.postTitle} /> : <div className="img-fluid blog-image" />}</figure>
                   <div className="card-body p-4">
                     <p>
                       <small className="text-muted fst-italic">{formateDate(data.publicationDate)}</small>
@@ -47,7 +48,7 @@ function LatestNews() {
         </div>
         <div className="text-center mt-5">
           <Link className="btn btn-primary" to="/blog">
-            View All News
+            {t('frontend.home.view_all_news')}
           </Link>
         </div>
       </div>

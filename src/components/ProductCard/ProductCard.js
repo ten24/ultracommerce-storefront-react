@@ -1,37 +1,39 @@
 import { useSelector } from 'react-redux'
-import { HeartButton, ProductImage, ProductPrice, Button } from '..'
+import { HeartButton, SimpleImage, ProductPrice, Button, ProductImage } from '..'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { getBrandRoute, getProductRoute } from '../../selectors'
 import { useAddToCart } from '../../hooks/useAPI'
 
 const ProductCard = props => {
-  const { productName, productCode, salePrice, urlTitle, brandName, brandUrlTitle, imageFallbackFileName = '', listPrice, imageFile, productClearance, imagePath, skuID = '', skuCode } = props
+  const { productName, productCode, salePrice, urlTitle, brandName, imagePath, imageFile, brandUrlTitle, listPrice, images, productClearance, skuID = '', skuCode } = props
   const { t } = useTranslation()
   const brand = useSelector(getBrandRoute)
   const product = useSelector(getProductRoute)
   const productLink = `/${product}/${urlTitle}` + (skuID.length ? `?skuid=${skuID}` : '')
   const [request, setRequest] = useAddToCart(skuID)
+  const useResizedImage = images && images?.length > 0
+
   return (
     <div className="card border-0 p-3">
       {productClearance === true && <span className="badge">{t('frontend.core.special')}</span>}
       <HeartButton skuID={skuID} />
       <Link to={`/${product}/${urlTitle}?skuid=${skuID}`}>
-        {imageFile && <ProductImage customClass="img-fluid card-image-height" imageFile={imageFile} skuID={skuID} fallbackFileName={imageFallbackFileName} />}
-        {imagePath && <ProductImage customClass="card-image-height" imageFile={imagePath} skuID={skuID} customPath="/" fallbackFileName={imageFallbackFileName} />}
+        {useResizedImage && <SimpleImage className="img-fluid card-image-height productImage" src={images[0]} alt={productName} type="product" />}
+        {!useResizedImage && imagePath && <ProductImage customClass="img-fluid card-image-height" imageFile={imagePath} skuID={skuID} customPath="/" />}
+        {!useResizedImage && imageFile && <ProductImage customClass="img-fluid card-image-height" imageFile={imageFile} skuID={skuID} />}
       </Link>
       <div className="card-body">
         <Link to={`/${brand}/${brandUrlTitle}`} className="text-capitalize mb-3" style={{ fontSize: 12 }}>
           {brandName}
         </Link>
         <h2>
-          <Link to={productLink} className="product-name">
+          <Link to={productLink} className="product-name d-inline-block w-100">
             {productName}
           </Link>
         </h2>
         {!skuCode && productCode && <div className="product-brand">{productCode}</div>}
         {skuCode && <div className="product-brand">{skuCode}</div>}
-
 
         <ProductPrice salePrice={salePrice} listPrice={listPrice} className="d-flex" />
       </div>

@@ -74,8 +74,7 @@ export const getCart = () => {
 export const clearCartData = () => {
   return async dispatch => {
     dispatch(requestCart())
-
-    await SlatwalApiService.cart.clear().then(response => {
+    await SlatwalApiService.cart.clear({ returnJSONObjects: 'cart' }).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
       if (response.isSuccess()) {
         dispatch(receiveCart(response.success().cart))

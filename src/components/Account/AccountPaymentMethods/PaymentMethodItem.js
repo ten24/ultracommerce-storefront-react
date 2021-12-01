@@ -5,7 +5,7 @@ import { deletePaymentMethod } from '../../../actions/'
 import { useTranslation } from 'react-i18next'
 
 const PaymentMethodItem = props => {
-  const { accountPaymentMethodID, isPrimary = false, creditCardType, expirationYear, expirationMonth, creditCardLastFour } = props
+  const { accountPaymentMethodID, isPrimary = false, creditCardType, expirationYear, expirationMonth, creditCardLastFour, accountPaymentMethodName } = props
   const MySwal = withReactContent(Swal)
   const dispatch = useDispatch()
   const { t } = useTranslation()
@@ -15,7 +15,8 @@ const PaymentMethodItem = props => {
       <td className="py-2">
         <div className="media align-items-center">
           <div className="media-body">
-            <b>{`${creditCardType} Ending in x${creditCardLastFour}`}</b>
+            <div> {accountPaymentMethodName && <b>{`${creditCardType} Ending in x${creditCardLastFour} - ${accountPaymentMethodName}`}</b>}</div>
+            <div>{!accountPaymentMethodName && <b>{`${creditCardType} Ending in x${creditCardLastFour}`}</b>} </div>
             <div>{`Exp: ${expirationMonth}/${expirationYear}`}</div>
           </div>
         </div>

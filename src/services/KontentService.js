@@ -8,7 +8,7 @@ const processForProductPicker = productList => {
   let response = {}
   response.title = productList.title.value
   response.body = productList.body.value
-  response.customBody = productList.body.value
+  response.contentBody = productList.body.value
   response.settings = {}
   if (productList.products.value.length) {
     response.products = productList.products.value.split(',')
@@ -20,7 +20,7 @@ const processForEnhancedMenu = (enhancedMenu, depth) => {
   let response = {}
   response.title = enhancedMenu.title.value
   response.body = enhancedMenu.body.value
-  response.customBody = enhancedMenu.body.value
+  response.contentBody = enhancedMenu.body.value
   if (enhancedMenu.pages.value.length) {
     response.pages = enhancedMenu.pages.value
       .map(page => {
@@ -56,7 +56,7 @@ const processForPage = (item, depth) => {
   hydrated.slug = item.slug.value
   hydrated.title = item.title.value
   hydrated.body = item.body.value
-  hydrated.customBody = item.body.value
+  hydrated.contentBody = item.body.value
   hydrated.settings = { contentTemplateFile: 'BasicPage.cfm' }
   return hydrated
 }
@@ -87,10 +87,10 @@ const getEntryBySlug = async (content = {}, slug = '') => {
           response?.slider.slides.forEach((slide, index) => {
             augmentedResponse[`home/main-banner-slider/${index}`] = {
               title: slide.contentTitle,
-              associatedImage: slide.contentImage.url,
+              imagePath: slide.contentImage.url,
               linkUrl: slide.contentLink,
               linkLabel: slide.contentLinkTitle,
-              customBody: slide.contentBody,
+              contentBody: slide.contentBody,
             }
           })
         }
@@ -99,8 +99,8 @@ const getEntryBySlug = async (content = {}, slug = '') => {
           augmentedResponse['home/content-columns'].columns = response?.contentColumns.columns.map(slide => {
             return {
               title: slide.contentTitle,
-              associatedImage: slide.image.url,
-              customBody: slide.body,
+              imagePath: slide.image.url,
+              contentBody: slide.body,
             }
           })
         }
@@ -177,7 +177,7 @@ const getFooterBySlug = async (content = {}, slug = '') => {
         }
         hydrated.title = item.heading.value
         hydrated.body = item.custombody.value
-        hydrated.customBody = item.custombody.value
+        hydrated.contentBody = item.custombody.value
       }
       //   console.log('hydrated ', hydrated)
       return hydrated
@@ -288,7 +288,7 @@ const processForBlock = block => {
   response.title = block.title.value
   response.title_link = block.title_link.value
   response.body = block.body.value
-  response.customBody = block.body.value
+  response.contentBody = block.body.value
   response.key = block.system.codename.replaceAll('_', '-')
   response.settings = {}
   if (block.image.value.length) {
@@ -303,7 +303,7 @@ const processForCTA = cta => {
   response.linkUrl = cta.link_url.value
   response.body = cta.body.value
   response.summary = cta.summary.value
-  response.customBody = cta.body.value
+  response.contentBody = cta.body.value
   if (cta.image.value.length) {
     response.image = processForAsset(cta.image.value[0])
   }

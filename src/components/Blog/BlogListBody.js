@@ -1,6 +1,7 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useHistory } from 'react-router-dom'
+import { SimpleImage } from '..'
 
 import { useFormatDateTime, useUtilities } from '../../hooks'
 
@@ -11,7 +12,7 @@ function BlogListBody({ blog }) {
   let { eventHandlerForWSIWYG } = useUtilities()
   return (
     <article className="shadow mb-5">
-      <div className="entry-img d-flex justify-content-center">{blog.postImage && <img src={blog.postImage.url} className="img-fluid " alt={blog.postTitle} />}</div>
+      <div className="max-height-img">{blog.postImage && <SimpleImage src={blog.postImage.url} alt={blog.postTitle} />}</div>
       <h2 className="entry-title px-4 py-3 m-0 text-underline">
         <Link className="link" to={`/blog/${blog.slug}`}>
           {blog.postTitle}

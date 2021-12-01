@@ -69,8 +69,8 @@ const getEntryBySlug = async (content = {}, slug = '') => {
         banners = banners
           .map(slide => {
             slide.key = slide.slug
-            slide.customBody = (slide.summary && ReactDOMServer.renderToStaticMarkup(documentToReactComponents(slide.summary.json))) || ''
-            slide.associatedImage = slide.image.url
+            slide.contentBody = (slide.summary && ReactDOMServer.renderToStaticMarkup(documentToReactComponents(slide.summary.json))) || ''
+            slide.imagePath = slide.image.url
             slide.linkUrl = slide.ctaLink.linkUrl
             slide.linkLabel = slide.title
             return slide
@@ -87,7 +87,7 @@ const getEntryBySlug = async (content = {}, slug = '') => {
       if (response?.status === 200 && response.data.data) {
         return {
           'home/recentBlogPost': {
-            customBody: {
+            contentBody: {
               items:
                 response.data.data.blogCollection.items.length > 0
                   ? response.data.data.blogCollection.items.map(data => {
@@ -106,8 +106,8 @@ const getEntryBySlug = async (content = {}, slug = '') => {
         return {
           'home/category': {
             title: item.title,
-            associatedImage: item.associatedImage.url,
-            customBody: documentToReactComponents(item.customBody.json).reduce((acc, current) => {
+            imagePath: item.associatedImage.url,
+            contentBody: documentToReactComponents(item.customBody.json).reduce((acc, current) => {
               acc += ReactDOMServer.renderToStaticMarkup(current)
               return acc
             }, ''),
@@ -121,8 +121,8 @@ const getEntryBySlug = async (content = {}, slug = '') => {
         return {
           'home/producttype': {
             title: item.title,
-            associatedImage: item.associatedImage.url,
-            customBody: documentToReactComponents(item.customBody.json).reduce((acc, current) => {
+            imagePath: item.associatedImage.url,
+            contentBody: documentToReactComponents(item.customBody.json).reduce((acc, current) => {
               acc += ReactDOMServer.renderToStaticMarkup(current)
               return acc
             }, ''),
@@ -177,7 +177,7 @@ const getEntryBySlug = async (content = {}, slug = '') => {
   if (slug === 'footer') {
     return graphqlPostMethod(getFooterQuery).then(response => {
       const newFooter = response.data.data.contentCollection.items[0].sectionsCollection.items.map(footerItem => {
-        return { title: '', settings: {}, urlTitle: footerItem?.slug?.replace('footer/', ''), customBody: ReactDOMServer.renderToStaticMarkup(renderDocument(footerItem.customBody.json)) }
+        return { title: '', settings: {}, urlTitle: footerItem?.slug?.replace('footer/', ''), contentBody: ReactDOMServer.renderToStaticMarkup(renderDocument(footerItem.customBody.json)) }
       })
       return {
         footer: { children: newFooter },
@@ -191,7 +191,7 @@ const getEntryBySlug = async (content = {}, slug = '') => {
       // my account parent page, it only have my account page title and custom summary and custom body of my account page so it stored with 'my-account' key.
       let myAccountContent = {
         title: response.data.data.contentCollection.items[0].title && response.data.data.contentCollection.items[0].title,
-        customBody: response.data.data.contentCollection.items[0].customBody && documentToReactComponents(response.data.data.contentCollection.items[0].customBody.json),
+        contentBody: response.data.data.contentCollection.items[0].customBody && documentToReactComponents(response.data.data.contentCollection.items[0].customBody.json),
         isMarkup: false,
         settings: { contentTemplateFile: 'BasicPage.cfm', contentHTMLTitleString: '<p>myaccount title</p>' },
       }
@@ -211,7 +211,7 @@ const getEntryBySlug = async (content = {}, slug = '') => {
                 title: title,
                 contentID: title,
                 isMarkup: false,
-                customBody: customBody && documentToReactComponents(customBody.json),
+                contentBody: customBody && documentToReactComponents(customBody.json),
               },
             }
             return myAccountSideBarMenu
@@ -237,8 +237,8 @@ const getEntryBySlug = async (content = {}, slug = '') => {
       if (items[0].seoDesc) {
         payload[slug].seoDesc = items[0].seoDesc
       }
-      if (items[0].customBody) {
-        payload[slug].customBody = ReactDOMServer.renderToStaticMarkup(documentToReactComponents(items[0].customBody.json))
+      if (items[0].contentBody) {
+        payload[slug].contentBody = ReactDOMServer.renderToStaticMarkup(documentToReactComponents(items[0].customBody.json))
       }
       if (page.items.length) {
         page.items.forEach(item => {

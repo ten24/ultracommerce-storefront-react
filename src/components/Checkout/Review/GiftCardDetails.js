@@ -5,7 +5,7 @@ const GiftCardDetails = ({ hideHeading }) => {
   return (
     <>
       {!hideHeading && <h6 className="h6">{t('frontend.checkout.payment_method')}</h6>}
-      <p>{t('frontend.checkout.payment.giftCard.title')}</p>
+      <p>{t('frontend.checkout.payment.giftCard.heading')}</p>
     </>
   )
 }

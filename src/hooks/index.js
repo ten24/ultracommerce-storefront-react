@@ -1,8 +1,9 @@
 import useFormatCurrency from './useFormatCurrency'
-export { useGetProductsWithPagination, useGetEntityWithPagination, useGetEntityByUrlTitle, useGetEntityByUrlTitleAdvanced, useGetAccountCartsAndQuotes, useGetProductsByEntityModified, useResizedImageByProfileName, useGetEntity, useGetEntityByID, useGetProductDetails, useGetProducts, useGetAvailableShippingMethods, useGetAvailablePaymentMethods, useAddWishlistItem, useGetOrderDetails, useGetAllOrders, useAddOrderShippingAddress, useGetProductAvailableSkuOptions, useGetProductSkuSelected, useGetProductImageGallery } from './useAPI'
+export { useGetProductsWithPagination, useGetEntityWithPagination, useGetEntityByUrlTitleAdvanced, useGetAccountCartsAndQuotes, useGetProductsByEntityModified, useResizedImageByProfileName, useGetEntity, useGetEntityByID, useGetProductDetails, useGetProducts, useGetAvailableShippingMethods, useGetAvailablePaymentMethods, useAddWishlistItem, useGetOrderDetails, useGetAllOrders, useAddOrderShippingAddress, useGetProductAvailableSkuOptions, useGetProductSkuSelected, useGetProductImageGallery, useAddToCart } from './useAPI'
 export { useFormatDate, useFormatDateTime, useFormatTime } from './useFormatDate'
 export { useRedirect, usePush } from './useRedirect'
 export { useUtilities } from './useUtilities'
+export { useValidation } from './useValidation'
 
 // Blog Hooks
 
@@ -14,6 +15,8 @@ export { useManufacturer } from './pages/useManufacturer'
 export { useProductDetail } from './pages/useProductDetail'
 export { useBrand } from './pages/useBrand'
 export { useProductType } from './pages/useProductType'
+export { useCategory } from './pages/useCategory'
+
 export { useSearch } from './pages/useSearch'
 export { useBasicPage } from './pages/useBasicPage'
 export { useBlogPage } from './pages/useBlogPage'
@@ -40,7 +43,7 @@ export { useBillingAddress } from './components/Checkout/useBillingAddress'
 export { useTermPayment } from './components/Checkout/useTermPayment'
 export { usePickupLocation } from './components/Checkout/usePickupLocation'
 export { useFulfilmentAddress } from './components/Checkout/useFulfilmentAddress'
-
+export { useGiftCardPayment } from './components/Checkout/useGiftCardPayment'
 export { useProductImage } from './components/ProductImage/useProductImage'
 export { useProductDetailGallery } from './components/ProductDetail/useProductDetailGallery'
 export { useProductPrice } from './components/ProductPrice/useProductPrice'

@@ -1,5 +1,5 @@
 import React from 'react'
-import { SWImage } from '..'
+import { SimpleImage } from '..'
 import { useHistory } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 //        local.homeContentColumns.addFilter("urlTitlePath","%content-columns/%","LIKE")
@@ -21,7 +21,8 @@ function HomeDetails() {
           homeContent.map((section, index) => {
             return (
               <div key={index} className="col-md">
-                <SWImage className="mb-3" customPath="/custom/assets/files/associatedimage/" src={section.associatedImage} />
+                <SimpleImage className="mb-3" src={section.imagePath} />
+
                 <h3 className="h3">{section.title}</h3>
                 <p
                   onClick={event => {
@@ -30,7 +31,7 @@ function HomeDetails() {
                       history.push(event.target.getAttribute('href'))
                     }
                   }}
-                  dangerouslySetInnerHTML={{ __html: section.customBody }}
+                  dangerouslySetInnerHTML={{ __html: section.contentBody }}
                 />
               </div>
             )

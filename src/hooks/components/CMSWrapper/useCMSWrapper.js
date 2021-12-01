@@ -19,6 +19,7 @@ const useCMSWrapper = () => {
         getContentByType(
           {
             'f:urlTitlePath:like': `header%`,
+            includeSettings: true,
           },
           'header',
           'header'
@@ -28,6 +29,7 @@ const useCMSWrapper = () => {
         getPageContent(
           {
             'f:urlTitlePath:like': `404%`,
+            includeSettings: true,
           },
           '404'
         )
@@ -36,6 +38,7 @@ const useCMSWrapper = () => {
         getContentByType(
           {
             'f:urlTitlePath:like': `footer%`,
+            includeSettings: true,
           },
           'footer',
           'footer'
@@ -45,6 +48,7 @@ const useCMSWrapper = () => {
         getPageContent(
           {
             'f:urlTitlePath:like': `${basePath}%`,
+            includeSettings: true,
           },
           basePath
         )
@@ -64,6 +68,7 @@ const useCMSWrapper = () => {
           getPageContent(
             {
               'f:urlTitlePath:like': `${newPath}%`,
+              includeSettings: true,
             },
             newPath
           )

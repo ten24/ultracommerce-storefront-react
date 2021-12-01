@@ -1,13 +1,14 @@
 import React, { Suspense, useEffect } from 'react'
 import { Switch, Route, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { Loading, Header } from './components'
+import { Loading, Header, Footer } from './components'
 import { getConfiguration } from './actions'
-import { Blog, NotFound, Home, Cart, MyAccount, Search, Checkout, ProductDetail, Brand, ContentPage, Product, ProductType, Category, Account, OrderConfirmation, BlogPost, Manufacturer, ErrorFallback, Contact } from './pages'
+import { Blog, NotFound, Home, Cart, MyAccount, Search, Checkout, ThreeDSHandover, ProductDetail, Brand, ContentPage, Product, ProductType, Category, Account, OrderConfirmation, BlogPost, Manufacturer, ErrorFallback, Contact } from './pages'
 import logo from './assets/images/logo.svg'
 import mobileLogo from './assets/images/logo-mobile.svg'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useCMSWrapper, useScrollToTop } from './hooks'
+import Testing from './pages/Testing/Testing'
 
 const pageComponents = {
   Blog,
@@ -59,6 +60,7 @@ export default function App() {
         {/* <SEO /> */}
         <Switch>
           <Route path="/404" component={NotFound} />
+          <Route path="/testing" component={Testing} />
           <Route path="/Error" component={ErrorFallback} />
           <Route path="/contact" component={Contact} />
           {routing.length &&
@@ -72,6 +74,7 @@ export default function App() {
           <Route path="/my-account" component={MyAccount} />
           <Route path="/checkout" component={Checkout} />
           <Route path="/checkout/:id" component={Checkout} />
+          <Route path="/threeDSHandover" component={ThreeDSHandover} />
           <Route path="/MyAccount" component={MyAccount} />
           <Route path="/shopping-cart" component={Cart} />
           <Route path="/blog" component={Blog} exact />
@@ -80,6 +83,7 @@ export default function App() {
           <Route path="" component={ContentPage} />
         </Switch>
       </ErrorBoundary>
+      <Footer />
     </Suspense>
   )
 }

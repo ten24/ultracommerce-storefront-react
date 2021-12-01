@@ -84,7 +84,7 @@ const processForBlock = block => {
   response.title = block.title.value
   response.title_link = block.title_link.value
   response.body = block.body.value
-  response.customBody = block.body.value
+  response.contentBody = block.body.value
   response.key = block.system.codename.replaceAll('_', '-')
   response.settings = {}
   if (block.image.value.length) {
@@ -99,7 +99,7 @@ const processForCTA = cta => {
   response.linkUrl = cta.link_url.value
   response.body = cta.body.value
   response.summary = cta.summary.value
-  response.customBody = cta.body.value
+  response.contentBody = cta.body.value
   if (cta.image.value.length) {
     response.image = processForAsset(cta.image.value[0])
   }

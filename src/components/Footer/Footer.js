@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux'
 import { SignUpForm } from '..'
 import styles from './Footer.module.css'
 import { useUtilities } from '../../hooks'
-import logo from '../../assets/images/slatwall-commerce-logo-white.svg'
 import { useTranslation } from 'react-i18next'
 
 function Footer() {
@@ -17,24 +16,12 @@ function Footer() {
     <footer className="footer">
       <div className="container pt-5">
         <div className="row justify-content-between pt-2">
-          <div className="col-md-3">
-            <span>
-              <small className="text-white d-block mb-3">{t('frontend.powered_by')}</small>
-            </span>
-            <a href="https://www.slatwallcommerce.com/" target="_blank" rel="noreferrer">
-              <img src={logo} className="img-fluid mb-4" alt="Slatwall Commerce" width="185" loading="lazy" />
-            </a>
-            <p>
-              <small>{t('frontend.slatwall_description')}</small>
-            </p>
-          </div>
-
           {footer?.children?.map(column => {
             if (column.urlTitle === 'stay-informed') return null
             return (
               <div key={column.urlTitle} className="col-md-2 col-sm-6">
-                <h4>{column?.title}</h4>
-                <div className="pb-2 mb-4" onClick={eventHandlerForWSIWYG} dangerouslySetInnerHTML={{ __html: column?.customBody }} />
+                <h5>{column?.title}</h5>
+                <div className="pb-2 mb-4 small" onClick={eventHandlerForWSIWYG} dangerouslySetInnerHTML={{ __html: column?.contentBody }} />
                 {column.urlTitle === 'stay-informed' && <SignUpForm url={formLink} />}
               </div>
             )
@@ -43,15 +30,21 @@ function Footer() {
           {footer?.children?.map(column => {
             if (column.urlTitle !== 'stay-informed') return null
             return (
-              <div key={column.urlTitle} className="col-md-4">
+              <div key={column.urlTitle} className="col-md-3">
                 <div className="pb-2 mb-4">
-                  <h4>{column?.title}</h4>
-                  <div className={`${styles.stayInformed}`} onClick={eventHandlerForWSIWYG} dangerouslySetInnerHTML={{ __html: column?.customBody }} />
+                  <h5>{column?.title}</h5>
+                  <small className={`${styles.stayInformed}`} onClick={eventHandlerForWSIWYG} dangerouslySetInnerHTML={{ __html: column?.contentBody }} />
                   <SignUpForm url={formLink} />
                 </div>
               </div>
             )
           })}
+
+          <div className={`${styles.bgFooter} p-4`}>
+            <div className="container">
+              <div className="text-center text-secondary small">{`@${new Date().getFullYear()} ${t('frontend.copywrite')}`}</div>
+            </div>
+          </div>
         </div>
       </div>
     </footer>

@@ -1,6 +1,6 @@
 import React from 'react'
 import Slider from 'react-slick'
-import { SWImage } from '..'
+import { SimpleImage } from '..'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -8,13 +8,13 @@ import { useGetEntity } from '../../hooks/'
 import { useEffect } from 'react'
 import { getBrandRoute } from '../../selectors/'
 
-const BandSlide = ({ brandLogo, urlTitle = '', title, customPath = '/custom/assets/files/associatedimage/' }) => {
+const BandSlide = ({ images, urlTitle = '', title }) => {
   const brand = useSelector(getBrandRoute)
   return (
     <div className="repeater">
       <div className="card-body">
-        <Link to={`/${brand}/${urlTitle}`}>
-          <SWImage className="img-fluid  d-block m-auto rounded-circle shadow-sm" customPath={customPath} src={brandLogo} alt={title} type="brand" />
+        <Link to={`/${brand}/${urlTitle}`} className="brand-rounded-img shadow-sm">
+          <SimpleImage src={!!images ? images[0] : ''} alt={title} type="brand" />
         </Link>
       </div>
     </div>
@@ -25,10 +25,13 @@ const BrandSlider = ({ params }) => {
   const { t } = useTranslation()
   let [request, setRequest] = useGetEntity()
   const shopByManufacturer = useSelector(state => state.configuration.shopByManufacturer)
+
   useEffect(() => {
+    const modifiedParams = { includeImages: true, ...params }
+
     let didCancel = false
     if (!request.isFetching && !request.isLoaded && !didCancel) {
-      setRequest({ ...request, isFetching: true, isLoaded: false, entity: 'brand', params, makeRequest: true })
+      setRequest({ ...request, isFetching: true, isLoaded: false, entity: 'brand', params: modifiedParams, makeRequest: true })
     }
     return () => {
       didCancel = true
@@ -76,12 +79,11 @@ const BrandSlider = ({ params }) => {
           <Slider {...settings}>
             {request.isLoaded &&
               request.data.map(slide => {
-                return <BandSlide key={slide.brandID} {...slide} customPath="/custom/assets/images/brand/logo/" brandLogo={slide.imageFile} />
+                return <BandSlide key={slide.brandID} {...slide} />
               })}
           </Slider>
         </div>
         <div className="text-center mt-5">
-          {/* TODO: need to navigate */}
           <Link className="btn btn-primary" to={shopByManufacturer.slug}>
             View All Brands
           </Link>

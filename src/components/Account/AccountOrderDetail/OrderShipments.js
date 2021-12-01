@@ -1,12 +1,12 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { ProductImage } from '../../'
+import { SimpleImage } from '../../'
 import { addToCart } from '../../../actions/'
 import { useFormatCurrency } from '../../../hooks/'
 import { getProductRoute } from '../../../selectors/'
 
-const OrderItem = ({ quantity, sku_skuID, sku_product_productName, sku_product_urlTitle, customPath, BrandName, isSeries, ProductSeries, calculatedExtendedPriceAfterDiscount, sku_calculatedSkuDefinition, sku_imageFile, images, price }) => {
+const OrderItem = ({ quantity, sku_skuID, sku_product_productName, sku_product_urlTitle, images, BrandName, isSeries, ProductSeries, calculatedExtendedPriceAfterDiscount, sku_calculatedSkuDefinition, sku_imageFile, price }) => {
   const [formatCurrency] = useFormatCurrency({})
   const dispatch = useDispatch()
   const { t } = useTranslation()
@@ -17,7 +17,7 @@ const OrderItem = ({ quantity, sku_skuID, sku_product_productName, sku_product_u
     <div className="row border-bottom py-3">
       <div className="col-sm-2 col-3">
         <Link to={`/${productRouting}/${sku_product_urlTitle}?skuid=${sku_skuID}`} className="mx-auto mr-sm-4">
-          <ProductImage customClass="img-fluid  m-auto image_container" imageFile={sku_imageFile} skuID={sku_skuID} />
+          {images && images?.length > 0 && <SimpleImage className="img-fluid  m-auto image_container productImage" src={images[0]} alt={sku_product_productName} type="product" />}
         </Link>
       </div>
       <div className="col-sm-4 col-9">
@@ -54,18 +54,18 @@ const OrderItem = ({ quantity, sku_skuID, sku_product_productName, sku_product_u
             <div className="row">
               <div className="col-12">
                 <button
-                onClick={event => {
-                  event.preventDefault()
-                  dispatch(addToCart(sku_skuID, quantity))
-                  window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth',
-                  })
-                }}
-                className="btn btn-outline-secondary mt-3"
-              >
-                Re-order
-              </button>
+                  onClick={event => {
+                    event.preventDefault()
+                    dispatch(addToCart(sku_skuID, quantity))
+                    window.scrollTo({
+                      top: 0,
+                      behavior: 'smooth',
+                    })
+                  }}
+                  className="btn btn-outline-secondary mt-3"
+                >
+                  Re-order
+                </button>
               </div>
             </div>
           </div>
@@ -103,9 +103,15 @@ const OrderShipments = ({ shipments }) => {
                   </div>
                   <div className="col-sm-12 col-md-6 d-none d-md-block">
                     <div className="row">
-                      <div className="col-sm-3"><small>{t('frontend.product.price')}</small></div>
-                      <div className="col-sm-3"><small>{t('frontend.cart.quantity')}</small></div>
-                      <div className="col-sm-6"><small>{t('frontend.cart.total')}</small></div>
+                      <div className="col-sm-3">
+                        <small>{t('frontend.product.price')}</small>
+                      </div>
+                      <div className="col-sm-3">
+                        <small>{t('frontend.cart.quantity')}</small>
+                      </div>
+                      <div className="col-sm-6">
+                        <small>{t('frontend.cart.total')}</small>
+                      </div>
                     </div>
                   </div>
                 </div>

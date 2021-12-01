@@ -29,13 +29,13 @@ export const receiveStateCodes = codes => {
 
 export const getPageContent = (content = {}, slug = '') => {
   return async (dispatch, getState) => {
-    if (getState().content[slug]) {
+    if (getState().content[slug] || slug === 'product' || slug === 'blog') {
       return
     }
     dispatch(requestContent())
     const { cmsProvider } = getState().configuration
     if (cmsProvider === 'slatwallCMS') {
-      const payload = { 'f:activeFlag': true, 'p:show': 250, ...content }
+      const payload = { 'f:activeFlag': true, 'p:show': 250, includeImages: true, includeSettings: true, ...content }
       SlatwallCMSService.getEntryBySlug(payload, slug).then(response => {
         dispatch(receiveContent(response))
       })
@@ -55,7 +55,6 @@ export const getPageContent = (content = {}, slug = '') => {
       KontentService.getEntryBySlug(content, slug)
         .then(data => {
           if (Array.isArray(data)) {
-            console.log('data', data)
             data.forEach(object => {
               dispatch(receiveContent(object))
             })
@@ -96,7 +95,6 @@ export const getContentByType = (content = {}, type = 'page', slug = '') => {
       KontentService.getEntryBySlugAndType(content, slug, type)
         .then(data => {
           if (Array.isArray(data)) {
-            console.log('data', data)
             data.forEach(object => {
               dispatch(receiveContent(object))
             })
@@ -112,8 +110,7 @@ export const getContentByType = (content = {}, type = 'page', slug = '') => {
 export const getStateCodeOptionsByCountryCode = (countryCode = 'US') => {
   return async dispatch => {
     dispatch(requestContent())
-    const payload = {}
-    await SlatwalApiService.location.states(payload).then(response => {
+    await SlatwalApiService.location.states({ countryCode }).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
       if (response.isSuccess()) {
         let responsePayload = {}

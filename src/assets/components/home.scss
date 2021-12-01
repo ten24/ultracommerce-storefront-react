@@ -20,7 +20,7 @@
   padding: 1rem 0 2rem 0;
 }
 .content-spacer {
-  padding: 6rem 0;
+  padding: 3rem 0;
 }
 // Section title
 .section-title {
@@ -81,21 +81,21 @@
   .card-body ul p {
     margin-bottom: 5px;
   }
-  .img-container {
-    position: relative;
-    overflow: hidden;
-    width: 100%;
-    height: 50vh;
-    max-height: 300px;
-    img {
-      position: absolute;
-      top: -9999px;
-      right: -9999px;
-      bottom: -9999px;
-      left: -9999px;
-      margin: auto;
-      min-width: 100%;
-      min-height: 100%;
-    }
+}
+
+.brand-rounded-img {
+  height: 200px;
+  width: 200px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 50%;
+  display: block;
+  img {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
   }
 }

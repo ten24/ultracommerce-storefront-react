@@ -22,7 +22,7 @@ const MegaMenuPanel = ({ subMenu = [] }) => {
               className="widget widget-links mb-3"
               onClick={eventHandlerForWSIWYG}
               dangerouslySetInnerHTML={{
-                __html: menuPanel?.customBody,
+                __html: menuPanel?.contentBody,
               }}
             />
           </div>
@@ -33,23 +33,24 @@ const MegaMenuPanel = ({ subMenu = [] }) => {
 }
 const MegaMenu = ({ menuItems = [] }) => {
   const { t } = useTranslation()
+  const { shopByManufacturer } = useSelector(state => state.configuration)
 
   return (
-    <ul className="navbar-nav nav-categories">
+    <ul className="navbar-nav nav-categories w-100">
       {menuItems.map(menuItem => {
         return (
           <li key={menuItem.linkTitle} className="nav-item dropdown">
-            {!menuItem.columns.length && (
+            {!menuItem.columns.length > 0 && (
               <Link className="nav-link" to={menuItem.linkUrl}>
                 {menuItem.linkTitle}
               </Link>
             )}
-            {menuItem.columns.length && (
+            {menuItem.columns.length > 0 && (
               <>
                 <a className="nav-link dropdown-toggle" href={menuItem.linkUrl} data-bs-toggle="dropdown">
                   {menuItem.linkTitle}
                 </a>
-                <div className="mega-menu dropdown-menu  pt-0 pb-3">
+                <div className="mega-menu dropdown-menu border pt-0 pb-3">
                   <div className="nav-shop-all ">
                     <Link to={menuItem.linkUrl}>
                       {`${t('frontend.nav.shopall')} ${menuItem.linkTitle}`}
@@ -63,6 +64,13 @@ const MegaMenu = ({ menuItems = [] }) => {
           </li>
         )
       })}
+      {shopByManufacturer.showInMenu && (
+        <li className="nav-item">
+          <Link className="nav-link" to={shopByManufacturer.slug}>
+            {t('frontend.nav.manufacturer')}
+          </Link>
+        </li>
+      )}
     </ul>
   )
 }
@@ -71,7 +79,6 @@ const NavBar = () => {
   const { t } = useTranslation()
   let history = useHistory()
   const menu_items = useSelector(state => state.content?.header?.mega_menu?.menu_items)
-  const { shopByManufacturer } = useSelector(state => state.configuration)
   const mobileTextInput = useRef(null)
 
   if (!menu_items) {
@@ -116,16 +123,6 @@ const NavBar = () => {
             />
           </div>
           <MegaMenu menuItems={menu_items} />
-          {shopByManufacturer.showInMenu && (
-            <ul className="navbar-nav mega-nav ">
-              <li className="nav-item">
-                <Link className="nav-link white-text" to={shopByManufacturer.slug}>
-                  <i className="bi bi-gear me-2"></i>
-                  {t('frontend.nav.manufacturer')}
-                </Link>
-              </li>
-            </ul>
-          )}
         </div>
       </div>
     </nav>
@@ -185,7 +182,7 @@ const Header = ({ logo }) => {
             </div>
             <MainNavBar />
 
-            <div className="col-xl-4 order-xl-2">
+            <div className="col-xl-3 order-xl-2">
               <SearchBar />
             </div>
           </div>

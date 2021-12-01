@@ -20,7 +20,7 @@ const ActionBanner = ({ data }) => {
                 <h2>{data.title}</h2>
               </header>
             )}
-            <div onClick={eventHandlerForWSIWYG} dangerouslySetInnerHTML={{ __html: data.customBody }} />
+            <div onClick={eventHandlerForWSIWYG} dangerouslySetInnerHTML={{ __html: data.contentBody }} />
             <Link className="btn btn-primary" to={data.linkUrl}>
               {data.linkLabel}
             </Link>

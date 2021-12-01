@@ -1,10 +1,10 @@
-import { ListingGrid, ListingPagination } from '../../components'
+import { ListingGrid, ListingPagination, SimpleTabs } from '../../components'
 import { useBasicPage, useUtilities } from '../../hooks'
 
 const BasicPage = () => {
   const { content, request, setPage } = useBasicPage()
-  let { eventHandlerForWSIWYG } = useUtilities()
-
+  let { eventHandlerForWSIWYG, getContentByType } = useUtilities()
+  const tabsData = getContentByType(content.children, 'cetTab')
   return (
     <div className="p-0">
       <div className="page-title-overlap bg-lightgray pt-4">
@@ -20,7 +20,7 @@ const BasicPage = () => {
             className="content-body"
             onClick={eventHandlerForWSIWYG}
             dangerouslySetInnerHTML={{
-              __html: content.customBody || '',
+              __html: content.contentBody || '',
             }}
           />
         )}
@@ -37,6 +37,8 @@ const BasicPage = () => {
               </div>
             )
           })}
+        <SimpleTabs data={tabsData} />
+
         {content?.productListingPageFlag && (
           <>
             <hr />

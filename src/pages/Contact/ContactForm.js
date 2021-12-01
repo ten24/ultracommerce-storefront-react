@@ -18,7 +18,9 @@ const ContactForm = () => {
   const formik = useFormik({
     enableReinitialize: false,
     initialValues: {
-      'formResponse.formID': contactFormID,
+      formResponse: {
+        formID: contactFormID,
+      },
       context: 'addFormResponse',
       firstName: '',
       lastName: '',

@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useGetBlogPosts, useFormatDateTime } from '../../hooks'
+import { SimpleImage } from '..'
 
 const RecentBlogs = () => {
   let [request, setRequest] = useGetBlogPosts()
@@ -23,7 +24,7 @@ const RecentBlogs = () => {
         request.data?.items?.map(feed => {
           return (
             <div key={feed.postTitle} className="post-item d-flex align-items-start mb-3">
-              {feed.postImage ? <img className="recent-image" src={feed.postImage.url} alt={feed.postTitle} /> : <div className="recent-image" />}
+              {feed.postImage ? <SimpleImage className="recent-image" src={feed.postImage.url} alt={feed.postTitle} /> : <div className="recent-image" />}
               <div className="ms-2 ">
                 <h6 className="text-underline">
                   <div

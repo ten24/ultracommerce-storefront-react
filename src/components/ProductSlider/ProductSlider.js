@@ -69,7 +69,7 @@ const ProductSliderWithList = ({ children, params = {}, settings, title, slidesT
     if (!didCancel && !request.isFetching && !request.isLoaded && productList.length) {
       setRequest({
         ...request,
-        params: { ...params, 'f:ProductID:in': productList.join(',') },
+        params: { ...params, includeImages: true, 'f:ProductID:in': productList.join(',') },
         entity: 'product',
         makeRequest: true,
         isFetching: true,
@@ -100,7 +100,7 @@ const ProductSliderWithConfig = ({ children, params = {}, settings, title, slide
     if (!didCancel && !request.isFetching && !request.isLoaded) {
       setRequest({
         ...request,
-        params,
+        params: { includeImages: true, ...params },
         entity: 'product',
         makeRequest: true,
         isFetching: true,

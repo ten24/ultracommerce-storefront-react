@@ -71,14 +71,14 @@ const AccountRecentOrders = ({ orders }) => {
   )
 }
 
-const AccountOverview = ({ customBody, crumbs, title, contentTitle }) => {
+const AccountOverview = ({ contentBody, crumbs, title, contentTitle }) => {
   const userData = useSelector(state => state.userReducer)
   const { t } = useTranslation()
   const { orders } = useAccountOverview()
   return (
-    <AccountLayout crumbs={crumbs} title={title}>
+    <AccountLayout crumbs={crumbs}>
       <h2 className="h3">{`${t('frontend.core.welcome')}, ${userData.firstName} ${userData.lastName}!`}</h2>
-      <AccountContent contentTitle={contentTitle} customBody={customBody} />
+      <AccountContent displayTitle={false} />
       <AccountRecentOrders orders={orders} />
     </AccountLayout>
   )

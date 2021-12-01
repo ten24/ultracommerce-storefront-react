@@ -58,8 +58,9 @@ const processForBlock = block => {
   let response = {}
   response.title = ''
   response.title_link = ''
-  response.body = block.customBody
-  response.customBody = block.customBody
+  response.body = block.contentBody
+  response.contentBody = block.contentBody
+  response.imagePath = block.imagePath
   response.settings = {}
 
   return response
@@ -97,14 +98,14 @@ const getHeaderBySlug = async (content = {}, slug = '') => {
     })
     .then(response => {
       let hydrated = {}
-      if (response.mega_menu.length) {
+      if (response?.mega_menu?.length) {
         const menu_items = response.mega_menu.map(menuItem => {
           return processForMenuItem(menuItem)
         })
         hydrated.mega_menu = { menu_items }
       }
       if (response?.utility_menu?.length) {
-        hydrated.utility_menu = { menu_items: response.utility_menu[0].customBody }
+        hydrated.utility_menu = { menu_items: response.utility_menu[0].contentBody }
       }
       return hydrated
     })
@@ -127,9 +128,9 @@ const getFooterBySlug = async (content = {}, slug = '') => {
         if (hydrated['footer/contact-us']) {
           CTA['home/callToAction'] = {
             title: hydrated['footer/contact-us'].title,
-            body: hydrated['footer/contact-us'].customBody,
-            summary: hydrated['footer/contact-us'].customSummary,
-            image: hydrated['footer/contact-us'].associatedImage,
+            body: hydrated['footer/contact-us'].contentBody,
+            summary: hydrated['footer/contact-us'].contentSummary,
+            image: hydrated['footer/contact-us'].imagePath,
             linkTitle: hydrated['footer/contact-us'].linkLabel,
             linkUrl: hydrated['footer/contact-us'].linkUrl,
           }
@@ -143,7 +144,7 @@ const getFooterBySlug = async (content = {}, slug = '') => {
     .then(response => {
       let hydrated = {}
       const nestedFooter = nestContentByKey(response, 'footer')
-      if (nestedFooter[0].children.length) {
+      if (nestedFooter[0]?.children?.length) {
         hydrated = { footer: nestedFooter[0] }
       }
       return hydrated
@@ -176,7 +177,7 @@ const getEntryBySlug = async (content = {}, slug = '') => {
             title: columns[0].title,
             body: '',
             columns: columns[0].children.map(column => {
-              return { customBody: column.customBody, title: column.title, fileName: column.associatedImage }
+              return { contentBody: column.contentBody, title: column.title, imagePath: column.imagePath }
             }),
           }
         }
@@ -186,5 +187,75 @@ const getEntryBySlug = async (content = {}, slug = '') => {
       return hydrated
     })
 }
+const processForPost = post => {
+  const response = { ...post }
+  response.postTitle = post?.title
+  // response.publicationDate = post.system.lastModified
+  if (post?.imagePath && post?.imagePath?.trim()?.length) {
+    response.postImage = {
+      name: post?.name,
+      url: post?.imagePath,
+    }
+  }
+  response.blogcategory = post?.categories?.map(({ categoryName, urlTitle }) => {
+    return {
+      name: categoryName,
+      value: urlTitle,
+    }
+  })
 
-export { getEntryBySlugAndType, getEntryBySlug }
+  response.postSummary = post?.contentSummary
+  response.postContent = post?.contentBody
+  response.slug = post?.urlTitle
+
+  return response
+}
+const getBlogPosts = ({ limit = 12, currentPage = 1, category = [] }) => {
+  let payload = { 'f:urlTitlePath:like': 'blog/%', 'p:show': limit, 'p:current': currentPage, includeImages: true, includeCategories: true }
+  if (category.length) {
+    payload['f:categories.urlTitle:in'] = category.join()
+  }
+  return SlatwalApiService.content.get(payload).then(response => {
+    let hydrated = {}
+    if (response.isSuccess()) {
+      hydrated.items = response.success().data.pageRecords.map(post => {
+        return processForPost(post)
+      })
+      hydrated.total = response.success().data.recordsCount
+      return hydrated
+    }
+
+    return hydrated
+  })
+}
+const getBlogPostData = ({ slug }) => {
+  return SlatwalApiService.content.get({ 'f:urlTitle': slug, includeImages: true, includeSettings: true, includeCategories: true }).then(response => {
+    let hydrated = {}
+    if (response.isSuccess()) {
+      response.success().data.pageRecords.forEach(post => {
+        hydrated = processForPost(post)
+      })
+    }
+
+    return hydrated
+  })
+}
+const processForCatagory = ({ urlTitle, categoryName, contentTotal }) => {
+  return {
+    name: contentTotal ? `${categoryName} (${contentTotal})` : categoryName,
+    value: urlTitle,
+  }
+}
+const getBlogCatagories = () => {
+  const payload = { entityName: 'Category', includeContentCount: true, 'f:contents.contentID:is not': 'NULL' }
+  return SlatwalApiService.general.getEntity(payload).then(response => {
+    let hydrated = []
+    if (response.isSuccess()) {
+      hydrated = response.success().data.pageRecords.map(post => {
+        return processForCatagory(post)
+      })
+    }
+    return hydrated
+  })
+}
+export { getEntryBySlugAndType, getEntryBySlug, getBlogPosts, getBlogPostData, getBlogCatagories }

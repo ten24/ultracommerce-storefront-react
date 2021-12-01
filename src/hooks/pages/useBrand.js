@@ -42,12 +42,12 @@ const useBrand = () => {
         isFetching: true,
         isLoaded: false,
         entity: 'ProductType',
-        params: { brandUrlTitle: path[0], 'p:show': 250, includeSettingsInList: true },
+        params: { brandUrlTitle: path[0], 'p:show': 250, includeSettingsInList: true, includeImages: true },
         makeRequest: true,
       })
     }
     if (!brandResponse.isFetching && !brandResponse.isLoaded) {
-      setBrandRequest({ ...brandResponse, isFetching: true, isLoaded: false, entity: 'brand', params: { 'f:urlTitle': path[0] }, makeRequest: true })
+      setBrandRequest({ ...brandResponse, isFetching: true, isLoaded: false, entity: 'brand', params: { 'f:urlTitle': path[0], includeImages: true }, makeRequest: true })
     }
   }, [productTypeUrl, setBrandRequest, brandResponse, path, setProductTypeRequest, productTypeRequest])
 

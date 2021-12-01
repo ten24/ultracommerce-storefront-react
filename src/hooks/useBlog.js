@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { ContentfulService, KontentService } from '../services'
+import { ContentfulService, KontentService, SlatwallCMSService } from '../services'
 import { useSelector } from 'react-redux'
 
 export const useGetBlogPosts = () => {
@@ -15,6 +15,12 @@ export const useGetBlogPosts = () => {
           .catch(thrown => {})
       } else if (cmsProvider === 'kontent') {
         KontentService.getBlogPosts(request.params)
+          .then(response => {
+            setRequest({ data: response, isFetching: false, isLoaded: true, makeRequest: false, params: {} })
+          })
+          .catch(thrown => {})
+      } else if (cmsProvider === 'slatwallCMS') {
+        SlatwallCMSService.getBlogPosts(request.params)
           .then(response => {
             setRequest({ data: response, isFetching: false, isLoaded: true, makeRequest: false, params: {} })
           })
@@ -40,6 +46,12 @@ export const useGetBlogPost = () => {
           .catch(thrown => {})
       } else if (cmsProvider === 'kontent') {
         KontentService.getBlogPostData(request.params)
+          .then(response => {
+            setRequest({ data: response, isFetching: false, isLoaded: true, makeRequest: false, params: {} })
+          })
+          .catch(thrown => {})
+      } else if (cmsProvider === 'slatwallCMS') {
+        SlatwallCMSService.getBlogPostData(request.params)
           .then(response => {
             setRequest({ data: response, isFetching: false, isLoaded: true, makeRequest: false, params: {} })
           })
@@ -72,7 +84,11 @@ export const useGetBlogCatagories = () => {
           })
           .catch(thrown => {})
       } else if (cmsProvider === 'slatwallCMS') {
-        // we can add our own function with buisness logic
+        SlatwallCMSService.getBlogCatagories(request.params)
+          .then(data => {
+            setRequest({ data: data, isFetching: false, isLoaded: true, makeRequest: false, params: {} })
+          })
+          .catch(thrown => {})
       }
     }
   }, [request, setRequest, cmsProvider])

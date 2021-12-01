@@ -5,7 +5,6 @@ import { toast } from 'react-toastify'
 import { getErrorMessage } from '../utils'
 import { useDispatch, useSelector } from 'react-redux'
 import { receiveCart } from '../actions'
-import { useDeepCompareEffect } from 'react-use'
 
 const headers = {}
 
@@ -14,7 +13,7 @@ export const useGetEntity = () => {
   useEffect(() => {
     let source = axios.CancelToken.source()
     if (request.makeRequest) {
-      const payload = { ...request.params, entityName: request.entity, includeAttributesMetadata: true }
+      const payload = { ...request.params, entityName: request.entity }
 
       SlatwalApiService.general.getEntity(payload, headers, source).then(response => {
         if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
@@ -89,32 +88,6 @@ export const useGetProductsWithPagination = filters => {
   }, [filters])
   return { isFetching, records: data.products, potentialFilters: data.potentialFilters, total: data.total, totalPages: Math.ceil(data.total / data.pageSize), error }
 }
-/*
-Currently this only wokrs for product
-*/
-export const useGetEntityByUrlTitle = () => {
-  let [request, setRequest] = useState({ isFetching: false, isLoaded: false, makeRequest: false, data: [], error: '', params: {}, entity: '' })
-  useEffect(() => {
-    let source = axios.CancelToken.source()
-    if (request.makeRequest) {
-      const payload = { ...request.params, entityName: request.entity, includeAttributesMetadata: true }
-
-      SlatwalApiService.general.getEntity(payload, headers, source).then(response => {
-        if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-        if (response.isSuccess()) {
-          setRequest({ data: response.success().data.product, attributeSets: response.success().data.attributeSets, isFetching: false, isLoaded: true, makeRequest: false, params: {} })
-        } else {
-          setRequest({ data: [], isFetching: false, makeRequest: false, isLoaded: true, params: {}, error: 'Something was wrong' })
-        }
-      })
-    }
-    return () => {
-      source.cancel()
-    }
-  }, [request, setRequest])
-
-  return [request, setRequest]
-}
 
 export const useGetEntityByID = () => {
   let [request, setRequest] = useState({ isFetching: false, isLoaded: false, makeRequest: false, data: [], error: '', params: {}, entity: '' })
@@ -166,12 +139,11 @@ export const useGetEntityByUrlTitleAdvanced = urlTitle => {
   let [isFetching, setFetching] = useState(true)
   let [data, setData] = useState({ product: {}, totalRecords: 0, totalPages: 1 })
   let [error, setError] = useState({ isError: false, message: '' })
-  //      const payload = { ...request.params, entityName: request.entity, includeAttributesMetadata: true }
 
-  useDeepCompareEffect(() => {
+  useEffect(() => {
     let source = axios.CancelToken.source()
     setFetching(true)
-    const payload = { urlTitle, entityName: 'product', includeAttributesMetadata: true }
+    const payload = { urlTitle, entityName: 'product', includeAttributesMetadata: true, includeCategories: true, includeOptions: true, includeSkus: true, includeSettings: true }
     SlatwalApiService.general.getEntity(payload, headers, source).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
       if (response.isSuccess()) {
@@ -229,7 +201,7 @@ export const useGetEntityWithPagination = (entity, currentPage, maxCount, orderB
   return { isFetching, records: data.pageRecords, totalRecords: data.pageRecordsCount, totalPages: data.totalPages, error }
 }
 export const useGetProducts = params => {
-  const propertyIdentifierList = useSelector(state => state.configuration.productSearch.propertyIdentifierList)
+  const propertyIdentifierList = useSelector(state => state.configuration.listings.productListing.params)
   let [request, setRequest] = useState({
     isFetching: false,
     isLoaded: false,
@@ -252,7 +224,7 @@ export const useGetProducts = params => {
     },
   })
   if (!!params['brand_slug'] || !!params['productType_slug']) {
-    params['returnFacetList'] = 'brand,option,attribute,sorting,priceRange,productType' // if hide we should correct
+    params['returnFacetList'] = 'brand,option,category,attribute,sorting,priceRange,productType' // if hide we should correct
   } else {
     params['returnFacetList'] = 'brand,sorting,productType'
   }
@@ -260,7 +232,7 @@ export const useGetProducts = params => {
   useEffect(() => {
     let source = axios.CancelToken.source()
     if (request.makeRequest) {
-      const payload = { propertyIdentifierList, ...request.params, includePagination: true }
+      const payload = { ...propertyIdentifierList, ...request.params, includePagination: true }
 
       SlatwalApiService.products.search(payload, headers, source).then(response => {
         if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
@@ -585,7 +557,7 @@ export const useGetProductImageGallery = productID => {
   let [error, setError] = useState({ isError: false, message: '' })
   useEffect(() => {
     let source = axios.CancelToken.source()
-    SlatwalApiService.products.getGallery({ productID }, headers, source).then(response => {
+    SlatwalApiService.products.getGallery({ productID, resizeSizes: 'large,small' }, headers, source).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) setError({ isError: false, message: getErrorMessage(response.success().errors) })
       if (response.isSuccess()) {
         setImageGallery(response.success().images)
@@ -619,10 +591,13 @@ export const useAddToCart = skuID => {
           returnJSONObjects: 'cart',
         })
         .then(response => {
-          if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-          if (response.isSuccess()) {
+          const hasError = Object.keys(response.success()?.errors || {}).length
+          if (response.isSuccess() && hasError) toast.error(getErrorMessage(response.success().errors))
+          if (response.isSuccess() && !hasError) {
             toast.success('Added to Cart')
             dispatch(receiveCart(response.success().cart))
+          } else {
+            dispatch(receiveCart({}))
           }
           setRequest({ isFetching: false, makeRequest: false })
         })

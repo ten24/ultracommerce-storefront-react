@@ -1,37 +1,19 @@
 footer {
-    background-image: linear-gradient(-47deg,#21beb9,#335fc6);
+  background: #D8D8D8;
 
-    h4, p, a {
-        color: $white;
+  ul {
+    padding: 0;
+    list-style: none;
+  }
+  
+  a {
+    color: #231f20;
+    &:hover {
+      color: $color-orange;
     }
+  }
 
-    h4 {
-        margin-bottom: 1.5rem;
-    }
-
-    ul {
-        padding: 0;
-        list-style: none;
-
-        a {
-            opacity: .8;
-        }
-        a:hover {
-            color: $white;
-            opacity: 1;
-        }
-    }
-
-    .form-control::placeholder {
-        color: $white;
-        opacity: 1;
-    }
-
-    :-ms-input-placeholder {
-      color: $white;
-    }
-
-    ::-ms-input-placeholder {
-      color: $white;
-    }
+  .input-group {
+    background: #FFF;
+  }
 }

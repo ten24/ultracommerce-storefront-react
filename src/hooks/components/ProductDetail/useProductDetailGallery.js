@@ -22,7 +22,7 @@ const useProductDetailGallery = ({ productID, skuID = '', imageFile }) => {
       nav1: slider1.current,
       nav2: slider2.current,
     })
-  }, [productID])
+  }, [productID, isFetching])
 
   let filterImages = []
   if (imageGallery && !isFetching) {

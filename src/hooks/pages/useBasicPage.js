@@ -4,36 +4,38 @@ import { useLocation } from 'react-router-dom'
 import { useGetProducts } from '../'
 import queryString from 'query-string'
 import { useGetProductsByEntityModified } from '../useAPI'
+import { getNestedContent } from '../../selectors'
 
 const useBasicPage = () => {
-  let loc = useLocation()
-  let params = queryString.parse(loc.search, { arrayFormat: 'separator', arrayFormatSeparator: ',' })
-  const content = useSelector(state => state.content[loc.pathname.substring(1)])
   const cmsProvider = useSelector(state => state.configuration.cmsProvider)
+  let { pathname, search } = useLocation()
+  let params = queryString.parse(search, { arrayFormat: 'separator', arrayFormatSeparator: ',' })
+  const structuredContent = useSelector(getNestedContent)
+  const pageData = structuredContent.filter(con => con.key === pathname.substring(1)).reduce((accumulator, con) => con, {})
 
-  const [path, setPath] = useState(loc.search)
+  const [path, setPath] = useState(search)
   let [request, setRequest] = useGetProducts(params)
   let [cmsProducts, setCmsProducts] = useGetProductsByEntityModified(params)
 
   const setPage = pageNumber => {
     params['currentPage'] = pageNumber
     request.data.currentPage = pageNumber
-    setRequest({ ...request, params: { currentPage: pageNumber, content_id: content.contentID, includePotentialFilters: false }, makeRequest: true, isFetching: true, isLoaded: false })
+    setRequest({ ...request, params: { currentPage: pageNumber, content_id: pageData.contentID, includePotentialFilters: false }, makeRequest: true, isFetching: true, isLoaded: false })
   }
 
   useEffect(() => {
     let didCancel = false
-    if (!didCancel && ((!request.isFetching && !request.isLoaded) || loc.search !== path) && content.productListingPageFlag && cmsProvider === 'slatwallCMS') {
-      setPath(loc.search)
-      setRequest({ ...request, params: { ...params, pageSize: 100, content_id: content.contentID, includePotentialFilters: false }, makeRequest: true, isFetching: true, isLoaded: false })
+    if (!didCancel && ((!request.isFetching && !request.isLoaded) || search !== path) && pageData.productListingPageFlag && cmsProvider === 'slatwallCMS') {
+      setPath(search)
+      setRequest({ ...request, params: { ...params, pageSize: 100, content_id: pageData.contentID, includePotentialFilters: false }, makeRequest: true, isFetching: true, isLoaded: false })
     }
-    if (!didCancel && ((!cmsProducts.isFetching && !cmsProducts.isLoaded) || loc.search !== path) && content.productListingPageFlag && cmsProvider !== 'slatwallCMS' && content.product) {
-      setPath(loc.search)
+    if (!didCancel && ((!cmsProducts.isFetching && !cmsProducts.isLoaded) || search !== path) && pageData.productListingPageFlag && cmsProvider !== 'slatwallCMS' && pageData.product) {
+      setPath(search)
       setCmsProducts({
         ...cmsProducts,
         params: {
           'f:publishedFlag': 1,
-          'f:productID:in': content.product.products.join(','),
+          'f:productID:in': pageData.product.products.join(','),
           pageSize: 100,
         },
         makeRequest: true,
@@ -44,7 +46,7 @@ const useBasicPage = () => {
     return () => {
       didCancel = true
     }
-  }, [request, setRequest, params, loc, path, content, cmsProvider, setCmsProducts, cmsProducts])
+  }, [request, setRequest, params, search, path, pageData, cmsProvider, setCmsProducts, cmsProducts])
 
   if (cmsProvider !== 'slatwallCMS') {
     request = {
@@ -54,7 +56,7 @@ const useBasicPage = () => {
       },
     }
   }
-  return { content: { isMarkup: true, ...content }, setPage, request }
+  return { content: { isMarkup: true, ...pageData }, setPage, request }
 }
 
 export { useBasicPage }

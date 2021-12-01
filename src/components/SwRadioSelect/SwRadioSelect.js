@@ -19,7 +19,8 @@ const SwRadioSelect = ({ label, onChange, options = [], selectedValue }) => {
                 <label
                   className="my-1 ms-2 custom-control-label"
                   htmlFor={code || value}
-                  onClick={() => {
+                  onClick={e => {
+                    e.preventDefault()
                     onChange(value)
                   }}
                   style={{ letterSpacing: '1.1' }}

@@ -19,28 +19,32 @@ const CreateAccount = () => {
       </p>
 
       <SWForm formik={formik} primaryButtontext="Create Account & Continue" title="">
-        <div className="row form-group align-items-center">
-          <div className="col-md-6 mb-3">
+        <div className="row">
+          <div className="col-md-6">
             <SWInput formik={formik} token="firstName" label="First Name" wrapperClasses="" />
           </div>
-          <div className="col-md-6 mb-3">
+          <div className="col-md-6">
             <SWInput formik={formik} token="lastName" label="Last Name" wrapperClasses="" />
           </div>
         </div>
-        <div className="mb-3">
-          <SWInput formik={formik} token="phoneNumber" label="Phone Number" type="phone" />
+        <div className="row">
+          <div className="col-12">
+            <SWInput formik={formik} token="phoneNumber" label="Phone Number" type="phone" />
+          </div>
         </div>
-        <div className="mb-3">
-          <SWInput formik={formik} token="emailAddress" label="Email Address" type="email" />
+        <div className="row">
+          <div className="col-md-6">
+            <SWInput formik={formik} token="emailAddress" label="Email Address" type="email" />
+          </div>
+          <div className="col-md-6">
+            <SWInput formik={formik} token="emailAddressConfirm" label="Confirm Email Address" type="email" />
+          </div>
         </div>
-        <div className="mb-3">
-          <SWInput formik={formik} token="emailAddressConfirm" label="Confirm Email Address" type="email" />
-        </div>
-        <div className="row form-group align-items-center">
-          <div className="col-md-6 mb-3">
+        <div className="row">
+          <div className="col-md-6">
             <SWInput formik={formik} token="password" label="Password" type="password" />
           </div>
-          <div className="col-md-6 mb-3">
+          <div className="col-md-6">
             <SWInput formik={formik} token="passwordConfirm" label="Confirm Password" type="password" />
           </div>
         </div>

@@ -1,20 +1,22 @@
-import { ProductPrice, ProductImage } from '../../components'
+import { ProductPrice, SimpleImage } from '../../components'
 import { useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { updateItemQuantity, removeItem } from '../../actions/'
 import { useCartLineItem, useFormatCurrency } from '../../hooks/'
+import { useState } from 'react'
 
 const CartLineItem = ({ orderItemID, isDisabled = false, setRemoveitem = () => {} }) => {
   const [formatCurrency] = useFormatCurrency({})
   const { t } = useTranslation()
   const dispatch = useDispatch()
   const { orderItem, listPrice, productRouting, isFetching, isBackordered } = useCartLineItem(orderItemID)
+  const [itemCount, setItemCount] = useState(orderItem.quantity)
   return (
     <div className="row border-bottom py-3">
       <div className="col-sm-2 col-3">
         <Link className="d-inline-block mx-auto mr-sm-4 image-width" to={`/${productRouting}/${orderItem.sku.product.urlTitle}`}>
-          <ProductImage skuID={orderItem.sku.skuID} imageFile={orderItem.sku.imageFile} fallbackFileName={orderItem.sku.product.imageFallbackFileName} customClass="img-fluid  m-auto image_container" />
+          {orderItem.sku.images && orderItem.sku.images?.length > 0 && <SimpleImage className="img-fluid  m-auto image_container productImage" src={orderItem.sku.images[0]} alt={orderItem.sku.product.productName} type="product" />}
         </Link>
       </div>
       <div className="col-sm-4 col-9">
@@ -49,20 +51,24 @@ const CartLineItem = ({ orderItemID, isDisabled = false, setRemoveitem = () => {
           )}
           {!isDisabled ? (
             <>
-              <div className="col-sm-3">
+              <div className="col-sm-4">
                 <input
-                  className="form-control"
                   type="number"
-                  id="quantity4"
-                  defaultValue={orderItem.quantity}
+                  className="form-control"
+                  value={itemCount}
                   disabled={isFetching && orderItem.sku.skuID}
-                  onBlur={e => {
-                    dispatch(updateItemQuantity(orderItem.sku.skuID, e.target.value))
+                  onChange={e => {
+                    setItemCount(e.target.value)
                   }}
-                  // onClick={e => {
-                  //   dispatch(updateItemQuantity(orderItem.sku.skuID, e.target.value))
-                  // }}
                 />
+                <button
+                  className="btn text-muted btn-link p-1 text-end"
+                  onClick={() => {
+                    dispatch(updateItemQuantity(orderItem.sku.skuID, itemCount))
+                  }}
+                >
+                  Update
+                </button>
               </div>
               <div className="col-sm-4">
                 <h6>

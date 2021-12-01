@@ -29,7 +29,7 @@ export default function NotFound() {
         <div className="col-xl-8 col-lg-10">
           <div
             dangerouslySetInnerHTML={{
-              __html: contentStore.customBody,
+              __html: contentStore.contentBody,
             }}
           ></div>
         </div>

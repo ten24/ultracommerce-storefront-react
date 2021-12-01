@@ -26,7 +26,7 @@ const Address = props => {
       <td>{isPrimary && <span className="align-middle badge bg-info ">{t('frontend.core.prinary')}</span>}</td>
       <td>
         <Link
-          className="nav-link-style "
+          className="link-button link nav-link-style"
           to={{
             pathname: `/my-account/addresses/${addressID}`,
             state: { ...props },
@@ -62,14 +62,14 @@ const Address = props => {
   )
 }
 
-const AccountAddresses = ({ title, customBody = '', contentTitle }) => {
+const AccountAddresses = ({ title, contentBody = '', contentTitle }) => {
   const { t } = useTranslation()
   const accountAddresses = useSelector(getAllAccountAddresses)
   const primaryAddress = useSelector(getPrimaryAddress)
   return (
     <AccountLayout title={title}>
-      <AccountContent customBody={customBody} contentTitle={contentTitle} />
-      <h2 className="h3 mb-3">{t('frontend.account.address.title')}</h2>
+      <AccountContent />
+
       {accountAddresses.length === 0 && (
         <div className="alert alert-info" role="alert">
           {t('frontend.account.address.none')}

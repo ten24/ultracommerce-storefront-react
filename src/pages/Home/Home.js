@@ -30,9 +30,9 @@ function Home() {
       {contentColumns?.columns && contentColumns?.columns?.length > 0 && (
         <ContentColumns title={contentColumns.title}>
           <div className="row justify-content-center">
-            {contentColumns.columns.map(column => {
+            {contentColumns.columns.map((column, index) => {
               return (
-                <div className={`col-lg-${12 / contentColumns.columns.length} pr-4-lg`}>
+                <div key={`${column.title}-${index}`} className={`col-lg-${12 / contentColumns.columns.length} pr-4-lg`}>
                   <ContentBlock {...column} />
                 </div>
               )

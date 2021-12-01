@@ -46,7 +46,7 @@ function SearchBar() {
           onKeyDown={e => {
             if (e.key === 'Enter') {
               e.preventDefault()
-              makeSearch(e.target.value)
+              makeSearch(textInput.current.value)
             }
           }}
           placeholder={t('frontend.search.placeholder')}
@@ -55,7 +55,7 @@ function SearchBar() {
         <button
           onClick={e => {
             e.preventDefault()
-            makeSearch(e.target.value)
+            makeSearch(textInput.current.value)
           }}
           className="btn btn-link"
           type="button"

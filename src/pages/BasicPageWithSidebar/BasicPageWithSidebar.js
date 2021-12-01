@@ -1,20 +1,21 @@
 import { useSelector } from 'react-redux'
 import { useHistory, useLocation } from 'react-router-dom'
+import { getNestedContent } from '../../selectors'
+import { getContentByType } from '../../utils'
 import Sidebar from './Sidebar'
 
 const BasicPageWithSidebar = ({ children }) => {
   let history = useHistory()
-  let loc = useLocation()
-  const path = loc.pathname.split('/').reverse()[0].toLowerCase()
-  const contentStore = useSelector(state => state.content[path]) || {}
-  const { title, customSummary } = contentStore
-
+  let { pathname } = useLocation()
+  const structuredContent = useSelector(getNestedContent)
+  const pageData = structuredContent.filter(con => con.key === pathname.substring(1)).reduce((accumulator, con) => con, {})
+  const sidebarData = getContentByType(pageData.children, 'cetSidebar')
   return (
     <>
       <div className="page-title-overlap bg-lightgray pt-4 pb-5">
         <div className="container d-lg-flex justify-content-between py-2 py-lg-3">
           <div className="order-lg-1 pr-lg-4 text-center text-lg-start">
-            <h1 className="h3 mb-0">{title || ''}</h1>
+            <h1 className="h3 mb-0">{pageData.title || ''}</h1>
           </div>
         </div>
       </div>
@@ -30,13 +31,13 @@ const BasicPageWithSidebar = ({ children }) => {
                   }
                 }}
                 dangerouslySetInnerHTML={{
-                  __html: customSummary || '',
+                  __html: pageData.contentSummary || '',
                 }}
               />
               {children}
             </div>
           </section>
-          <Sidebar />
+          <Sidebar data={sidebarData} />
         </div>
       </div>
     </>

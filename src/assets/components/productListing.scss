@@ -87,6 +87,13 @@
     }
   }
 }
+.product-grid {
+  .product-name {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+}
 
 // product Listing sidebar
 .contentLoader {
@@ -147,4 +154,18 @@
   border-top-right-radius: 0.25rem;
   border-bottom-right-radius: 0.25rem;
   padding: 0.375rem 0.75rem;
+}
+
+.category-links a {
+  &:after {
+    content: ', ';
+  }
+  &:last-child:after {
+    content: none;
+  }
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill,minmax(250px,1fr));
 }

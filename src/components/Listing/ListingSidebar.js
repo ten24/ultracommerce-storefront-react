@@ -33,14 +33,6 @@ const ListingSidebar = ({ isFetching, hide, filtering, updateAttribute, recordsC
           <FilterLoader />
         </>
       )}
-      {!isFetching &&
-        category &&
-        category.options &&
-        category.options.length > 0 &&
-        !hide.includes(category.facetKey) &&
-        [category].map(filter => {
-          return <FacetFilter filter={filter} facetIdentifier="name" facetKey={`category`} key={`category`} updateAttribute={updateAttribute} />
-        })}
 
       {!isFetching && (
         <div className="filter-block p-4">
@@ -60,6 +52,15 @@ const ListingSidebar = ({ isFetching, hide, filtering, updateAttribute, recordsC
             !hide.includes(brand.facetKey) &&
             [brand].map(filter => {
               return <FacetFilter filter={filter} facetIdentifier="slug" facetKey={`brand_slug`} key={`brand`} updateAttribute={updateAttribute} />
+            })}
+
+          {!isFetching &&
+            category &&
+            category.options &&
+            category.options.length > 0 &&
+            !hide.includes(category.facetKey) &&
+            [category].map(filter => {
+              return <FacetFilter filter={filter} facetIdentifier="slug" facetKey={`category_slug`} key={`category_slug`} updateAttribute={updateAttribute} />
             })}
 
           {priceRange &&

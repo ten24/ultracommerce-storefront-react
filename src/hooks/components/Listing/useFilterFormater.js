@@ -14,9 +14,11 @@ const useFilterFormater = ({ option, brand, attribute, category, priceRange, pro
     })
   }
   if (brand && brand.options) {
-    brand.options = brand.options.map(option => {
-      return { ...option, displayName: option.name }
-    })
+    brand.options = brand.options
+      .map(option => {
+        return { ...option, displayName: option.name }
+      })
+      .sort((a, b) => a.displayName.localeCompare(b.displayName))
   }
 
   if (priceRange && priceRange.options) {
