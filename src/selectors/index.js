@@ -1,4 +1,4 @@
-export { getBrandRoute, getProductRoute, getImageFallbackFlag, getProductTypeRoute, getCategoryRoute, isVatCountry } from './configurationSelectors'
+export { checkInvetory, getBrandRoute, getProductRoute, getImageFallbackFlag, getProductTypeRoute, getCategoryRoute, isVatCountry } from './configurationSelectors'
 export { getShopBy, getMyAccountMenu, getAllSidebars, getAllbanners, getAllFooterContentSelector, getStructuredContent, getNestedContent } from './contentSelectors'
 export { getAllOrderPayments, orderItemsCountSelector, hasOrderItems, disableInteractionSelector, fulfillmentMethodSelector, fulfillmentSelector, shippingAddressSelector, shippingMethodSelector, accountAddressSelector, pickupLocationOptions, pickupLocationSelector, orderPayment, eligiblePaymentMethodDetailSelector, billingAccountAddressSelector, billingAddressNickname, shippingAddressNicknameSelector } from './orderSelectors'
 export { accountPaymentMethods, getAllAccountAddresses, getPrimaryAddress, getItemsForDefaultWishList, getDefaultWishlist } from './userSelectors'

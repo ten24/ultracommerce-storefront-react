@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Blocks, ListItem, ListItemWithImage } from '../..'
-import { getContentByType } from '../../../utils'
+import { ListItem, ListItemWithImage } from '../..'
+import { useUtilities } from '../../../hooks'
 
 const TabHeading = ({ name = '', loc, isActive = false, setActiveTab }) => {
   return (
@@ -25,32 +25,37 @@ const TabHeading = ({ name = '', loc, isActive = false, setActiveTab }) => {
   )
 }
 
-const TabPanel = panel => {
-  const blockItems = getContentByType(panel.children, 'cetBlock')
-
+const TabPanel = ({ panel, isActive }) => {
+  let { eventHandlerForWSIWYG } = useUtilities()
   const generateChildren = panel.children
     .map(child => {
-      if (child.contentElementType_systemCode === 'cetListItem') {
+      if (child.elementType === 'cetListItem') {
         return <ListItem {...child} />
       }
-      if (child.contentElementType_systemCode === 'cetListItemWithImage') {
+      if (child.elementType === 'cetListItemWithImage') {
         return <ListItemWithImage {...child} />
       }
       return null
     })
     .filter(item => item)
-  if (blockItems.length) {
-    generateChildren.push(<Blocks blocks={blockItems} />)
-  }
+  // if (blockItems.length) {
+  //   generateChildren.push(<Blocks blocks={blockItems} />)
+  // }
   return (
-    <div className={`tab-pane fade ${panel.isActive ? 'show active' : ''}`} id={panel.name} role="tabpanel" aria-labelledby={`${panel.name}-tab`}>
-      {panel.body}
+    <div className={`tab-pane fade ${isActive ? 'show active' : ''}`} id={panel.name} role="tabpanel" aria-labelledby={`${panel.name}-tab`}>
+      <div
+        className="content-body"
+        onClick={eventHandlerForWSIWYG}
+        dangerouslySetInnerHTML={{
+          __html: panel.contentBody || '',
+        }}
+      />
       <div className="tab-panel-children">
         {generateChildren.map((child, index) => {
           return (
-            <>
+            <div key={index}>
               {child} {index < generateChildren.length - 1 && <hr />}
-            </>
+            </div>
           )
         })}
       </div>
@@ -74,10 +79,10 @@ const Tabs = ({ headings, panels }) => {
 const SimpleTabs = ({ data }) => {
   const [activeTab, setActiveTab] = useState(0)
   const headings = data.map(({ title, key }, index) => {
-    return <TabHeading name={title} key={key} isActive={activeTab === index} setActiveTab={setActiveTab} loc={index} />
+    return <TabHeading name={title} key={index} isActive={activeTab === index} setActiveTab={setActiveTab} loc={index} />
   })
   const panels = data.map((tab, index) => {
-    return <TabPanel {...tab} isActive={activeTab === index} />
+    return <TabPanel key={index} panel={tab} isActive={activeTab === index} />
   })
   return <Tabs headings={headings} panels={panels} />
 }

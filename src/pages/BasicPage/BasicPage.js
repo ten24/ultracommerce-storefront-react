@@ -3,8 +3,7 @@ import { useBasicPage, useUtilities } from '../../hooks'
 
 const BasicPage = () => {
   const { content, request, setPage } = useBasicPage()
-  let { eventHandlerForWSIWYG, getContentByType } = useUtilities()
-  const tabsData = getContentByType(content.children, 'cetTab')
+  let { eventHandlerForWSIWYG } = useUtilities()
   return (
     <div className="p-0">
       <div className="page-title-overlap bg-lightgray pt-4">
@@ -37,7 +36,7 @@ const BasicPage = () => {
               </div>
             )
           })}
-        <SimpleTabs data={tabsData} />
+        <SimpleTabs data={content.tabs} />
 
         {content?.productListingPageFlag && (
           <>

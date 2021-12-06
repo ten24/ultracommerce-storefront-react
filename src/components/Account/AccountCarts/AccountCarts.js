@@ -30,7 +30,7 @@ const OrderListItem = props => {
         <Link
           className="text-link link"
           onClick={event => {
-            dispatch(setOrderOnCart(orderID))
+            dispatch(setOrderOnCart(orderID, t('frontend.account.order.change_order_success')))
             window.scrollTo({
               top: 0,
               behavior: 'smooth',

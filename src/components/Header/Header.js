@@ -17,7 +17,7 @@ const MegaMenuPanel = ({ subMenu = [] }) => {
       {subMenu.map((menuPanel, index) => {
         return (
           <div key={index} className="mega-dropdown-column py-4 px-3">
-            <Link to={menuPanel.title_link}>{menuPanel.title}</Link>
+            <Link to={menuPanel.title_link || ''}>{menuPanel.title}</Link>
             <div
               className="widget widget-links mb-3"
               onClick={eventHandlerForWSIWYG}
@@ -170,7 +170,7 @@ const Header = ({ logo }) => {
 
   return (
     <>
-      <nav className="my-4">
+      <nav className="my-4 no-print">
         <div className="container">
           <div className="row justify-content-center justify-content-lg-between align-items-center">
             <div className="col-xl-4 col-md-5 col-10 text-center text-md-start mb-3 mb-lg-0 order-xl-1">

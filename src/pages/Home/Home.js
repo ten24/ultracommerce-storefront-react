@@ -3,10 +3,9 @@ import { useSelector } from 'react-redux'
 import { ContentSlider, ProductSliderWithConfig, BrandSlider, ContentColumns, Layout, LatestNews, ContentBlock, ActionBanner } from '../../components'
 import { useTranslation } from 'react-i18next'
 function Home() {
-  const content = useSelector(state => state.content)
-  const popularProducts = content['home/popularProducts'] || {}
-  const contentColumns = content['home/content-columns'] || {}
-  const callToAction = content['home/calltoaction']
+  const { home = {} } = useSelector(state => state.content)
+  const { callToAction, popularProducts, contentColumns } = home
+
   const { t } = useTranslation()
   return (
     <Layout>
@@ -27,7 +26,7 @@ function Home() {
           productList={popularProducts.products}
         /> */}
       </section>
-      {contentColumns?.columns && contentColumns?.columns?.length > 0 && (
+      {contentColumns?.columns?.length > 0 && (
         <ContentColumns title={contentColumns.title}>
           <div className="row justify-content-center">
             {contentColumns.columns.map((column, index) => {

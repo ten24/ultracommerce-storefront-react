@@ -50,7 +50,7 @@ const AccountHeader = () => {
   const [disableButton, setdisableButton] = useState(false)
 
   return (
-    <div className="bg-light p-3 pt-4 mb-4 text-center">
+    <div className="bg-light p-3 pt-4 mb-4 text-center no-print">
       <h1 className="display-4">{t('frontend.account.myAccount')}</h1>
       <button
         type="button"

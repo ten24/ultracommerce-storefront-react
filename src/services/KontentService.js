@@ -1,7 +1,9 @@
 import { DeliveryClient } from '@kentico/kontent-delivery'
 
 const projectId = process.env.REACT_APP_KONTENT_PROJECT_ID
-
+const getContentID = () => {
+  return Math.floor(Math.random() * 100000)
+}
 // Initializes DeliveryClient for a specific project
 const deliveryClient = new DeliveryClient({ projectId })
 const processForProductPicker = productList => {
@@ -35,6 +37,7 @@ const processForEnhancedMenu = (enhancedMenu, depth) => {
 }
 const processForPage = (item, depth) => {
   let hydrated = {}
+
   if (item.slider.value.length) {
     hydrated.slider = processForSlider(item.slider.value[0])
   }
@@ -42,7 +45,7 @@ const processForPage = (item, depth) => {
     hydrated.contentColumns = processForContentColumn(item.content_columns.value[0])
   }
   if (item.call_to_action.value.length) {
-    hydrated.calltoaction = processForCTA(item.call_to_action.value[0])
+    hydrated.callToAction = processForCTA(item.call_to_action.value[0])
   }
   if (item.product_listing.value.length) {
     hydrated.product = processForProductPicker(item.product_listing.value[0])
@@ -52,12 +55,12 @@ const processForPage = (item, depth) => {
   if (item.enhanced_menu.value.length) {
     hydrated.menu = processForEnhancedMenu(item.enhanced_menu.value[0], depth + 1)
   }
-  hydrated.contentID = item.slug.value
+  hydrated.contentID = getContentID()
   hydrated.slug = item.slug.value
   hydrated.title = item.title.value
   hydrated.body = item.body.value
   hydrated.contentBody = item.body.value
-  hydrated.settings = { contentTemplateFile: 'BasicPage.cfm' }
+  hydrated.contentPageType = 'BasicPage'
   return hydrated
 }
 
@@ -83,33 +86,7 @@ const getEntryBySlug = async (content = {}, slug = '') => {
     .then(response => {
       let augmentedResponse = {}
       if (slug === 'home') {
-        if (response?.slider) {
-          response?.slider.slides.forEach((slide, index) => {
-            augmentedResponse[`home/main-banner-slider/${index}`] = {
-              title: slide.contentTitle,
-              imagePath: slide.contentImage.url,
-              linkUrl: slide.contentLink,
-              linkLabel: slide.contentLinkTitle,
-              contentBody: slide.contentBody,
-            }
-          })
-        }
-        if (response?.contentColumns) {
-          augmentedResponse['home/content-columns'] = { title: response?.contentColumns.title, body: response?.contentColumns.body, columns: [] }
-          augmentedResponse['home/content-columns'].columns = response?.contentColumns.columns.map(slide => {
-            return {
-              title: slide.contentTitle,
-              imagePath: slide.image.url,
-              contentBody: slide.body,
-            }
-          })
-        }
-        if (response?.calltoaction) {
-          augmentedResponse[`home/calltoaction`] = response?.calltoaction
-        }
-        if (response?.product) {
-          augmentedResponse[`home/popularProducts`] = response?.product
-        }
+        augmentedResponse[slug] = response
       } else {
         if (response?.menu) {
           response.menu.pages.forEach(page => {
@@ -148,10 +125,7 @@ const getHeaderBySlug = async (content = {}, slug = '') => {
         hydrated.settings = {}
       }
       // console.log('hydrated ', hydrated)
-      return hydrated
-    })
-    .then(response => {
-      return { header: response }
+      return { header: hydrated }
     })
 }
 /*
@@ -171,26 +145,15 @@ const getFooterBySlug = async (content = {}, slug = '') => {
         const item = response.items[0]
         //   console.log('getFooterBySlug', response)
         if (item.blocks.value.length) {
-          hydrated.blocks = item.blocks.value.map(block => {
+          hydrated.children = item.blocks.value.map(block => {
             return processForBlock(block)
           })
         }
         hydrated.title = item.heading.value
-        hydrated.body = item.custombody.value
+        hydrated.key = getContentID()
         hydrated.contentBody = item.custombody.value
       }
-      //   console.log('hydrated ', hydrated)
-      return hydrated
-    })
-    .then(response => {
-      const children = response?.blocks?.map(block => {
-        block.urlTitle = block.key
-        block.key = `footer/${block.key}`
-        return block
-      })
-
-      //   console.log('getFooterBySlug final ', augmentedResponse)
-      return { footer: { children } }
+      return { footer: hydrated }
     })
 }
 /*
@@ -267,17 +230,20 @@ const processForCatagory = ({ codename, name }) => {
 }
 const processForSlide = slide => {
   let response = {}
-  response.contentTitle = slide.contenttitle.value
+  response.title = slide.contenttitle.value
   response.contentBody = slide.contentbody.value
   response.contentImage = processForAsset(slide.contentimage.value[0])
-  response.contentLink = slide.contentlink.value
-  response.contentLinkTitle = slide.contentlinktitle.value
+  response.imagePath = response.contentImage.url
+  response.linkUrl = slide.contentlink.value
+  response.linkLabel = slide.contentlinktitle.value
+  response.contentID = getContentID()
   return response
 }
 const processForSlider = slider => {
   let response = {}
   response.contentTitle = slider.contenttitle.value
-  response.contentTitle = slider.contentbody.value
+  response.contentBody = slider.contentbody.value
+  response.contentID = getContentID()
   response.slides = slider.slider.value.map(slide => {
     return processForSlide(slide)
   })
@@ -286,13 +252,12 @@ const processForSlider = slider => {
 const processForBlock = block => {
   let response = {}
   response.title = block.title.value
-  response.title_link = block.title_link.value
-  response.body = block.body.value
   response.contentBody = block.body.value
-  response.key = block.system.codename.replaceAll('_', '-')
-  response.settings = {}
+  response.urlTitle = block.system.codename.replaceAll('_', '-')
+  response.key = `${getContentID()}/${block.system.codename.replaceAll('_', '-')}`
   if (block.image.value.length) {
     response.image = processForAsset(block.image.value[0])
+    response.imagePath = response.image.url
   }
   return response
 }

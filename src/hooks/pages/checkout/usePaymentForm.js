@@ -7,6 +7,7 @@ import { SlatwalApiService } from '../../../services'
 import { getErrorMessage } from '../../../utils'
 import * as Yup from 'yup'
 import { useTranslation } from 'react-i18next'
+import dayjs from 'dayjs'
 
 const validationSchema = Yup.object({
   creditCardNumber: Yup.string().required('Required'),
@@ -30,8 +31,8 @@ export const usePaymentForm = () => {
     paymentMethodType: 'creditCard',
     creditCardNumber: '',
     nameOnCreditCard: '',
-    expirationMonth: new Date().getMonth() + 2,
-    expirationYear: new Date().getFullYear().toString().substring(2),
+    expirationMonth: dayjs().add(1, 'month').format('MM'),
+    expirationYear: dayjs().add(1, 'month').format('YYYY'),
     securityCode: '',
     billingAccountAddress: {
       accountAddressID: '',

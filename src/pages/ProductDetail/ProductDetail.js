@@ -31,15 +31,15 @@ const ProductDetail = () => {
         }).length === productOptions.length
       )
     })
-    
+
     //check if product is of gift card type, if yes then return default sku from sku list (as it will not have options)
-    if( product?.productType_productTypeIDPath && product?.defaultSku_skuID && ( product.productType_productTypeIDPath ).includes('50cdfabbc57f7d103538d9e0e37f61e4') ) {
+    if (product?.productType_productTypeIDPath && product?.defaultSku_skuID && product.productType_productTypeIDPath.includes('50cdfabbc57f7d103538d9e0e37f61e4')) {
       found = skus.filter(sku => sku.skuID === product.defaultSku_skuID)
     }
-    
+
     return found.length === 1 ? found[0] : null
   }
-  
+
   let selectedSKu = selectionToSku(skus, optionGroupPairs)
   if (params?.skuid) {
     // If we have a skuID we need to redirect to codes
@@ -110,7 +110,7 @@ const ProductDetail = () => {
               <ProductDetails sku={selectedSKu} product={product} />
 
               {!isFetching && !cart.isFetching && skus?.length && <SkuOptions sku={selectedSKu} selection={params} productOptions={updatedProductOptions} skus={skus} />}
-              {/* We hide the quantity and add to cart button if the calculatedQATS is 0 */}
+
               <ProductForm sku={selectedSKu} isDisabled={isFetching || cart.isFetching || !selectedSKu?.skuID} isLoading={isFetching || cart.isFetching} />
 
               <div className="row mb-4">

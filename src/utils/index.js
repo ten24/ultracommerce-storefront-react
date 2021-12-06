@@ -117,7 +117,7 @@ export const getOptionByCode = (filteredOptions, optionGroupCode, optionCode) =>
     .shift()
 }
 export const getContentByType = (content = [], code = '') => {
-  return content.filter(con => con?.contentElementType_systemCode === code)
+  return content.filter(con => con?.contentElementType_systemCode === code).sort((a, b) => a.sortOrder - b.sortOrder)
 }
 export const getAllChildrenContentByType = (content = [], code = '') => {
   const response = []

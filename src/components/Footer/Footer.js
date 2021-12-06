@@ -13,7 +13,7 @@ function Footer() {
   const { t } = useTranslation()
 
   return (
-    <footer className="footer">
+    <footer className="footer no-print">
       <div className="container pt-5">
         <div className="row justify-content-between pt-2">
           {footer?.children?.map(column => {

@@ -19,8 +19,8 @@ const ContentPage = () => {
   const path = loc.pathname.split('/').reverse()[0].toLowerCase()
   const content = useSelector(state => state.content)
   let component = 'NotFound'
-  if (!content.isFetching && content[path] && content[path].settings) {
-    component = content[path].settings.contentTemplateFile.replace('.cfm', '')
+  if (!content.isFetching && content[path]) {
+    component = content[path].contentPageType
   }
 
   return <Layout>{!content.isFetching && createElement(pageComponents[component])}</Layout>

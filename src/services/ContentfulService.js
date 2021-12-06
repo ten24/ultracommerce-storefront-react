@@ -252,7 +252,7 @@ const getEntryBySlug = async (content = {}, slug = '') => {
         })
       }
 
-      payload[slug].settings = { contentTemplateFile: 'BasicPage.cfm' } // this needs to be a content type field on the content. this will dynamically render using the generic BasicPage Page Component.
+      payload[slug].contentPageType = 'BasicPage'
     } else {
       payload[slug] = false
     }

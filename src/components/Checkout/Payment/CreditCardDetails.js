@@ -9,6 +9,7 @@ import { getErrorMessage } from '../../../utils'
 import { useCheckoutUtilities } from '../../../hooks'
 import * as Yup from 'yup'
 import { useState } from 'react'
+import dayjs from 'dayjs'
 
 const CreditCardDetails = ({ onSubmit }) => {
   const { t } = useTranslation()
@@ -28,8 +29,8 @@ const CreditCardDetails = ({ onSubmit }) => {
     paymentMethodType: 'creditCard',
     creditCardNumber: '',
     nameOnCreditCard: '',
-    expirationMonth: new Date().getMonth() + 2,
-    expirationYear: new Date().getFullYear().toString().substring(2),
+    expirationMonth: dayjs().add(1, 'month').format('MM'),
+    expirationYear: dayjs().add(1, 'month').format('YYYY'),
     securityCode: '',
     accountAddressID: billingAccountAddress ? billingAccountAddress.accountAddressID : '',
     saveShippingAsBilling: false,

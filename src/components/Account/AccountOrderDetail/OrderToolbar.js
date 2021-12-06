@@ -23,7 +23,7 @@ const OrderToolbar = ({ delivered, orderPayments }) => {
                 <i className="bi bi-box-full mr-2"></i> Request RMA
               </a>
             </div> */}
-            <button className="btn btn-outline-secondary w-25">
+            <button className="btn btn-outline-secondary w-25 no-print" onClick={() => window.print()}>
               <i className="bi bi-print mr-2"></i> Print
             </button>
           </div>

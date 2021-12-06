@@ -95,6 +95,8 @@ export { RelatedProductsSlider } from './RelatedProductsSlider/RelatedProductsSl
 export { ProductDetailGallery } from './ProductDetail/ProductDetailGallery'
 export { ProductPageHeader } from './ProductDetail/ProductPageHeader'
 export { ProductPagePanels } from './ProductDetail/ProductPagePanels'
+export { ProductQuantityInput } from './ProductDetail/ProductQuantityInput'
+
 export { SkuOptions } from './ProductDetail/SkuOptions'
 export { ProductAdditionalInformation } from './ProductDetail/ProductAdditionalInformation'
 export { ProductDetails } from './ProductDetail/ProductDetails'
@@ -115,6 +117,7 @@ export { Loading } from './Loading/Loading'
 export { SEO } from './SEO/SEO'
 
 //Global
+export { Modal } from './Modal/Modal'
 export { Footer } from './Footer/Footer'
 export { Header } from './Header/Header'
 export { SearchBar } from './Header/SearchBar'

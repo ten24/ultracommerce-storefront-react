@@ -2,30 +2,28 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { useUtilities } from '../../hooks'
 import { useTranslation } from 'react-i18next'
-import { getNestedContent } from '../../selectors/contentSelectors'
 import { SimpleImage } from '..'
 import { useLocation } from 'react-router'
-import { getAllChildrenContentByType } from '../../utils'
 
 const ContentSlider = () => {
   const { t } = useTranslation()
   let { eventHandlerForWSIWYG } = useUtilities()
   let { pathname } = useLocation()
   if (pathname === '/') pathname = 'home'
-  const structuredContent = useSelector(getNestedContent)
-  const pageData = structuredContent.filter(con => con.key === pathname).reduce((accumulator, con) => con, {})
-  const slides = getAllChildrenContentByType(pageData.children, 'cetContentSlide')
+  const pageData = useSelector(state => state.content[pathname])
   return (
     <div className="hero content-slider">
-      {slides && slides.length > 0 && (
+      {pageData?.slider?.slides && pageData.slider.slides.length > 0 && (
         <div id="carousel" className="carousel slide" data-bs-ride="carousel">
-          <div className="carousel-indicators">
-            {slides.map(({ title }, idx) => {
-              return <button key={title} type="button" data-bs-target="#carousel" data-bs-slide-to={idx} className={idx === 0 ? 'active' : ''} aria-current="true" aria-label={`Slide ${idx}`}></button>
-            })}
-          </div>
+          {pageData?.slider?.slides?.length > 1 && (
+            <div className="carousel-indicators">
+              {pageData.slider.slides.map(({ title }, idx) => {
+                return <button key={title} type="button" data-bs-target="#carousel" data-bs-slide-to={idx} className={idx === 0 ? 'active' : ''} aria-current="true" aria-label={`Slide ${idx}`}></button>
+              })}
+            </div>
+          )}
           <div className="carousel-inner">
-            {slides.map(({ contentBody, title, imagePath, linkUrl, linkLabel }, key) => {
+            {pageData.slider.slides.map(({ contentBody, title, imagePath, linkUrl, linkLabel }, key) => {
               return (
                 <div key={title} className={key === 0 ? 'carousel-item active' : 'carousel-item'}>
                   <SimpleImage className="d-block w-100" src={imagePath} alt="carouselImage" />
@@ -44,14 +42,19 @@ const ContentSlider = () => {
               )
             })}
           </div>
-          <button className="carousel-control-prev" type="button" data-bs-target="#carousel" data-bs-slide="prev">
-            <span className="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span className="visually-hidden">{t('frontend.core.previous')}</span>
-          </button>
-          <button className="carousel-control-next" type="button" data-bs-target="#carousel" data-bs-slide="next">
-            <span className="carousel-control-next-icon" aria-hidden="true"></span>
-            <span className="visually-hidden">{t('frontend.core.next')}</span>
-          </button>
+
+          {pageData?.slider?.slides && pageData.slider.slides.length > 0 && (
+            <>
+              <button className="carousel-control-prev" type="button" data-bs-target="#carousel" data-bs-slide="prev">
+                <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span className="visually-hidden">{t('frontend.core.previous')}</span>
+              </button>
+              <button className="carousel-control-next" type="button" data-bs-target="#carousel" data-bs-slide="next">
+                <span className="carousel-control-next-icon" aria-hidden="true"></span>
+                <span className="visually-hidden">{t('frontend.core.next')}</span>
+              </button>
+            </>
+          )}
         </div>
       )}
     </div>

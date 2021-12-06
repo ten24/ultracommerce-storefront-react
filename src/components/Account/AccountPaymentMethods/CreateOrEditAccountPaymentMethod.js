@@ -10,6 +10,7 @@ import { getErrorMessage } from '../../../utils'
 import { toast } from 'react-toastify'
 import { receiveUser } from '../../../actions'
 import { useHistory } from 'react-router'
+import dayjs from 'dayjs'
 
 const initialBillingAddress = {
   countryCode: 'US',
@@ -41,12 +42,11 @@ const CreateOrEditAccountPaymentMethod = () => {
     paymentMethodType: 'creditCard',
     creditCardNumber: '',
     nameOnCreditCard: '',
-    expirationMonth: new Date().getMonth() + 2,
-    expirationYear: new Date().getFullYear().toString().substring(2),
+    expirationMonth: dayjs().add(1, 'month').format('MM'),
+    expirationYear: dayjs().add(1, 'month').format('YYYY'),
     securityCode: '',
   })
   const [paymentMethodErrors, setPaymentMethodErrors] = useState({})
-
   const saveCardToAccount = () => {
     const payload = { ...paymentMethod, transactionInitiator: 'ACCOUNT', billingAccountAddress: { accountAddressID: '' }, billingAddress: {}, returnJSONObjects: 'account' }
     if (billingAccountAddressID.length) payload.billingAccountAddress.accountAddressID = billingAccountAddressID

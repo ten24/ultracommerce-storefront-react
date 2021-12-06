@@ -27,6 +27,12 @@ const data = {
   products: {
     fallbackImageCall: false,
     loginRequiredForPrice: false,
+    dropdownLimit: 20,
+    quantityInput: 'text', // [ text|dropdown]
+  },
+  productPrice: {
+    checkInvetory: false,
+    showPriceForUnverifiedAccounts: true,
   },
   listings: {
     productListing: {

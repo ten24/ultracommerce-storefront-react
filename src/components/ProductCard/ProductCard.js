@@ -15,7 +15,7 @@ const ProductCard = props => {
   const useResizedImage = images && images?.length > 0
 
   return (
-    <div className="card border-0 p-3">
+    <div className="card p-3 pt-2 h-100">
       {productClearance === true && <span className="badge">{t('frontend.core.special')}</span>}
       <HeartButton skuID={skuID} />
       <Link to={`/${product}/${urlTitle}?skuid=${skuID}`}>
@@ -37,7 +37,7 @@ const ProductCard = props => {
 
         <ProductPrice salePrice={salePrice} listPrice={listPrice} className="d-flex" />
       </div>
-      <div className="text-center card-footer border-0 bg-transparent">
+      <div className="text-center card-footer border-0 bg-transparent pb-3 pt-0">
         <Button disabled={request.isFetching} isLoading={request.isFetching} className="btn btn-primary btn-block my-3" label={t('frontend.product.add_to_cart')} onClick={() => setRequest({ makeRequest: true, isFetching: true })} />
       </div>
     </div>

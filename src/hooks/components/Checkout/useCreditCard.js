@@ -6,6 +6,7 @@ import { SlatwalApiService } from '../../../services'
 import { toast } from 'react-toastify'
 import { getErrorMessage } from '../../../utils'
 import { useCheckoutUtilities } from './useCheckoutUtilities'
+import dayjs from 'dayjs'
 
 /* see: userAction addPaymentMethod */
 
@@ -19,8 +20,8 @@ const useCreditCard = ({ onSubmit }) => {
     initialValues: {
       creditCardNumber: '',
       nameOnCreditCard: '',
-      expirationMonth: new Date().getMonth() + 1,
-      expirationYear: new Date().getFullYear().toString().substring(2),
+      expirationMonth: dayjs().add(1, 'month').format('MM'),
+      expirationYear: dayjs().add(1, 'month').format('YYYY'),
       securityCode: '',
       accountPaymentMethodName: '',
       accountAddressID: billingAccountAddress ? billingAccountAddress.accountAddressID : '',

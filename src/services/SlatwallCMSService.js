@@ -1,4 +1,4 @@
-import { groupBy } from '../utils'
+import { getContentByType, groupBy } from '../utils'
 import { SlatwalApiService } from './SlatwalApiService'
 const generateMegaMenu = content => {
   let menu = Object.keys(content)
@@ -54,14 +54,19 @@ const getEntryBySlugAndType = async (content = {}, slug = '', type = 'page') => 
   return getEntryBySlug(content, slug)
 }
 
-const processForBlock = block => {
+const processForBlock = (block, includeTitle = true) => {
   let response = {}
-  response.title = ''
-  response.title_link = ''
+  if (includeTitle) {
+    response.title = block.title
+    response.title_link = block.linkUrl
+  }
+  response.linkLabel = block.linkLabel
+  response.linkUrl = block.linkUrl
   response.body = block.contentBody
+  response.contentSummary = block.contentSummary
   response.contentBody = block.contentBody
   response.imagePath = block.imagePath
-  response.settings = {}
+  response.elementType = block.contentElementType_systemCode
 
   return response
 }
@@ -71,7 +76,7 @@ const processForMenuItem = menuItem => {
   response.linkUrl = menuItem.linkUrl
   // response.bootstrapIconClass = menuItem.bootstrapiconclass.value
   response.columns = menuItem.children.map(block => {
-    return processForBlock(block)
+    return processForBlock(block, false)
   })
   return response
 }
@@ -170,23 +175,133 @@ const getEntryBySlug = async (content = {}, slug = '') => {
     })
     .then(response => {
       let hydrated = { ...response }
-      if (slug === 'home') {
-        let columns = nestContentByKey(response, 'content-columns')
-        if (columns.length) {
-          columns = {
-            title: columns[0].title,
-            body: '',
-            columns: columns[0].children.map(column => {
-              return { contentBody: column.contentBody, title: column.title, imagePath: column.imagePath }
-            }),
-          }
-        }
-        hydrated = { ...hydrated, 'home/content-columns': columns }
-      }
-
+      // if (slug === 'home') {
+      //   let columns = nestContentByKey(response, 'content-columns')
+      //   if (columns.length) {
+      //     columns = {
+      //       title: columns[0].title,
+      //       body: '',
+      //       columns: columns[0].children.map(column => {
+      //         return { contentBody: column.contentBody, title: column.title, imagePath: column.imagePath }
+      //       }),
+      //     }
+      //     hydrated.contentColumns = getContentByType(response, 'cetContentSlide')
+      //   }
+      //   const pageStruc = processForPage(slug, Object.values(response))
+      //   hydrated = { ...hydrated, [slug]: pageStruc, 'home/content-columns': columns }
+      // } else {
+      const pageStruc = processForPage(slug, Object.values(response))
+      hydrated = { ...hydrated, [slug]: { ...pageStruc, ...response[slug] } }
       return hydrated
     })
 }
+const processForPage = (slug, content) => {
+  let hydrated = {}
+  hydrated.tabs = getContentByType(content, 'cetTab')
+  hydrated.slider = processForSlider(content)
+  hydrated.contentColumns = processForContentColumn(content)
+  hydrated.callToAction = processForSidebar(content)
+  hydrated.sidebar = processForSidebar(content)
+  hydrated.tabs = processForTabs(content)
+  hydrated.callToAction = null
+  hydrated.menu = {}
+  hydrated.contentPageType = 'BasicPage'
+  return hydrated
+}
+const getParent = (content = [], parentContentID) => content.filter(item => item.contentID === parentContentID)
+const getChildren = (content = [], contentID) => content.filter(item => item.parentContent_contentID === contentID).sort((a, b) => a.sortOrder - b.sortOrder)
+const processForSlide = slide => {
+  let response = {}
+  response.title = slide.title
+  response.contentBody = slide.contentBody
+  response.imagePath = slide.imagePath
+  response.linkUrl = slide.linkUrl
+  response.linkLabel = slide.linkLabel
+  response.contentID = slide.contentID
+  return response
+}
+const processForSlider = content => {
+  const slides = getContentByType(content, 'cetContentSlide')
+  let response = {}
+  if (slides?.length) {
+    const parentId = slides[0].parentContent_contentID
+    const parent = getParent(content, parentId)
+    response.contentTitle = parent[0].title
+    response.contentBody = parent[0].contentBody
+    response.contentID = parent[0].contentID
+    response.slides = slides.map(slide => {
+      return processForSlide(slide)
+    })
+  }
+
+  return response
+}
+const processForContentColumn = content => {
+  const column = getContentByType(content, 'cetColumns')
+  const columns = getContentByType(content, 'cetColumn')
+  let response = {}
+  if (column?.length) {
+    response.title = column[0].title
+    response.contentTitle = column[0].title
+    response.contentBody = column[0].contentBody
+    response.contentID = column[0].contentID
+    response.columns = columns.map(c => {
+      return processForBlock(c)
+    })
+  }
+
+  return response
+}
+const processForTabs = content => {
+  const tabs = getContentByType(content, 'cetTab')
+  return tabs.map(tab => {
+    let hydrated = {}
+    hydrated.title = tab.title
+    hydrated.contentBody = tab.contentBody
+    hydrated.contentID = tab.contentID
+
+    hydrated.key = tab.contentID
+    hydrated.children = getChildren(content, tab.contentID)
+    if (hydrated.children) {
+      hydrated.children = hydrated.children.map(child => {
+        return processGeneral(child, content)
+      })
+    }
+
+    return hydrated
+  })
+}
+const processListItem = (item, content) => {
+  let response = {}
+  response.title = item.title
+  response.contentBody = item.contentBody
+  response.contentID = item.contentID
+  response.elementType = item.contentElementType_systemCode
+  response.key = item.contentID
+  response.imagePath = item.imagePath
+  response.linkUrl = item.linkUrl
+  response.linkLabel = item.linkLabel
+  response.children = getChildren(content, item.contentID)
+  if (response.children) {
+    response.children = response.children.map(child => {
+      return processGeneral(child, content)
+    })
+  }
+  return response
+}
+const processGeneral = (item, content) => {
+  let response = {}
+  if (['cetListItem', 'cetListItemWithImage'].includes(item.contentElementType_systemCode)) {
+    response = processListItem(item, content)
+  }
+
+  if (['cetBlock', 'cetProfile'].includes(item.contentElementType_systemCode)) {
+    response = processForBlock(item)
+  }
+  return response
+}
+const processForSidebar = content => getContentByType(content, 'cetSidebar')
+
 const processForPost = post => {
   const response = { ...post }
   response.postTitle = post?.title

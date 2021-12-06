@@ -14,7 +14,7 @@ const ProductSlider = ({ children, settings, title, slidesToShow = 4, products =
         slidesToShow: slidesToShow,
         slidesToScroll: 1,
         autoplay: true,
-        autoplaySpeed: 3000,
+        autoplaySpeed: 5000,
         responsive: [
           {
             breakpoint: 1200,
@@ -49,7 +49,7 @@ const ProductSlider = ({ children, settings, title, slidesToShow = 4, products =
             return (
               <div className="repeater" key={slide.defaultSku_skuID}>
                 {/*Fixed the slider design issue */}
-                <div className="card-body">
+                <div className="card-body h-100">
                   <ProductCard {...slide} imageFile={slide.defaultSku_imageFile} skuID={slide.defaultSku_skuID} salePrice={slide.salePrice} listPrice={slide.listPrice} key={slide.defaultSku_skuID} />
                 </div>
               </div>

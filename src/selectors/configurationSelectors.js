@@ -3,6 +3,7 @@ import { createSelector } from 'reselect'
 export const getRoutes = state => state.configuration.router
 export const getSiteConfig = state => state.configuration.site
 export const getImageFallbackFlag = state => state.configuration.products.fallbackImageCall
+export const checkInvetory = state => state.configuration.productPrice.checkInvetory
 
 export const isVatCountry = createSelector(getSiteConfig, ({ defaultCountry, hibachiConfig }) => {
   return hibachiConfig?.vatCountries?.split(',')?.includes(defaultCountry) || false

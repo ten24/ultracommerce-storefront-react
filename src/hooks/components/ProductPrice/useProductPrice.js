@@ -33,8 +33,9 @@ const useProductPrice = ({ salePrice = 0, listPrice = 0, type = 'product' }) => 
     Only show if list is different than of is the user is not authenticated
   */
   const showListPrice = listPriceDisplay > 0 && salePriceDisplay < listPriceDisplay && salePriceDisplay !== listPriceDisplay && !loginRequiredForPrice
+  const showAddToCart = !(salePrice <= 0 && listPrice <= 0)
 
-  return { showMissingPrice, showListPrice, showSalePrice, isAuthed, loginRequiredForPrice }
+  return { showAddToCart, showMissingPrice, showListPrice, showSalePrice, isAuthed, loginRequiredForPrice }
 }
 
 export { useProductPrice }
