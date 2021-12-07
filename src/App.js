@@ -8,6 +8,7 @@ import logo from './assets/images/logo.svg'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useCMSWrapper, useScrollToTop } from '@slatwall/slatwall-storefront-react/hooks'
 import Home from './pages/Home/Home'
+// import { useCMSWrapper } from './hooks/components/CMSWrapper/useCMSWrapper'
 
 const pageComponents = {
   Blog,

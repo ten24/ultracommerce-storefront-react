@@ -5,6 +5,8 @@ const data = {
   footer: {
     formLink: '',
   },
+  cmsProvider: 'myCustomCMSLogic',
+
   theme: {
     ...preload.theme,
     host: process.env.REACT_APP_HOST_URL,

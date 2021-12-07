@@ -3,10 +3,9 @@ import { useSelector } from 'react-redux'
 import { ContentSlider, ProductSliderWithConfig, BrandSlider, ContentColumns, Layout, LatestNews, ContentBlock, ActionBanner } from '@slatwall/slatwall-storefront-react/components'
 import { useTranslation } from 'react-i18next'
 function Home() {
-  const content = useSelector(state => state.content)
-  const popularProducts = content['home/popularProducts'] || {}
-  const contentColumns = content['home/content-columns'] || {}
-  const callToAction = content['home/callToAction']
+  const { home = {} } = useSelector(state => state.content)
+  const { callToAction, popularProducts, contentColumns } = home
+
   const { t } = useTranslation()
   return (
     <Layout>
