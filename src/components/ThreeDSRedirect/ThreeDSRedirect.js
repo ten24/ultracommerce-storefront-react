@@ -46,15 +46,3 @@ const ThreeDSRedirect = ({ url, payload, method }) => {
   )
 }
 export { ThreeDSRedirect }
-
-/*
-
-
-https://cluson.slatwallcommerce-dev.io/threeDSHandover
-
-http://localhost:3006/threeDSHandover
-
-https://cluson-admin.slatwallcommerce-dev.io/index.cfm/api/scope/pay360threeDSHandover
-
-http://cluson:8906/index.cfm/api/scope/pay360threeDSHandover
-*/

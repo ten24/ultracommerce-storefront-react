@@ -65,7 +65,6 @@ const CreditCardDetails = ({ onSubmit }) => {
         }
       })
   }
-  //http://cluson:8906/index.cfm/api/scope/pay360threeDSHandover?MD=10145770911&reload=true
 
   const requiredValidation = ({ value, name, msg }) => {
     Yup.string()
