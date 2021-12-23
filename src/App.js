@@ -9,7 +9,7 @@ import mobileLogo from './assets/images/logo-mobile.svg'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useCMSWrapper, useScrollToTop } from './hooks'
 import Testing from './pages/Testing/Testing'
-import { getBlogRoute } from './selectors/configurationSelectors'
+import { getBlogRoute } from './selectors'
 
 const pageComponents = {
   Blog,
