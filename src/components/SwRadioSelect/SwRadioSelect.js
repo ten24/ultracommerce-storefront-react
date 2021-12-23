@@ -1,12 +1,10 @@
-const SwRadioSelect = ({ label, onChange, options = [], selectedValue }) => {
+const SwRadioSelect = ({ label, onChange, options = [], selectedValue, errorMsg }) => {
   return (
     <div className="form-group">
       {/* don't pass label for custom label */}
       {label && (
         <>
           <label className="w-100 h4">{label}</label>
-          {/* <hr />
-          <br /> */}
         </>
       )}
 
@@ -31,6 +29,7 @@ const SwRadioSelect = ({ label, onChange, options = [], selectedValue }) => {
             )
           })}
       </div>
+      {!!errorMsg && <span className="form-error-msg">{errorMsg}</span>}
     </div>
   )
 }

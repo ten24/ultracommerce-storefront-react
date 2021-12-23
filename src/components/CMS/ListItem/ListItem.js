@@ -8,7 +8,7 @@ const ListItemWithImage = props => {
 const ListItem = item => {
   let { eventHandlerForWSIWYG } = useUtilities()
   return (
-    <div className="container">
+    <div className="ListItem container">
       <div className="row">
         <div className="col">
           <div className="listItem">
@@ -28,7 +28,7 @@ const ListItem = item => {
           </div>
         </div>
         {item.showImage && (
-          <div className="col col-lg-4">
+          <div className="col-lg-4">
             <SimpleImage src={item.imagePath} className="img-fluid " alt={item.title} />
           </div>
         )}

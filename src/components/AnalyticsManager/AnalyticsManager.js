@@ -1,40 +1,32 @@
 import { useSelector } from 'react-redux'
 import { CookieBanner } from '@palmabit/react-cookie-law'
 import { useTranslation } from 'react-i18next'
+import { useUtilities } from '../../hooks'
 
-function AnalyticsManager() {
+const AnalyticsManager = ({ cookieSettings }) => {
   const showCookieBanner = useSelector(state => state.configuration.analytics.showCookieBanner)
-  const { t } = useTranslation()
+  const { eventHandlerForWSIWYG } = useUtilities()
 
-  return (
-    <>
-      {showCookieBanner && (
-        <CookieBanner
-          message={t('frontend.coookie.banner')}
-          wholeDomain={true}
-          onAccept={() => {}}
-          onDeclinePreferences={() => {}}
-          onDeclineStatistics={() => {
-            window['Statistics-Allowed'] = false
-          }}
-          onDeclineMarketing={() => {
-            window['Marketing-Allowed'] = false
-          }}
-          onAcceptPreferences={() => {}}
-          onAcceptStatistics={() => {
-            window['Statistics-Allowed'] = true
-          }}
-          onAcceptMarketing={() => {
-            window['Marketing-Allowed'] = true
-          }}
-          preferencesDefaultChecked={true}
-          statisticsDefaultChecked={true}
-          marketingDefaultChecked={true}
-          managePreferencesButtonText={t('frontend.cookie.buttonNext')}
-        />
-      )}
-    </>
-  )
+  const { t } = useTranslation()
+  const settings = {
+    message: t('frontend.coookie.banner'),
+    wholeDomain: true,
+    onAccept: () => {},
+    onAcceptPreferences: () => {},
+    onAcceptStatistics: () => {
+      window['Statistics-Allowed'] = true
+    },
+    onAcceptMarketing: () => {
+      window['Statistics-Allowed'] = true
+    },
+    preferencesDefaultChecked: true,
+    statisticsDefaultChecked: true,
+    marketingDefaultChecked: true,
+    policyLink: '/governance-and-policies',
+    privacyPolicyLinkText: t('frontend.cookie_policy'),
+    ...cookieSettings,
+  }
+  return <div onClick={eventHandlerForWSIWYG}>{showCookieBanner && <CookieBanner {...settings} />}</div>
 }
 
 export { AnalyticsManager }

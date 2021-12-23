@@ -551,13 +551,13 @@ export const useGetSkuOptionDetails = () => {
   return [request, setRequest]
 }
 
-export const useGetProductImageGallery = productID => {
+export const useGetProductImageGallery = urlTitle => {
   let [isFetching, setFetching] = useState(true)
   let [imageGallery, setImageGallery] = useState([])
   let [error, setError] = useState({ isError: false, message: '' })
   useEffect(() => {
     let source = axios.CancelToken.source()
-    SlatwalApiService.products.getGallery({ productID, resizeSizes: 'large,small' }, headers, source).then(response => {
+    SlatwalApiService.products.getGallery({ urlTitle, resizeSizes: 'large,small' }, headers, source).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) setError({ isError: false, message: getErrorMessage(response.success().errors) })
       if (response.isSuccess()) {
         setImageGallery(response.success().images)
@@ -569,7 +569,7 @@ export const useGetProductImageGallery = productID => {
     return () => {
       source.cancel()
     }
-  }, [productID])
+  }, [urlTitle])
 
   return { isFetching, imageGallery, error }
 }

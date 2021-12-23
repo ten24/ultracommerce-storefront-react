@@ -1,14 +1,21 @@
 import { useEffect } from 'react'
 
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import * as braintree from 'braintree-web'
 import * as paypal from 'paypal-checkout'
 import axios from 'axios'
+import { SwRadioSelect } from '../../../components'
 import { sdkURL } from '../../../services'
 import { addPayment } from '../../../actions'
+import { getSavedPaypalMethods, orderPayment } from '../../../selectors'
+import { useTranslation } from 'react-i18next'
 
 const PayPalPayment = () => {
   const dispatch = useDispatch()
+  const paymentMethods = useSelector(getSavedPaypalMethods)
+  const { t } = useTranslation()
+  const { accountPaymentMethod = { accountPaymentMethodID: '' } } = useSelector(orderPayment)
+
   useEffect(() => {
     let source = axios.CancelToken.source()
 
@@ -22,11 +29,9 @@ const PayPalPayment = () => {
         },
         data: { paymentToken },
       }).then(response => {
-        console.log('createPayPalAccountPaymentMethod response', response)
         if (response.status === 200) {
           return response.data
         }
-        console.log('Error in creating paypal account payment method.')
         return null
       })
     }
@@ -50,8 +55,6 @@ const PayPalPayment = () => {
       const paypalClient = await braintree.paypalCheckout.create({ client: braintreeClient })
 
       const payment = (data, actions) => {
-        console.log('payment paypalClient', paypalClient)
-        console.log('payment paypalConfig', paypalConfig)
         return paypalClient.createPayment({
           flow: 'vault',
           billingAgreementDescription: '',
@@ -71,9 +74,7 @@ const PayPalPayment = () => {
         })
       }
       const onAuthorize = (data, actions) => {
-        console.log('onAuthorize data', data)
         return paypalClient.tokenizePayment(data).then(payload => {
-          console.log('tokenizePayment payload', payload)
           if (payload.nonce) {
             return createPayPalAccountPaymentMethod(payload.nonce).then(ppMethod => {
               dispatch(
@@ -92,7 +93,6 @@ const PayPalPayment = () => {
           }
           return null
         })
-        // send payload.nonce to server
       }
       let buttonConfig = {
         env: paypalConfig.paymentMode,
@@ -108,9 +108,33 @@ const PayPalPayment = () => {
       source.cancel()
     }
   }, [dispatch])
-
   return (
     <>
+      <hr />
+      {paymentMethods?.length > 0 && (
+        <div className="row mb-3">
+          <div className="col-sm-6">
+            <div className="form-group">
+              <SwRadioSelect
+                label={t('frontend.checkout.PaypalOptions')}
+                options={paymentMethods}
+                onChange={value => {
+                  dispatch(
+                    addPayment({
+                      accountPaymentMethodID: value,
+                      newOrderPayment: {
+                        requireBillingAddress: 0,
+                      },
+                    })
+                  )
+                }}
+                selectedValue={accountPaymentMethod.accountPaymentMethodID}
+                displayNew={false}
+              />
+            </div>
+          </div>
+        </div>
+      )}
       <div className="row mb-3">
         <div className="col-sm-6">
           <div className="form-group">

@@ -11,9 +11,10 @@ import { toast } from 'react-toastify'
 import { receiveUser } from '../../../actions'
 import { useHistory } from 'react-router'
 import dayjs from 'dayjs'
+import { getDefaultCountry } from '../../../selectors'
 
 const initialBillingAddress = {
-  countryCode: 'US',
+  countryCode: null,
   name: '',
   company: '',
   phoneNumber: '',
@@ -26,6 +27,7 @@ const initialBillingAddress = {
 }
 const CreateOrEditAccountPaymentMethod = () => {
   const accountAddresses = useSelector(state => state.userReducer.accountAddresses)
+  const countryCode = useSelector(getDefaultCountry)
   const [showNewAddressForm, setShowNewAddressForm] = useState(false)
   let [redirectUrl, setRedirectUrl] = useState()
   let [redirectPayload, setRedirectPayload] = useState({})
@@ -35,7 +37,9 @@ const CreateOrEditAccountPaymentMethod = () => {
   const history = useHistory()
   const { t } = useTranslation()
   const { months, years } = useCheckoutUtilities()
-  const [billingAddress, setBillingAddress] = useState(initialBillingAddress)
+  const [billingAddress, setBillingAddress] = useState({ ...initialBillingAddress, countryCode })
+  const [billingAddressErrors, setBillingAddressErrors] = useState({})
+  const [billingAccountAddressIDError, setBillingAccountAddressIDError] = useState()
   const [billingAccountAddressID, setBillingAccountAddressID] = useState('')
   const [paymentMethod, setPaymentMethod] = useState({
     accountPaymentMethodName: '',
@@ -90,7 +94,59 @@ const CreateOrEditAccountPaymentMethod = () => {
         )
       })
   }
-
+  const verifyOnSubmit = () => {
+    try {
+      Yup.object()
+        .shape({
+          creditCardNumber: Yup.string().required('Required'),
+          nameOnCreditCard: Yup.string().required('Required'),
+          expirationMonth: Yup.string().required('Required'),
+          expirationYear: Yup.string().required('Required'),
+          securityCode: Yup.string().required('Required'),
+          accountPaymentMethodName: Yup.string().required('Required'),
+        })
+        .validateSync(paymentMethod, { abortEarly: false })
+    } catch (err) {
+      setPaymentMethodErrors(
+        err.inner.reduce((acc, { path, message }) => {
+          return {
+            ...acc,
+            [path]: { path, message },
+          }
+        }, paymentMethodErrors)
+      )
+      return false
+    }
+    if (!showNewAddressForm && billingAccountAddressID.length === 0) {
+      setBillingAccountAddressIDError('Required')
+      return false
+    } else if (!showNewAddressForm && billingAccountAddressID.length > 0) {
+      return true
+    } else {
+      try {
+        Yup.object()
+          .shape({
+            name: Yup.string().required('Required'),
+            streetAddress: Yup.string().required('Required'),
+            city: Yup.string().required('Required'),
+            stateCode: Yup.string().required('Required'),
+            postalCode: Yup.string().required('Required'),
+          })
+          .validateSync(billingAddress, { abortEarly: false })
+        return true
+      } catch (err) {
+        setBillingAddressErrors(
+          err.inner.reduce((acc, { path, message }) => {
+            return {
+              ...acc,
+              [path]: { path, message },
+            }
+          }, billingAddressErrors)
+        )
+        return false
+      }
+    }
+  }
   if (redirectUrl) return <ThreeDSRedirect url={redirectUrl} payload={redirectPayload} method={redirectMethod} />
   return (
     <AccountLayout>
@@ -266,60 +322,60 @@ const CreateOrEditAccountPaymentMethod = () => {
                 }}
               />
             </div>
-          </div>
-          <div className="col-md-12">
-            <hr className="my-4" />
-          </div>
 
-          {paymentMethod.creditCardNumber.length > 0 && (
-            <div className="row">
-              <div className="col-sm-12">
-                <div className="col-md-6 pl-0">
-                  <div className="form-group">
-                    <label htmlFor="accountAddressID">{t('frontend.account.billing_address')}</label>
-                    <SwRadioSelect
-                      onChange={value => {
-                        setBillingAccountAddressID(value)
-                        setBillingAddress(initialBillingAddress)
-                        setShowNewAddressForm(false)
-                      }}
-                      options={accountAddresses.map(({ accountAddressName, accountAddressID, address: { streetAddress } }) => {
-                        return { name: `${accountAddressName} - ${streetAddress}`, value: accountAddressID }
-                      })}
-                      selectedValue={billingAccountAddressID}
-                    />
-                    {!showNewAddressForm && (
-                      <button
-                        className="btn btn-secondary mt-2"
-                        onClick={e => {
-                          setBillingAccountAddressID('')
-                          setBillingAddress(initialBillingAddress)
-                          setShowNewAddressForm(true)
+            {paymentMethod.creditCardNumber.length > 0 && (
+              <div className="row">
+                <div className="col-sm-12">
+                  <div className="col-md-6 pl-0">
+                    <div className="form-group">
+                      <label htmlFor="accountAddressID">{t('frontend.account.billing_address')}</label>
+                      <SwRadioSelect
+                        errorMsg={billingAccountAddressIDError}
+                        onChange={value => {
+                          setBillingAccountAddressIDError(null)
+                          setBillingAccountAddressID(value)
+                          setBillingAddress({ ...initialBillingAddress, countryCode })
+                          setShowNewAddressForm(false)
                         }}
-                      >
-                        {t('frontend.account.address.add')}
-                      </button>
-                    )}
+                        options={accountAddresses.map(({ accountAddressName, accountAddressID, address: { streetAddress } }) => {
+                          return { name: `${accountAddressName} - ${streetAddress}`, value: accountAddressID }
+                        })}
+                        selectedValue={billingAccountAddressID}
+                      />
+                      {!showNewAddressForm && (
+                        <button
+                          className="btn btn-secondary mt-2"
+                          onClick={e => {
+                            setBillingAccountAddressIDError(null)
+                            setBillingAccountAddressID('')
+                            setBillingAddress({ ...initialBillingAddress, countryCode })
+                            setShowNewAddressForm(true)
+                          }}
+                        >
+                          {t('frontend.account.address.add')}
+                        </button>
+                      )}
+                    </div>
                   </div>
+                  {showNewAddressForm && <AccountAddressForm billingAddress={billingAddress} setBillingAddress={setBillingAddress} billingAddressErrors={billingAddressErrors} setBillingAddressErrors={setBillingAddressErrors} />}
                 </div>
-                {showNewAddressForm && <AccountAddressForm billingAddress={billingAddress} setBillingAddress={setBillingAddress} />}
               </div>
+            )}
+            <hr className="mt-4 mb-4" />
+            <div className="d-flex flex-wrap justify-content-end">
+              <Button
+                disabled={isFetching}
+                isLoading={isFetching}
+                label={t('frontend.account.payment.saveNew')}
+                classList="btn btn-primary mt-3 mt-sm-0"
+                onClick={() => {
+                  if (verifyOnSubmit()) {
+                    setFetching(true)
+                    saveCardToAccount()
+                  }
+                }}
+              />
             </div>
-          )}
-        </div>
-        <div className="row">
-          <hr className="mt-4 mb-4" />
-          <div className="d-flex flex-wrap justify-content-end">
-            <Button
-              disabled={isFetching}
-              isLoading={isFetching}
-              label={t('frontend.account.payment.saveNew')}
-              classList="btn btn-primary mt-3 mt-sm-0"
-              onClick={() => {
-                setFetching(true)
-                saveCardToAccount()
-              }}
-            />
           </div>
         </div>
       </form>

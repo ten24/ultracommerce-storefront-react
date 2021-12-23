@@ -30,9 +30,12 @@ const useUtilities = () => {
   }
 
   const eventHandlerForWSIWYG = event => {
-    event.preventDefault()
-
     if (event.target.getAttribute('href')) {
+      if (event.target.getAttribute('href').includes('tel:') || event.target.getAttribute('href').includes('mailto:')) {
+        return
+      }
+      event.preventDefault()
+
       if (event.target.getAttribute('href').includes('.pdf')) {
         window.open(event.target.getAttribute('href'), '_blank')
         return
@@ -47,6 +50,8 @@ const useUtilities = () => {
         history.push(event.target.getAttribute('href'))
       }
     } else {
+      event.preventDefault()
+
       if (event.target.closest('a')) {
         history.push(event.target.closest('a').getAttribute('href'))
       }

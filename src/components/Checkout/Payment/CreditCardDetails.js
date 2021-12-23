@@ -297,6 +297,7 @@ const CreditCardDetails = ({ onSubmit }) => {
                                 paymentMethodID: CREDIT_CARD,
                               },
                             },
+                            saveAccountPaymentMethodName: paymentMethod.accountPaymentMethodName,
                             saveAccountPaymentMethodFlag: savePaymentMethodToAccount,
                           })
                         } else {
@@ -347,6 +348,7 @@ const CreditCardDetails = ({ onSubmit }) => {
                       },
                     },
                     accountAddressID: value,
+                    saveAccountPaymentMethodName: paymentMethod.accountPaymentMethodName,
                     saveAccountPaymentMethodFlag: savePaymentMethodToAccount,
                   })
                 }}
@@ -381,6 +383,7 @@ const CreditCardDetails = ({ onSubmit }) => {
                               paymentMethodID: CREDIT_CARD,
                             },
                           },
+                          saveAccountPaymentMethodName: paymentMethod.accountPaymentMethodName,
                           saveAccountPaymentMethodFlag: savePaymentMethodToAccount,
                         })
                       }

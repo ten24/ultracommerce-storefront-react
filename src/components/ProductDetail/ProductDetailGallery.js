@@ -6,9 +6,9 @@ import { useProductDetailGallery } from '../../hooks'
 Probably should move to this eventually
 https://react-slick.neostack.com/docs/example/custom-paging
 */
-const ProductDetailGallery = ({ productID, skuID, imageFile }) => {
-  const { sliders, slider1, slider2, filterImages, isFetching } = useProductDetailGallery({ productID, skuID, imageFile })
-  if (isFetching || !productID) return null
+const ProductDetailGallery = ({ productUrlTitle, skuID, imageFile }) => {
+  const { sliders, slider1, slider2, filterImages, isFetching } = useProductDetailGallery({ productUrlTitle, skuID, imageFile })
+  if (isFetching || !productUrlTitle) return null
   return (
     <div className="row" data-mdb-zoom-effect="true" data-mdb-auto-height="primaryProductImage">
       <div className="preview-item active mb-3" id="first">

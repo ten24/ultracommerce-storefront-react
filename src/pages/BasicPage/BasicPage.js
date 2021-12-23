@@ -1,4 +1,4 @@
-import { ListingGrid, ListingPagination, SimpleTabs } from '../../components'
+import { Blocks, ContentBlock, ContentColumns, ListingGrid, ListingPagination, ListItem, SimpleTabs } from '../../components'
 import { useBasicPage, useUtilities } from '../../hooks'
 
 const BasicPage = () => {
@@ -13,7 +13,7 @@ const BasicPage = () => {
           </div>
         </div>
       </div>
-      <div className="container bg-white shadow-sm rounded-3 p-5 mb-5">
+      <div className="container bg-white shadow-sm rounded-3 p-lg-5 mb-5">
         {content.isMarkup && (
           <div
             className="content-body"
@@ -36,7 +36,30 @@ const BasicPage = () => {
               </div>
             )
           })}
-        <SimpleTabs data={content.tabs} />
+        {content?.tabs?.length > 0 && <SimpleTabs data={content.tabs} />}
+        {content?.contentColumns?.columns?.length > 0 && (
+          <ContentColumns title={content.contentColumns?.title}>
+            <div className="row">
+              <div className="col">
+                <div onClick={eventHandlerForWSIWYG} dangerouslySetInnerHTML={{ __html: content?.contentColumns?.contentBody }} />
+              </div>
+            </div>
+            <div className="row justify-content-center">
+              {content.contentColumns.columns.map((column, index) => {
+                return (
+                  <div key={`${column.title}-${index}`} className={`col-lg-${12 / content?.contentColumns?.columns?.length} pr-4-lg`}>
+                    <ContentBlock {...column} />
+                  </div>
+                )
+              })}
+            </div>
+          </ContentColumns>
+        )}
+
+        {content.listItems.map(item => {
+          return <ListItem {...item} />
+        })}
+        {content?.blocks?.length > 0 && <Blocks blocks={content.blocks} />}
 
         {content?.productListingPageFlag && (
           <>

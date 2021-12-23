@@ -25,12 +25,14 @@ const useBlogPage = () => {
     if (!request.isFetching && !request.isLoaded && !didCancel) {
       setRequest({ ...request, isFetching: true, isLoaded: false, params: { currentPage, skip: currentPage === '1' ? 0 : (currentPage - 1) * countOnPage, limit: countOnPage, category: params.category && [params.category] }, makeRequest: true })
     }
-    history.listen(location => {
+    const unload = history.listen(location => {
       const newParams = queryString.parse(location.search, { arrayFormat: 'separator', arrayFormatSeparator: ',' })
       const skip = newParams.currentPage === '1' ? 0 : (newParams.currentPage ? newParams.currentPage - 1 : 1 - 1) * countOnPage
       setRequest({ ...request, isFetching: true, isLoaded: false, params: { currentPage: newParams.currentPage, skip, limit: countOnPage, category: newParams.category && [newParams.category] }, makeRequest: true })
     })
     return () => {
+      unload()
+
       didCancel = true
     }
   }, [request, setRequest, countOnPage, currentPage, history, loc])

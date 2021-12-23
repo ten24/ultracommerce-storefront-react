@@ -1,20 +1,24 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import { Link, useHistory } from 'react-router-dom'
 import { SimpleImage } from '..'
 
-import { useFormatDateTime, useUtilities } from '../../hooks'
+import { useFormatDate, useUtilities } from '../../hooks'
+import { getBlogRoute } from '../../selectors/configurationSelectors'
 
 function BlogListBody({ blog }) {
   const route = useHistory()
-  const [formateDate] = useFormatDateTime()
+  const [formateDate] = useFormatDate()
   const { t } = useTranslation() // Translate
   let { eventHandlerForWSIWYG } = useUtilities()
+  const blogPath = useSelector(getBlogRoute)
+
   return (
     <article className="shadow mb-5">
       <div className="max-height-img">{blog.postImage && <SimpleImage src={blog.postImage.url} alt={blog.postTitle} />}</div>
       <h2 className="entry-title px-4 py-3 m-0 text-underline">
-        <Link className="link" to={`/blog/${blog.slug}`}>
+        <Link className="link" to={`/${blogPath}/${blog.slug}`}>
           {blog.postTitle}
         </Link>
       </h2>
@@ -40,7 +44,7 @@ function BlogListBody({ blog }) {
         <button
           className="btn btn-primary btn-block"
           onClick={() => {
-            route.push({ pathname: `/blog/${blog.slug}` })
+            route.push({ pathname: `/${blogPath}/${blog.slug}` })
           }}
         >
           {t('frontend.blog.readMore')}

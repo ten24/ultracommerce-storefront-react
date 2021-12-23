@@ -2,11 +2,11 @@ import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { CreditCardDetails, SwRadioSelect } from '../..'
 import { addPayment } from '../../../actions/'
-import { accountPaymentMethods, orderPayment } from '../../../selectors/'
+import { getSavedCreditCardMethods, orderPayment } from '../../../selectors/'
 import { useTranslation } from 'react-i18next'
 
 const CreditCardPayment = () => {
-  const paymentMethods = useSelector(accountPaymentMethods)
+  const paymentMethods = useSelector(getSavedCreditCardMethods)
   const [newOrderPayment, setNewOrderPayment] = useState(false)
   const { accountPaymentMethod = { accountPaymentMethodID: '' } } = useSelector(orderPayment)
   const dispatch = useDispatch()

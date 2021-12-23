@@ -13,12 +13,13 @@ const BlogPost = () => {
     if (!request.isFetching && !request.isLoaded && !didCancel) {
       setRequest({ ...request, isFetching: true, isLoaded: false, params: { slug: loc.params.id }, makeRequest: true })
     }
-    history.listen(location => {
+    const unload = history.listen(location => {
       let slug = location.pathname.split('/')
       slug = slug[2]
       setRequest({ ...request, isFetching: true, isLoaded: false, params: { slug }, makeRequest: true })
     })
     return () => {
+      unload()
       didCancel = true
     }
   }, [request, history, loc, setRequest])

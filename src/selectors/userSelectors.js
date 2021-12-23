@@ -6,10 +6,26 @@ export const getPrimaryAddress = state => state.userReducer.primaryAddress
 export const getWishlists = state => state.userReducer.wishList.lists
 export const getWishlistsItems = state => state.userReducer.wishList.items
 
+const creditCardTypePaypal = 'PayPal'
+
 export const accountPaymentMethods = createSelector(getAllAccountPaymentMethods, (accountPaymentMethods = []) => {
   return accountPaymentMethods.map(({ accountPaymentMethodName, creditCardType, creditCardLastFour, accountPaymentMethodID }) => {
     return { name: `${accountPaymentMethodName} | ${creditCardType} - *${creditCardLastFour}`, value: accountPaymentMethodID }
   })
+})
+export const getSavedCreditCardMethods = createSelector(getAllAccountPaymentMethods, (accountPaymentMethods = []) => {
+  return accountPaymentMethods
+    .filter(accountPayment => ![creditCardTypePaypal].includes(accountPayment.creditCardType))
+    .map(({ accountPaymentMethodName, creditCardType, creditCardLastFour, accountPaymentMethodID }) => {
+      return { name: `${accountPaymentMethodName} | ${creditCardType} - *${creditCardLastFour}`, value: accountPaymentMethodID }
+    })
+})
+export const getSavedPaypalMethods = createSelector(getAllAccountPaymentMethods, (accountPaymentMethods = []) => {
+  return accountPaymentMethods
+    .filter(accountPayment => accountPayment.creditCardType === creditCardTypePaypal)
+    .map(({ accountPaymentMethodName, creditCardType, accountPaymentMethodID }) => {
+      return { name: `${accountPaymentMethodName} | ${creditCardType}`, value: accountPaymentMethodID }
+    })
 })
 
 export const getDefaultWishlist = createSelector(getWishlists, (lists = []) => {

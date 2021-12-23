@@ -1,8 +1,7 @@
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useCreateOrEditAccountAddress } from '../../../hooks/'
 import { AccountContent, AccountLayout, SwSelect, TextInput, Button } from '../../'
 import { useTranslation } from 'react-i18next'
-import { getStateCodeOptionsByCountryCode } from '../../../actions/'
 import * as Yup from 'yup'
 import { useState } from 'react'
 import { receiveUser, requestUser } from '../../../actions'
@@ -10,12 +9,14 @@ import { SlatwalApiService } from '../../../services'
 import { toast } from 'react-toastify'
 import { getErrorMessage } from '../../../utils'
 import { useHistory } from 'react-router'
+import { getDefaultCountry } from '../../../selectors'
 
 const CreateOrEditAccountAddress = ({ path, heading, action = 'Account Address' }) => {
   const dispatch = useDispatch()
   const [billingAddressErrors, setBillingAddressErrors] = useState({})
   let [isFetching, setFetching] = useState(false)
   const history = useHistory()
+  const countryCode = useSelector(getDefaultCountry)
 
   const { t } = useTranslation()
 
@@ -57,8 +58,34 @@ const CreateOrEditAccountAddress = ({ path, heading, action = 'Account Address' 
     })
   }
 
-  const requiredValidation = ({ value, name, msg }) => {
-    Yup.string()
+  const verifyOnSubmit = address => {
+    try {
+      Yup.object()
+        .shape({
+          accountAddressName: Yup.string().required('Required'),
+          name: Yup.string().required('Required'),
+          streetAddress: Yup.string().required('Required'),
+          city: Yup.string().required('Required'),
+          stateCode: Yup.string().required('Required'),
+          postalCode: Yup.string().required('Required'),
+        })
+        .validateSync(address, { abortEarly: false })
+      return true
+    } catch (err) {
+      setBillingAddressErrors(
+        err.inner.reduce((acc, { path, message }) => {
+          return {
+            ...acc,
+            [path]: { path, message },
+          }
+        }, billingAddressErrors)
+      )
+    }
+    return false
+  }
+
+  const requiredValidation = async ({ value, name, msg }) => {
+    return await Yup.string()
       .required(msg)
       .validate(value, { abortEarly: false })
       .then(() => {
@@ -127,14 +154,13 @@ const CreateOrEditAccountAddress = ({ path, heading, action = 'Account Address' 
               <label htmlFor="countryCode">{t('frontend.account.countryCode')}</label>
               <SwSelect
                 id="countryCode"
-                value={billingAddress.countryCode}
+                value={billingAddress.countryCode || countryCode}
                 onChange={e => {
                   e.preventDefault()
-                  const { value } = e.target
-                  dispatch(getStateCodeOptionsByCountryCode(value))
                   setBillingAddress({
                     ...billingAddress,
                     countryCode: e.target.value,
+                    stateCode: null,
                   })
                 }}
                 options={countryCodeOptions}
@@ -173,7 +199,7 @@ const CreateOrEditAccountAddress = ({ path, heading, action = 'Account Address' 
                   street2Address: value,
                 })
               }}
-              onBlur={value => requiredValidation({ value, name: 'street2Address', msg: t('frontend.core.required') })}
+              // onBlur={value => requiredValidation({ value, name: 'street2Address', msg: t('frontend.core.required') })}
             />
           </div>
           <div className="col-md-6">
@@ -290,9 +316,11 @@ const CreateOrEditAccountAddress = ({ path, heading, action = 'Account Address' 
               label={isEdit ? `${t('frontend.core.save')} ${action}` : `${t('frontend.core.saveNew')} ${action}`}
               classList="btn btn-primary mt-3 mt-sm-0"
               onClick={() => {
-                setFetching(true)
-                if (isEdit) updateAccountAddress(billingAddress)
-                if (!isEdit) addNewAccountAddress(billingAddress)
+                if (verifyOnSubmit(billingAddress)) {
+                  setFetching(true)
+                  if (isEdit) updateAccountAddress(billingAddress)
+                  if (!isEdit) addNewAccountAddress(billingAddress)
+                }
               }}
             />
           </div>

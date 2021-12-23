@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react'
 import { ContentfulService, KontentService, SlatwallCMSService } from '../services'
 import { useSelector } from 'react-redux'
+import { getBlogRoute } from '../selectors/configurationSelectors'
 
 export const useGetBlogPosts = () => {
   const { cmsProvider } = useSelector(state => state.configuration)
-  let [request, setRequest] = useState({ isFetching: false, isLoaded: false, makeRequest: false, data: [], error: '', params: { content_type: 'blog', limit: 3 }, entity: '' })
+  const blogKey = useSelector(getBlogRoute)
+
+  let [request, setRequest] = useState({ isFetching: false, isLoaded: false, makeRequest: false, data: [], error: '', params: { content_type: blogKey, limit: 3 }, entity: '' })
   useEffect(() => {
     if (request.makeRequest) {
       if (cmsProvider === 'contentful') {
@@ -20,21 +23,22 @@ export const useGetBlogPosts = () => {
           })
           .catch(thrown => {})
       } else if (cmsProvider === 'slatwallCMS') {
-        SlatwallCMSService.getBlogPosts(request.params)
+        SlatwallCMSService.getBlogPosts({ ...request.params, blogKey })
           .then(response => {
             setRequest({ data: response, isFetching: false, isLoaded: true, makeRequest: false, params: {} })
           })
           .catch(thrown => {})
       }
     }
-  }, [request, setRequest, cmsProvider])
+  }, [request, setRequest, blogKey, cmsProvider])
 
   return [request, setRequest]
 }
 
 export const useGetBlogPost = () => {
   const { cmsProvider } = useSelector(state => state.configuration)
-  let [request, setRequest] = useState({ isFetching: false, isLoaded: false, params: { content_type: 'blog', limit: 3 }, makeRequest: false, data: [], error: '', entity: '' })
+  const blogKey = useSelector(getBlogRoute)
+  let [request, setRequest] = useState({ isFetching: false, isLoaded: false, params: { content_type: blogKey, limit: 3 }, makeRequest: false, data: [], error: '', entity: '' })
 
   useEffect(() => {
     if (request.makeRequest) {

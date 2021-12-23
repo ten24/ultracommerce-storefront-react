@@ -1,15 +1,18 @@
 import React, { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { SimpleImage } from '..'
 import { useGetBlogPosts, useUtilities } from '../../hooks'
 import { useFormatDate } from '../../hooks/useFormatDate'
+import { getBlogRoute } from '../../selectors/configurationSelectors'
 
 function LatestNews() {
   const { t } = useTranslation()
   const [formateDate] = useFormatDate()
   let [request, setRequest] = useGetBlogPosts()
   let { eventHandlerForWSIWYG } = useUtilities()
+  const blogPath = useSelector(getBlogRoute)
 
   useEffect(() => {
     if (!request.isFetching && !request.isLoaded) {
@@ -29,17 +32,19 @@ function LatestNews() {
         <div className="row">
           {request.data?.items?.map(data => {
             return (
-              <div key={data.postTitle} className="col-md-4">
-                <article className="blog-card card border-0 shadow m-3">
-                  <figure className="overflow-hidden m-0">{data.postImage ? <SimpleImage src={data.postImage.url} className="img-fluid blog-image d-block w-100 zoom-in" alt={data.postTitle} /> : <div className="img-fluid blog-image" />}</figure>
+              <div key={data.postTitle} className="col-md-6 col-lg-4 d-flex">
+                <article className="blog-card card border-0 shadow m-3 w-100">
+                  <figure className="blog-figure overflow-hidden m-0">{data.postImage ? <SimpleImage src={data.postImage.url} className="blog-image" alt={data.postTitle} /> : <div className="blog-image" />}</figure>
                   <div className="card-body p-4">
-                    <p>
-                      <small className="text-muted fst-italic">{formateDate(data.publicationDate)}</small>
-                    </p>
+                    {data.publicationDate && (
+                      <p>
+                        <small className="text-muted fst-italic">{formateDate(data.publicationDate)}</small>
+                      </p>
+                    )}
                     <h4>
-                      <Link to={`/blog/${data.slug}`}>{data.postTitle}</Link>
+                      <Link to={`/${blogPath}/${data.slug}`}>{data.postTitle}</Link>
                     </h4>
-                    <p className="text-secondary line-height" onClick={eventHandlerForWSIWYG} dangerouslySetInnerHTML={{ __html: data.postSummary }} />
+                    <p className="text-secondary" onClick={eventHandlerForWSIWYG} dangerouslySetInnerHTML={{ __html: data.postSummary }} />
                   </div>
                 </article>
               </div>
@@ -47,7 +52,7 @@ function LatestNews() {
           })}
         </div>
         <div className="text-center mt-5">
-          <Link className="btn btn-primary" to="/blog">
+          <Link className="btn btn-primary" to={`/${blogPath}`}>
             {t('frontend.home.view_all_news')}
           </Link>
         </div>

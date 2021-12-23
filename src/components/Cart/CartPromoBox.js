@@ -26,13 +26,14 @@ const CartPromoBox = () => {
                       className="btn btn-primary"
                       onClick={e => {
                         e.preventDefault()
-                        dispatch(applyPromoCode(promoCode))
+                        dispatch(applyPromoCode(promoCode, t('frontend.cart.promo_code_applied')))
                         setPromoCode('')
                       }}
                       type="submit"
                     >
                       {t('frontend.cart.apply')}
                     </button>
+                    
                   </span>
                 </div>
               </form>

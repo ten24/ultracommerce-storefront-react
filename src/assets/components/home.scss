@@ -1,27 +1,103 @@
-@include media-breakpoint-up(lg) {
-.carousel-item {
-    height: 500px;
+.content-slider {
+   .carousel-inner {
+    background: $gray-900;
+  }
 
-    img {
-      position: absolute;
-      object-fit: cover;
-      top: 0;
-      left: 0;
-      min-height: 500px;
+  .carousel-image {
+    width: 100%;
+    position: relative;
+  }
+  
+  @include media-breakpoint-up(lg) {
+    .carousel-item {
+      height: 500px;
+      .carousel-image img {
+        opacity: .4;
+        position: absolute;
+        object-fit: cover;
+        top: 0;
+        left: 0;
+        width: 100%;
+        min-height: 500px;
+      }
+    }
+    .carousel-caption {
+      text-align: left;
+      transform: translateY(-50%);
+      bottom: initial;
+      top: 50%;
+      p {
+        font-size: 1.25rem;
+        font-weight: 300;
+      }
     }
   }
+  
+  @include media-breakpoint-down(lg) {
+    .carousel-caption {
+      position: relative;
+      text-align: left;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      top: 0;
+      margin: 20px 50px 50px 50px;
+      color: $dark;
+    }
+    .carousel-inner {
+      background: $gray-200;
+    }
+    .carousel-image {
+      opacity: 1;
+      height: 30vh;
+      overflow: hidden;
+      img {
+        position: absolute;
+        width: 100%;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        margin: auto;
+      }
+    }
+    .carousel-control-next,
+    .carousel-control-prev,
+    .carousel-indicators [data-bs-target] {
+      filter: invert(100%);
+    }
+    .carousel-control-next,
+    .carousel-control-prev {
+      width: 50px;
+      top: 50%;
+    }
+  }
+
+  .slick-slider .card .card-footer {
+    border: none;
+    background: transparent;
+    padding: 1rem 0 2rem 0;
+  }
+  
+  .slick-prev:before,
+  .slick-next:before {
+    color: $gray-middle-level;
+  }
+  
+} // End content-slider
+
+.slick-track {
+  display: flex !important;
 }
-.slick-slider .card {
-  border: none;
+.slick-slide {
+  height: inherit !important;
 }
-.slick-slider .card .card-footer {
-  border: none;
-  background: transparent;
-  padding: 1rem 0 2rem 0;
-}
+
+
 .content-spacer {
   padding: 3rem 0;
 }
+
 // Section title
 .section-title {
   h2 {
@@ -40,30 +116,6 @@
       content: '';
       margin: 0 auto;
     }
-  }
-}
-.slick-prev:before,
-.slick-next:before {
-  color: $gray-middle-level;
-}
-
-.content-slider {
-  .carousel-inner {
-    background: $gray-900;
-  }
-  .carousel-caption {
-    text-align: left;
-    transform: translateY(-50%);
-    bottom: initial;
-    top: 50%;
-
-    p {
-      font-size: 1.25rem;
-      font-weight: 300;
-    }
-  }
-  img {
-      opacity: .4;
   }
 }
 
@@ -99,3 +151,4 @@
     margin: auto;
   }
 }
+

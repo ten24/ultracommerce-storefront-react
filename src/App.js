@@ -9,6 +9,7 @@ import mobileLogo from './assets/images/logo-mobile.svg'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useCMSWrapper, useScrollToTop } from './hooks'
 import Testing from './pages/Testing/Testing'
+import { getBlogRoute } from './selectors/configurationSelectors'
 
 const pageComponents = {
   Blog,
@@ -35,6 +36,7 @@ const pageComponents = {
 //https://itnext.io/react-router-transitions-with-lazy-loading-2faa7a1d24a
 export default function App() {
   const routing = useSelector(state => state.configuration.router)
+  const blogUrlTitle = useSelector(getBlogRoute)
   const loc = useLocation()
   const shopByManufacturer = useSelector(state => state.configuration.shopByManufacturer)
   // eslint-disable-next-line no-unused-vars
@@ -63,6 +65,8 @@ export default function App() {
           <Route path="/testing" component={Testing} />
           <Route path="/Error" component={ErrorFallback} />
           <Route path="/contact" component={Contact} />
+          <Route path={`/${blogUrlTitle}/:id`} component={BlogPost} />
+          <Route path={`/${blogUrlTitle}`} component={Blog} />
           {routing.length &&
             routing.map(({ URLKey, URLKeyType }, index) => {
               return <Route key={index} path={`/${URLKey}/:id`} component={pageComponents[URLKeyType]} />
@@ -77,8 +81,6 @@ export default function App() {
           <Route path="/threeDSHandover" component={ThreeDSHandover} />
           <Route path="/MyAccount" component={MyAccount} />
           <Route path="/shopping-cart" component={Cart} />
-          <Route path="/blog" component={Blog} exact />
-          <Route path="/blog/:id" component={BlogPost} />
           <Route exact path="/" component={Home} />
           <Route path="" component={ContentPage} />
         </Switch>

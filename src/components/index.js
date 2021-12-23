@@ -82,6 +82,10 @@ export { ListingPaginationModern } from './Listing/ListingPaginationModern'
 export { ListingSidebar } from './Listing/ListingSidebar'
 export { ListingToolBar } from './Listing/ListingToolBar'
 export { NoProductFound } from './Listing/NoProductFound'
+export { FacetFilter } from './Listing/Filters/FacetFilter'
+export { FacetHeading } from './Listing/Filters/FacetHeading'
+export { FacetSearch } from './Listing/Filters/FacetSearch'
+
 export { ProductTypeList } from './ProductTypeList/ProductTypeList'
 export { CategoryList } from './CategoryList/CategoryList'
 
@@ -115,6 +119,7 @@ export { CreditCardNumber, TextInput } from './Fields/Fields'
 export { Button } from './Button/Button'
 export { Loading } from './Loading/Loading'
 export { SEO } from './SEO/SEO'
+export { Loop } from './Loop/Loop'
 
 //Global
 export { Modal } from './Modal/Modal'

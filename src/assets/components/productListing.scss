@@ -51,7 +51,6 @@
 }
 .product-name {
   line-height: 1.2;
-  white-space: nowrap;
   display: -webkit-box;
   font-size: 16px;
   color: $color-black;
@@ -123,7 +122,6 @@
   height: 'fit-content';
 }
 .card-image-height {
-  height: 200px;
   margin-left: auto;
   margin-right: auto;
   padding: 4%;

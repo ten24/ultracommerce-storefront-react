@@ -13,7 +13,7 @@ const ProductSlider = ({ children, settings, title, slidesToShow = 4, products =
         // infinite: true,
         slidesToShow: slidesToShow,
         slidesToScroll: 1,
-        autoplay: true,
+        autoplay: false,
         autoplaySpeed: 5000,
         responsive: [
           {

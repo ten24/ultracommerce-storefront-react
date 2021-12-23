@@ -28,7 +28,7 @@ const OrderSummary = () => {
           <li className="list-group-item d-flex justify-content-between ">
             <h6 className="my-0"> {t('frontend.cart.shippingDelivery')}</h6>
             <span className="float-end">
-              <strong>{fulfillmentChargeAfterDiscountTotal > 0 ? formatCurrency(fulfillmentChargeAfterDiscountTotal) : '--'}</strong>
+              <strong>{fulfillmentChargeAfterDiscountTotal > 0 ? formatCurrency(fulfillmentChargeAfterDiscountTotal) : t('frontend.cart.shippingFree')}</strong>
             </span>
           </li>
           {showVat && (
@@ -56,7 +56,7 @@ const OrderSummary = () => {
                   <h6 className="my-0"> {t('frontend.cart.discount')}</h6>
                 </div>
                 <span className="float-end align-center">
-                  <span className="text-success">- {discountTotal > 0 ? formatCurrency(discountTotal) : '--'}</span>
+                  <span className="text-success">{discountTotal > 0 ? formatCurrency(discountTotal) : '--'}</span>
                 </span>
               </li>
               <li className="list-group-item d-flex justify-content-between bg-light">
@@ -75,7 +75,7 @@ const OrderSummary = () => {
                         disabled={disableInteraction}
                         onClick={event => {
                           event.preventDefault()
-                          dispatch(removePromoCode(promotionCode))
+                          dispatch(removePromoCode(promotionCode, undefined, t('frontend.cart.promo_code_removed')))
                         }}
                       >
                         <i class="bi bi-x"></i>

@@ -5,8 +5,9 @@ import { SwRadioSelect, SwSelect, TextInput } from '../..'
 import { useTranslation } from 'react-i18next'
 import * as Yup from 'yup'
 import { useDeepCompareEffect } from 'react-use'
+import { getDefaultCountry } from '../../../selectors'
 const initialBillingAddress = {
-  countryCode: 'US',
+  countryCode: null,
   name: '',
   company: '',
   phoneNumber: '',
@@ -19,12 +20,14 @@ const initialBillingAddress = {
 }
 const BillingAddress = ({ onSave, onCancel }) => {
   const dispatch = useDispatch()
+  const countryCode = useSelector(getDefaultCountry)
+
   const countryCodeOptions = useSelector(state => state.content.countryCodeOptions)
   const stateCodeOptions = useSelector(state => state.content.stateCodeOptions)
   const { t } = useTranslation()
   const [billingAddressErrors, setBillingAddressErrors] = useState({})
   const [saveAddress, setSaveAddress] = useState(false)
-  const [billingAddress, setBillingAddress] = useState(initialBillingAddress)
+  const [billingAddress, setBillingAddress] = useState({ ...initialBillingAddress, countryCode })
 
   useDeepCompareEffect(() => {
     if (countryCodeOptions.length < 1) {

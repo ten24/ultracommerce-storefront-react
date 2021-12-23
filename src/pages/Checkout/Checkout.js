@@ -26,17 +26,21 @@ const Checkout = () => {
     event.preventDefault()
     dispatch(requestCart())
     SlatwalApiService.cart.placeOrder({ returnJSONObjects: 'cart', transactionInitiator: 'ACCOUNT' }).then(response => {
-      if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
       if (response.isSuccess()) {
         const placeOrderResp = response.success()
-        if (placeOrderResp.redirectUrl) {
+        const orderHasError = Object.keys(placeOrderResp?.errors || {})?.length > 0
+        if (placeOrderResp?.redirectUrl) {
           const { redirectUrl, redirectPayload, redirectMethod } = placeOrderResp
           setThreeDSRedirect({ redirectUrl, redirectPayload, redirectMethod })
         } else {
-          setTimeout(() => {
-            dispatch(receiveCart(placeOrderResp.cart))
-            history.push('/order-confirmation')
-          }, 2000)
+          if (orderHasError) {
+            toast.error(getErrorMessage(response.success().errors))
+          } else {
+            setTimeout(() => {
+              dispatch(receiveCart(placeOrderResp.cart))
+              history.push('/order-confirmation')
+            }, 2000)
+          }
         }
       } else {
         toast.error(t('frontend.core.error.network'))

@@ -12,7 +12,7 @@ const Blog = () => {
       </div>
       <div className="container my-5">
         <div className="row">
-          {request.isLoaded && request.data?.items?.length && (
+          {request.isLoaded && request.data?.items?.length > 0 && (
             <div className="col-lg-8 entries">
               {request.data.items.map(field => {
                 return <BlogListBody key={field.slug} blog={field} />
@@ -27,7 +27,7 @@ const Blog = () => {
               </div>
             </div>
           )}
-          {<BlogSidebar />}
+          <BlogSidebar />
         </div>
       </div>
     </Layout>

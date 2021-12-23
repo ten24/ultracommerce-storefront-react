@@ -7,13 +7,25 @@ import { setTitle } from './configActions'
 export const REQUEST_CONTENT = 'REQUEST_CONTENT'
 export const RECEIVE_CONTENT = 'RECEIVE_CONTENT'
 export const RECEIVE_STATE_CODES = 'RECEIVE_STATE_CODES'
+export const REQUEST_CONTENT_SILENTLY = 'REQUEST_CONTENT_SILENTLY'
+export const RECEIVE_CONTENT_SILENTLY = 'RECEIVE_CONTENT_SILENTLY'
 
 export const requestContent = () => {
   return {
     type: REQUEST_CONTENT,
   }
 }
-
+export const requestContentSiltently = () => {
+  return {
+    type: REQUEST_CONTENT_SILENTLY,
+  }
+}
+export const receiveContentSiltently = content => {
+  return {
+    type: RECEIVE_CONTENT_SILENTLY,
+    content,
+  }
+}
 export const receiveContent = content => {
   return {
     type: RECEIVE_CONTENT,
@@ -29,7 +41,7 @@ export const receiveStateCodes = codes => {
 
 export const getPageContent = (content = {}, slug = '') => {
   return async (dispatch, getState) => {
-    if (getState().content[slug] || slug === 'product' || slug === 'blog') {
+    if (getState().content[slug] || slug === 'product' || slug === 'blog' || slug === 'articles') {
       return
     }
     dispatch(requestContent())
@@ -72,22 +84,25 @@ export const getContentByType = (content = {}, type = 'page', slug = '') => {
     if (getState().content[slug]) {
       return
     }
-    dispatch(requestContent())
+    if (type === 'page') dispatch(requestContent())
     const { cmsProvider } = getState().configuration
     if (cmsProvider === 'slatwallCMS') {
       const payload = { 'f:activeFlag': true, 'p:show': 250, ...content }
       SlatwallCMSService.getEntryBySlugAndType(payload, slug, type).then(response => {
-        dispatch(receiveContent(response))
+        if (type === 'page') dispatch(receiveContent(response))
+        if (type !== 'page') dispatch(receiveContentSiltently(response))
       })
     } else if (cmsProvider === 'contentful') {
       ContentfulService.getEntryBySlug(content, slug)
         .then(data => {
           if (Array.isArray(data)) {
             data.forEach(object => {
-              dispatch(receiveContent(object))
+              if (type === 'page') dispatch(receiveContent(object))
+              if (type !== 'page') dispatch(receiveContentSiltently(object))
             })
           } else {
-            dispatch(receiveContent(data))
+            if (type === 'page') dispatch(receiveContent(data))
+            if (type !== 'page') dispatch(receiveContentSiltently(data))
           }
         })
         .catch(thrown => {})
@@ -96,10 +111,12 @@ export const getContentByType = (content = {}, type = 'page', slug = '') => {
         .then(data => {
           if (Array.isArray(data)) {
             data.forEach(object => {
-              dispatch(receiveContent(object))
+              if (type === 'page') dispatch(receiveContent(object))
+              if (type !== 'page') dispatch(receiveContentSiltently(object))
             })
           } else {
-            dispatch(receiveContent(data))
+            if (type === 'page') dispatch(receiveContent(data))
+            if (type !== 'page') dispatch(receiveContentSiltently(data))
           }
         })
         .catch(thrown => {})

@@ -79,6 +79,8 @@ const getEntryBySlug = async (content = {}, slug = '') => {
       if (response.items.length) {
         const item = response.items[0]
         hydrated = processForPage(item, 1)
+      } else {
+        return
       }
       // console.log('hydrated ', hydrated)
       return hydrated

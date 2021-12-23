@@ -1,4 +1,4 @@
-import { BreadCrumb, Layout, RelatedProductsSlider, ProductPageHeader, ProductDetailGallery, ProductAdditionalInformation, ProductDetails, ProductPagePanels, SkuOptions, HeartButton, ProductForm } from '../../components'
+import { BreadCrumb, Layout, RelatedProductsSlider, ProductPageHeader, ProductDetailGallery, ProductAdditionalInformation, ProductDetails, ProductPagePanels, SkuOptions, HeartButton, ProductForm, Spinner } from '../../components'
 import { useGetEntityByUrlTitleAdvanced, useProductDetail } from '../../hooks'
 import { Helmet } from 'react-helmet'
 import { useSelector } from 'react-redux'
@@ -43,10 +43,9 @@ const ProductDetail = () => {
   let selectedSKu = selectionToSku(skus, optionGroupPairs)
   if (params?.skuid) {
     // If we have a skuID we need to redirect to codes
-    console.log('skuID found, waiting for skus')
-    if (!product) return null
+    console.log('skuID found, waiting for skus', !product)
     const found = skus?.filter(sku => sku.skuID === params.skuid)
-    if (!found?.length) return null
+    if (!found?.length) return <ProductDetailLoading />
     if (found.length) {
       console.log('Redirect based on found sku')
       history.replace({
@@ -84,7 +83,7 @@ const ProductDetail = () => {
       search: [...optionGroupPairs, updateParams].join('&'),
     })
   }
-
+  const isDisabled = isFetching || cart.isFetching || !selectedSKu?.skuID
   return (
     <Layout>
       {product?.productID && (
@@ -94,8 +93,9 @@ const ProductDetail = () => {
       )}
       {product?.productID && <Helmet title={product.settings.productHTMLTitleString} />}
 
-      {product?.productID && (
-        <div className="container mt-5">
+      <div className="container mt-5">
+        {!product?.productID && <Spinner />}
+        <>
           {selectedSKu && (
             <div className="d-flex justify-content-end">
               <HeartButton skuID={selectedSKu.skuID} className="btn-wishlist mr-0 flex-end" />
@@ -103,26 +103,45 @@ const ProductDetail = () => {
           )}
           <div className="row">
             <div className="col-sm-6 col-md-4 mb-4 mb-md-0">
-              <ProductDetailGallery productID={product.productID} skuID={selectedSKu?.skuID} />
-              <ProductAdditionalInformation additionalInformation={product.additionalInformation} />
+              <ProductDetailGallery productUrlTitle={urlTitle[0]} skuID={selectedSKu?.skuID} />
+              {product?.productID && <ProductAdditionalInformation additionalInformation={product.additionalInformation} />}
             </div>
             <div className="col-sm-6 col-md-6 offset-md-1">
-              <ProductDetails sku={selectedSKu} product={product} />
-
+              {product?.productID && <ProductDetails sku={selectedSKu} product={product} />}
               {!isFetching && !cart.isFetching && skus?.length && <SkuOptions sku={selectedSKu} selection={params} productOptions={updatedProductOptions} skus={skus} />}
 
-              <ProductForm sku={selectedSKu} isDisabled={isFetching || cart.isFetching || !selectedSKu?.skuID} isLoading={isFetching || cart.isFetching} />
-
-              <div className="row mb-4">
-                <div className="col-md-12">
-                  <ProductPagePanels product={product} attributeSets={attributeSets} />
+              {product?.productID && <ProductForm sku={selectedSKu} isDisabled={isDisabled} isLoading={isFetching || cart.isFetching} />}
+              {product?.productID && (
+                <div className="row mb-4">
+                  <div className="col-md-12">
+                    <ProductPagePanels product={product} attributeSets={attributeSets} />
+                  </div>
                 </div>
-              </div>
+              )}
+            </div>
+          </div>
+        </>
+      </div>
+      <RelatedProductsSlider productUrlTitle={urlTitle[0]} />
+    </Layout>
+  )
+}
+
+const ProductDetailLoading = () => {
+  return (
+    <Layout>
+      <div className="container mt-5">
+        <Spinner />
+        <div className="d-flex justify-content-end"></div>
+        <div className="row">
+          <div className="col-sm-6 col-md-4 mb-4 mb-md-0"></div>
+          <div className="col-sm-6 col-md-6 offset-md-1">
+            <div className="row mb-4">
+              <div className="col-md-12"></div>
             </div>
           </div>
         </div>
-      )}
-      {product.productID && <RelatedProductsSlider productID={product.productID} />}
+      </div>
     </Layout>
   )
 }

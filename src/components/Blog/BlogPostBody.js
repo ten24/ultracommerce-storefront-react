@@ -1,11 +1,14 @@
 import React from 'react'
+import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { SimpleImage } from '..'
-import { useFormatDateTime, useUtilities } from '../../hooks'
+import { useFormatDate, useUtilities } from '../../hooks'
+import { getBlogRoute } from '../../selectors/configurationSelectors'
 
 const BlogPostBody = ({ blogPostData }) => {
-  const [formateDate] = useFormatDateTime()
+  const [formateDate] = useFormatDate()
   let { eventHandlerForWSIWYG } = useUtilities()
+  const blogPath = useSelector(getBlogRoute)
   return (
     <article className="shadow mb-5">
       <div className="max-height-img">{blogPostData.postImage && <SimpleImage src={blogPostData.postImage.url} alt={blogPostData.postTitle} />}</div>
@@ -36,7 +39,7 @@ const BlogPostBody = ({ blogPostData }) => {
               return (
                 <li key={category.value} className="d-flex align-items-center me-3">
                   <i className="bi bi-folder me-1 small line-height-0"></i>
-                  <Link className="link-button text-underline" to={`/blog?category=${category.value}`}>
+                  <Link className="link-button text-underline" to={`/${blogPath}?category=${category.value}`}>
                     {category.name}
                   </Link>
                 </li>

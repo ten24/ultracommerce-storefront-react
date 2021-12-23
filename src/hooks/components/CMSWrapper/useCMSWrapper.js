@@ -57,11 +57,11 @@ const useCMSWrapper = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
   useEffect(() => {
     const unload = history.listen(location => {
       if (location.pathname !== currentPath) {
-        let newPath = location.pathname.split('/').reverse()[0].toLowerCase()
+        // let newPath = location.pathname.split('/').reverse()[0].toLowerCase()
+        let newPath = location.pathname.split('/')[1].toLowerCase()
         newPath = newPath.length ? newPath : 'home'
         setCurrentPath(location.pathname)
         dispatch(

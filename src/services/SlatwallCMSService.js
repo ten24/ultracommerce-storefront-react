@@ -1,4 +1,4 @@
-import { getContentByType, groupBy } from '../utils'
+import { getContentByType, getContentPages, groupBy } from '../utils'
 import { SlatwalApiService } from './SlatwalApiService'
 const generateMegaMenu = content => {
   let menu = Object.keys(content)
@@ -53,7 +53,6 @@ const getEntryBySlugAndType = async (content = {}, slug = '', type = 'page') => 
   if (type === 'footer') return getFooterBySlug(content, slug)
   return getEntryBySlug(content, slug)
 }
-
 const processForBlock = (block, includeTitle = true) => {
   let response = {}
   if (includeTitle) {
@@ -61,6 +60,9 @@ const processForBlock = (block, includeTitle = true) => {
     response.title_link = block.linkUrl
   }
   response.linkLabel = block.linkLabel
+  response.profilePhoneNumber = block?.profilePhoneNumber
+  response.profileEmailAddress = block?.profileEmailAddress
+  response.positionName = block?.positionName
   response.linkUrl = block.linkUrl
   response.body = block.contentBody
   response.contentSummary = block.contentSummary
@@ -175,37 +177,36 @@ const getEntryBySlug = async (content = {}, slug = '') => {
     })
     .then(response => {
       let hydrated = { ...response }
-      // if (slug === 'home') {
-      //   let columns = nestContentByKey(response, 'content-columns')
-      //   if (columns.length) {
-      //     columns = {
-      //       title: columns[0].title,
-      //       body: '',
-      //       columns: columns[0].children.map(column => {
-      //         return { contentBody: column.contentBody, title: column.title, imagePath: column.imagePath }
-      //       }),
-      //     }
-      //     hydrated.contentColumns = getContentByType(response, 'cetContentSlide')
-      //   }
-      //   const pageStruc = processForPage(slug, Object.values(response))
-      //   hydrated = { ...hydrated, [slug]: pageStruc, 'home/content-columns': columns }
-      // } else {
+
       const pageStruc = processForPage(slug, Object.values(response))
       hydrated = { ...hydrated, [slug]: { ...pageStruc, ...response[slug] } }
       return hydrated
     })
 }
 const processForPage = (slug, content) => {
+  const pages = getContentPages(content)
   let hydrated = {}
-  hydrated.tabs = getContentByType(content, 'cetTab')
-  hydrated.slider = processForSlider(content)
-  hydrated.contentColumns = processForContentColumn(content)
-  hydrated.callToAction = processForSidebar(content)
-  hydrated.sidebar = processForSidebar(content)
-  hydrated.tabs = processForTabs(content)
-  hydrated.callToAction = null
-  hydrated.menu = {}
-  hydrated.contentPageType = 'BasicPage'
+  if (pages.length) {
+    const page = pages[0]
+    const children = getChildren(content, page.contentID)
+    hydrated.tabs = getContentByType(content, 'cetTab')
+    hydrated.slider = processForSlider(content)
+    hydrated.contentColumns = processForContentColumn(content)
+    hydrated.callToAction = processForSidebar(content)
+    hydrated.sidebar = processForSidebar(content)
+    hydrated.tabs = processForTabs(content)
+    const listItems = getContentByType(children, 'cetListItem,cetListItemWithImage')
+    hydrated.listItems = listItems.map(item => {
+      return processListItem(item, content)
+    })
+    const blocks = getContentByType(children, 'cetBlock,cetProfile')
+    hydrated.blocks = blocks.map(item => {
+      return processForBlock(item, content)
+    })
+    hydrated.callToAction = null
+    hydrated.menu = {}
+    hydrated.contentPageType = 'BasicPage'
+  }
   return hydrated
 }
 const getParent = (content = [], parentContentID) => content.filter(item => item.contentID === parentContentID)
@@ -245,6 +246,7 @@ const processForContentColumn = content => {
     response.contentTitle = column[0].title
     response.contentBody = column[0].contentBody
     response.contentID = column[0].contentID
+    response.elementType = column[0].contentElementType_systemCode
     response.columns = columns.map(c => {
       return processForBlock(c)
     })
@@ -294,7 +296,9 @@ const processGeneral = (item, content) => {
   if (['cetListItem', 'cetListItemWithImage'].includes(item.contentElementType_systemCode)) {
     response = processListItem(item, content)
   }
-
+  if (['cetColumns'].includes(item.contentElementType_systemCode)) {
+    response = processForContentColumn(content)
+  }
   if (['cetBlock', 'cetProfile'].includes(item.contentElementType_systemCode)) {
     response = processForBlock(item)
   }
@@ -305,7 +309,7 @@ const processForSidebar = content => getContentByType(content, 'cetSidebar')
 const processForPost = post => {
   const response = { ...post }
   response.postTitle = post?.title
-  // response.publicationDate = post.system.lastModified
+  response.publicationDate = post?.contentPublicationDate?.trim()?.length > 0 ? post.contentPublicationDate : null
   if (post?.imagePath && post?.imagePath?.trim()?.length) {
     response.postImage = {
       name: post?.name,
@@ -325,8 +329,8 @@ const processForPost = post => {
 
   return response
 }
-const getBlogPosts = ({ limit = 12, currentPage = 1, category = [] }) => {
-  let payload = { 'f:urlTitlePath:like': 'blog/%', 'p:show': limit, 'p:current': currentPage, includeImages: true, includeCategories: true }
+const getBlogPosts = ({ limit = 12, currentPage = 1, category = [], blogKey = 'blog' }) => {
+  let payload = { 'f:urlTitlePath:like': `${blogKey}/%`, 'p:show': limit, 'p:current': currentPage, includeImages: true, includeCategories: true }
   if (category.length) {
     payload['f:categories.urlTitle:in'] = category.join()
   }

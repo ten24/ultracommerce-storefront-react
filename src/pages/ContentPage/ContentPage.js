@@ -19,10 +19,12 @@ const ContentPage = () => {
   const path = loc.pathname.split('/').reverse()[0].toLowerCase()
   const content = useSelector(state => state.content)
   let component = 'NotFound'
-  if (!content.isFetching && content[path]) {
+  if (!content.isFetching && content[path] && content[path]?.contentPageType) {
     component = content[path].contentPageType
   }
-
+  if (content.isFetching) {
+    component = 'BasicPage'
+  }
   return <Layout>{!content.isFetching && createElement(pageComponents[component])}</Layout>
 }
 

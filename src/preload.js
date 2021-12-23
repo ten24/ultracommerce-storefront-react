@@ -12,7 +12,6 @@ const data = {
       vatCountries: 'GB',
     },
   },
-
   router: [
     { URLKeyType: 'Product', URLKey: 'product' },
     { URLKeyType: 'ProductType', URLKey: 'products' },
@@ -22,6 +21,9 @@ const data = {
     { URLKeyType: 'Address', URLKey: 'ad' },
     { URLKeyType: 'Attribute', URLKey: 'att' },
   ],
+  blog: {
+    url: 'blog',
+  },
   cmsProvider: 'slatwallCMS',
   enforceVerifiedAccountFlag: false,
   products: {

@@ -41,7 +41,7 @@ export const clearCart = () => {
     type: CLEAR_CART,
   }
 }
-export const setOrderOnCart = orderID => {
+export const setOrderOnCart = (orderID, successMsg="") => {
   return async dispatch => {
     dispatch(requestCart())
 
@@ -54,8 +54,10 @@ export const setOrderOnCart = orderID => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
       if (response.isSuccess()) {
         dispatch(receiveCart(response.success().cart))
-      } else {
-        dispatch(receiveCart())
+        if (successMsg !== "" && !Object.keys(response.success()?.errors || {}).length) {
+            toast.success(successMsg);
+          }
+        } else {
       }
     })
   }
@@ -313,7 +315,7 @@ export const updateFulfillment = (params = {}) => {
   }
 }
 
-export const applyPromoCode = promotionCode => {
+export const applyPromoCode = (promotionCode, successMsg = "") => {
   return async dispatch => {
     dispatch(requestCart())
     await SlatwalApiService.cart
@@ -324,13 +326,16 @@ export const applyPromoCode = promotionCode => {
       .then(response => {
         if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
         if (response.isSuccess()) {
-          dispatch(receiveCart(response.success().cart))
+         dispatch(receiveCart(response.success().cart))
+          if (successMsg !== "" && !Object.keys(response.success()?.errors || {}).length) {
+            toast.success(successMsg);
+          }
         } else {
         }
       })
   }
 }
-export const removePromoCode = (promotionCode, promotionCodeID) => {
+export const removePromoCode = (promotionCode, promotionCodeID, successMsg = "") => {
   return async dispatch => {
     dispatch(requestCart())
     await SlatwalApiService.cart
@@ -343,6 +348,9 @@ export const removePromoCode = (promotionCode, promotionCodeID) => {
         if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
         if (response.isSuccess()) {
           dispatch(receiveCart(response.success().cart))
+          if (successMsg !== "" && !Object.keys(response.success()?.errors || {}).length) {
+            toast.success(successMsg);
+          }
         } else {
         }
       })

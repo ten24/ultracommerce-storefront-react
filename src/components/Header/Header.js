@@ -17,7 +17,6 @@ const MegaMenuPanel = ({ subMenu = [] }) => {
       {subMenu.map((menuPanel, index) => {
         return (
           <div key={index} className="mega-dropdown-column py-4 px-3">
-            <Link to={menuPanel.title_link || ''}>{menuPanel.title}</Link>
             <div
               className="widget widget-links mb-3"
               onClick={eventHandlerForWSIWYG}

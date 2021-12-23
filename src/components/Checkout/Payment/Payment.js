@@ -52,7 +52,7 @@ const PaymentSlide = ({ currentStep }) => {
           <div className="row mb-3">
             <div className="col-sm-12">
               {eligiblePaymentMethodDetails.length === 0 && (
-                <div class="alert alert-warning" role="alert">
+                <div className="alert alert-warning" role="alert">
                   {t('frontend.checkout.noPaymentEnabled')}
                 </div>
               )}

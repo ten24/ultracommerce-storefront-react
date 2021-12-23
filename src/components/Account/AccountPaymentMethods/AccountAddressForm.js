@@ -3,15 +3,16 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { getCountries, getStateCodeOptionsByCountryCode } from '../../../actions/contentActions'
 import { useDeepCompareEffect } from 'react-use'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import * as Yup from 'yup'
+import { getDefaultCountry } from '../../../selectors/configurationSelectors'
 
-const AccountAddressForm = ({ billingAddress, setBillingAddress }) => {
+const AccountAddressForm = ({ billingAddress, setBillingAddress, billingAddressErrors, setBillingAddressErrors }) => {
   const { t } = useTranslation()
   const dispatch = useDispatch()
   const countryCodeOptions = useSelector(state => state.content.countryCodeOptions)
   const stateCodeOptions = useSelector(state => state.content.stateCodeOptions)
-  const [billingAddressErrors, setBillingAddressErrors] = useState({})
+  const countryCode = useSelector(getDefaultCountry)
 
   useDeepCompareEffect(() => {
     if (countryCodeOptions.length < 1) {
@@ -19,8 +20,8 @@ const AccountAddressForm = ({ billingAddress, setBillingAddress }) => {
     }
   }, [dispatch, countryCodeOptions])
   useEffect(() => {
-    dispatch(getStateCodeOptionsByCountryCode(billingAddress.countryCode))
-  }, [dispatch, billingAddress?.countryCode])
+    dispatch(getStateCodeOptionsByCountryCode(billingAddress.countryCode || countryCode))
+  }, [dispatch, billingAddress?.countryCode, countryCode])
 
   const requiredValidation = ({ value, name, msg }) => {
     Yup.string()
@@ -42,16 +43,18 @@ const AccountAddressForm = ({ billingAddress, setBillingAddress }) => {
         )
       })
   }
+
   return (
     <>
       <h5 className="mt-4 mb-2">{t('frontend.account.address.billingAddress')}</h5>
+
       <div className="row">
         <div className="col-md-6">
           <div className="form-group">
             <label htmlFor="countryCode">{t('frontend.account.countryCode')}</label>
             <SwSelect
               id="countryCode"
-              value={billingAddress.countryCode}
+              value={billingAddress.countryCode || countryCode}
               onChange={e => {
                 e.preventDefault()
                 const { value } = e.target

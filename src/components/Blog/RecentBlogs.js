@@ -1,22 +1,24 @@
 import React, { useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { useGetBlogPosts, useFormatDateTime } from '../../hooks'
+import { useGetBlogPosts, useFormatDate } from '../../hooks'
 import { SimpleImage } from '..'
+import { getBlogRoute } from '../../selectors/configurationSelectors'
+import { useSelector } from 'react-redux'
 
 const RecentBlogs = () => {
   let [request, setRequest] = useGetBlogPosts()
   let history = useHistory()
   const { t } = useTranslation()
-  const [formateDate] = useFormatDateTime()
+  const [formateDate] = useFormatDate()
   const countOnPage = 3
+  const blogPath = useSelector(getBlogRoute)
 
   useEffect(() => {
     if (!request.isFetching && !request.isLoaded) {
       setRequest({ ...request, isFetching: true, isLoaded: false, params: { limit: countOnPage }, makeRequest: true })
     }
   }, [request, setRequest, countOnPage])
-
   return (
     <div className="filter-block recent-posts mt-3">
       <h3> {t('frontend.blog.recentPosts')}</h3>
@@ -31,16 +33,18 @@ const RecentBlogs = () => {
                     className="link"
                     onClick={() =>
                       history.push({
-                        pathname: `/blog/${feed.slug}`,
+                        pathname: `/${blogPath}/${feed.slug}`,
                       })
                     }
                   >
                     {feed.postTitle}
                   </div>
                 </h6>
-                <i className="data-time">
-                  <time>{formateDate(feed.publicationDate)}</time>
-                </i>
+                {feed.publicationDate && (
+                  <i className="data-time">
+                    <time>{formateDate(feed.publicationDate)}</time>
+                  </i>
+                )}
               </div>
             </div>
           )

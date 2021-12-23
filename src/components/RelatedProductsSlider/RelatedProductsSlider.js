@@ -4,16 +4,16 @@ import { useTranslation } from 'react-i18next'
 import Slider from 'react-slick'
 import { ProductCard } from '..'
 
-const RelatedProductsSlider = ({ productID, slidesToShow = 4 }) => {
+const RelatedProductsSlider = ({ productUrlTitle, slidesToShow = 4 }) => {
   const { t } = useTranslation()
-  const [relatedProducts, setRelatedProducts] = useState({ products: [], isLoaded: false, err: '', productID })
-  if (relatedProducts.productID !== productID) {
-    setRelatedProducts({ products: [], isLoaded: false, err: '', productID })
+  const [relatedProducts, setRelatedProducts] = useState({ products: [], isLoaded: false, err: '', productUrlTitle })
+  if (relatedProducts.productUrlTitle !== productUrlTitle) {
+    setRelatedProducts({ products: [], isLoaded: false, err: '', productUrlTitle })
   }
   useEffect(() => {
     let didCancel = false
     if (!relatedProducts.isLoaded) {
-      SlatwalApiService.products.getRelatedProducts({ productID }).then(response => {
+      SlatwalApiService.products.getRelatedProducts({ urlTitle: productUrlTitle }).then(response => {
         if (response.isSuccess() && !didCancel) {
           const products = response.success().relatedProducts.map(sku => {
             return { ...sku, productName: sku.relatedProduct_productName, productCode: sku.relatedProduct_productCode, urlTitle: sku.relatedProduct_urlTitle, brandName: sku.relatedProduct_brand_brandName, brandUrlTitle: sku.relatedProduct_brand_urlTitle, imageFile: sku.relatedProduct_defaultSku_imageFile, skuID: sku.relatedProduct_defaultSku_skuID, skuCode: sku.relatedProduct_defaultSku_skuCode }
@@ -36,7 +36,7 @@ const RelatedProductsSlider = ({ productID, slidesToShow = 4 }) => {
     return () => {
       didCancel = true
     }
-  }, [relatedProducts, setRelatedProducts, productID])
+  }, [relatedProducts, setRelatedProducts, productUrlTitle])
   if (!relatedProducts.products.length) {
     return null
   }

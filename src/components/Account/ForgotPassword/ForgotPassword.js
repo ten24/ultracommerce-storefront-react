@@ -16,15 +16,13 @@ const ForgotPassword = () => {
     },
     onSubmit: values => {
       SlatwalApiService.account.forgotPassword(values).then(response => {
-        if (response.isSuccess()) {
-          if (!response.success().failureActions.length) {
-            toast.success('Success')
-            history.push(`/my-account`)
-          }
-          toast.error(getErrorMessage(response.success().errors))
-        } else {
-          toast.success('Failure')
-        }
+      if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
+      if (response.isSuccess()) {
+        history.push(`/my-account`)
+        toast.success('Success')
+      } else {
+        toast.error('Failure')
+      }
       })
     },
   })
