@@ -1804,10 +1804,10 @@
     "lodash" "^4.17.21"
     "qs" "^6.10.1"
 
-"@slatwall/slatwall-storefront-react@^1.2.0-RC5":
-  "integrity" "sha512-AlXLGRp3EbiHNFzA8HpKb27+s6PHFilPUOQDRMpR8okrivN6g4KYmNolw4VkMvnudqPhHmNuimWki3OlMyKwQQ=="
-  "resolved" "https://registry.npmjs.org/@slatwall/slatwall-storefront-react/-/slatwall-storefront-react-1.2.0-RC5.tgz"
-  "version" "1.2.0-RC5"
+"@slatwall/slatwall-storefront-react@^1.2.0-RC6":
+  "integrity" "sha512-5vh02EWdRCiK1elyH+YJGqf99hHkqci/ttICjzii7QgK1F5D6r+NsjRLdCPXGwDj4HbFKEzfby44IlaEtjHNzw=="
+  "resolved" "https://registry.npmjs.org/@slatwall/slatwall-storefront-react/-/slatwall-storefront-react-1.2.0-RC6.tgz"
+  "version" "1.2.0-RC6"
   dependencies:
     "sass" "^1.43.5"
 
