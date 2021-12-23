@@ -19,12 +19,12 @@ function Home() {
             'f:productFeaturedFlag': 1,
           }}
         />
-        {/* <ProductSliderWithList
-          title={popularProducts?.title || t('frontend.home.popular_products')}
+      {/* <ProductSliderWithList
+          title={product?.title || t('frontend.home.popular_products')}
           params={{
             'f:publishedFlag': 1,
           }}
-          productList={popularProducts.products}
+          productList={product.products} 
         /> */}
       </section>
       {contentColumns?.columns?.length > 0 && (

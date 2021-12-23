@@ -24,8 +24,8 @@ const BasicPage = () => {
           />
         )}
         {!content.isMarkup &&
-          content.sections &&
-          content.sections.map(({ title, text, imageUrl }) => {
+          content?.sections &&
+          content?.sections.map(({ title, text, imageUrl }) => {
             return (
               <div key={title}>
                 <h2>{title}</h2>
@@ -56,7 +56,7 @@ const BasicPage = () => {
           </ContentColumns>
         )}
 
-        {content.listItems.map(item => {
+        {content?.listItems?.map(item => {
           return <ListItem {...item} />
         })}
         {content?.blocks?.length > 0 && <Blocks blocks={content.blocks} />}
