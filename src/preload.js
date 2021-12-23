@@ -24,7 +24,7 @@ const data = {
   blog: {
     url: 'blog',
   },
-  cmsProvider: 'slatwallCMS',
+  cmsProvider: 'kontent',
   enforceVerifiedAccountFlag: false,
   products: {
     fallbackImageCall: false,
