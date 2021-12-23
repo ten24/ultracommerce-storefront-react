@@ -4,12 +4,12 @@ import { ContentSlider, ProductSliderWithConfig, BrandSlider, ContentColumns, La
 import { useTranslation } from 'react-i18next'
 function Home() {
   const { home = {} } = useSelector(state => state.content)
-  const { callToAction, popularProducts, contentColumns } = home
+  const { callToAction, popularProducts, contentColumns, slider } = home
 
   const { t } = useTranslation()
   return (
     <Layout>
-      <ContentSlider />
+      <ContentSlider slider={slider} />
       <section className="content-spacer">
         <ProductSliderWithConfig
           title={popularProducts?.title || t('frontend.home.popular_products')}
@@ -19,11 +19,11 @@ function Home() {
           }}
         />
         {/* <ProductSliderWithList
-          title={popularProducts?.title || t('frontend.home.popular_products')}
+          title={product?.title || t('frontend.home.popular_products')}
           params={{
             'f:publishedFlag': 1,
           }}
-          productList={popularProducts.products}
+          productList={product.products}
         /> */}
       </section>
       {contentColumns?.columns && contentColumns?.columns?.length > 0 && (

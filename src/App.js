@@ -8,6 +8,7 @@ import logo from './assets/images/logo.svg'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useCMSWrapper, useScrollToTop } from '@slatwall/slatwall-storefront-react/hooks'
 import Home from './pages/Home/Home'
+import { getBlogRoute } from '@slatwall/slatwall-storefront-react/selectors'
 
 const pageComponents = {
   Blog,
@@ -35,6 +36,7 @@ const pageComponents = {
 export default function App() {
   const loc = useLocation()
   const routing = useSelector(state => state.configuration.router)
+  const blogUrlTitle = useSelector(getBlogRoute)
   const shopByManufacturer = useSelector(state => state.configuration.shopByManufacturer)
   // eslint-disable-next-line no-unused-vars
   const cms = useCMSWrapper()
@@ -62,6 +64,8 @@ export default function App() {
           <Route path="/404" component={NotFound} />
           <Route path="/Error" component={ErrorFallback} />
           <Route path="/contact" component={Contact} />
+          <Route path={`/${blogUrlTitle}/:id`} component={BlogPost} />
+          <Route path={`/${blogUrlTitle}`} component={Blog} />
           {routing.length &&
             routing.map(({ URLKey, URLKeyType }, index) => {
               return <Route key={index} path={`/${URLKey}/:id`} component={pageComponents[URLKeyType]} />
