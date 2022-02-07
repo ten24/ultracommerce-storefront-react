@@ -6,9 +6,9 @@ import { useUtilities } from '../../../hooks'
 const Block = ({ contentBody, title }) => {
   let { eventHandlerForWSIWYG } = useUtilities()
   return (
-    <div className="col col-lg-3 block">
-      <div className="card m-3">
-        <div className="card-body d-flex flex-column text-center">
+    <div className="col col-lg-3 d-flex my-3">
+      <div className="card w-100">
+        <div className="card-body d-flex flex-column text-center bg-light">
           <h2 className="card-title h6">{title}</h2>
           <div
             className="card-text"
@@ -38,7 +38,7 @@ const BlockProfile = ({ contentBody, imagePath, contentSummary, title, profilePh
           setModal(!showModal)
         }}
       >
-        <div className="card-body d-flex flex-column text-center" style={{ lineHeight: '1.2' }}>
+        <div className="card-body d-flex flex-column text-center bg-light zoom-hover" style={{ lineHeight: '1.2' }}>
           <SimpleImage src={imagePath} className="img-fluid my-3 mx-auto" style={{ maxWidth: '130px' }} alt={title} />
           <h2 className="card-title h6 title mt-2">{title}</h2>
           {positionName && <span className="positionName mb-2">{positionName}</span>}
@@ -113,7 +113,7 @@ const BlockProfile = ({ contentBody, imagePath, contentSummary, title, profilePh
 
 const Blocks = ({ blocks = [] }) => {
   return (
-    <div className="container block-list">
+    <div className="container block-list mt-2">
       <div className="row">
         {blocks.map((item, index) => {
           if (item.elementType === 'cetProfile') {

@@ -176,8 +176,7 @@ const getEntryBySlug = async (content = {}, slug = '') => {
       return hydrated
     })
     .then(response => {
-      let hydrated = { ...response }
-
+      let hydrated = {}
       const pageStruc = processForPage(slug, Object.values(response))
       hydrated = { ...hydrated, [slug]: { ...pageStruc, ...response[slug] } }
       return hydrated
@@ -192,7 +191,7 @@ const processForPage = (slug, content) => {
     hydrated.tabs = getContentByType(content, 'cetTab')
     hydrated.slider = processForSlider(content)
     hydrated.contentColumns = processForContentColumn(content)
-    hydrated.callToAction = processForSidebar(content)
+    hydrated.callToAction = processForCTA(content)
     hydrated.sidebar = processForSidebar(content)
     hydrated.tabs = processForTabs(content)
     const listItems = getContentByType(children, 'cetListItem,cetListItemWithImage')
@@ -203,7 +202,6 @@ const processForPage = (slug, content) => {
     hydrated.blocks = blocks.map(item => {
       return processForBlock(item, content)
     })
-    hydrated.callToAction = null
     hydrated.menu = {}
     hydrated.contentPageType = 'BasicPage'
   }
@@ -211,6 +209,26 @@ const processForPage = (slug, content) => {
 }
 const getParent = (content = [], parentContentID) => content.filter(item => item.contentID === parentContentID)
 const getChildren = (content = [], contentID) => content.filter(item => item.parentContent_contentID === contentID).sort((a, b) => a.sortOrder - b.sortOrder)
+const processForCTA = content => {
+  let cta = getContentByType(content, 'cetCallToCaction')
+  let response = {}
+  if (cta?.length) {
+    cta = cta[0]
+    response.title = cta.title
+    response.linkLabel = cta.linkLabel
+    response.linkUrl = cta.linkUrl
+    response.summary = cta.contentSummary
+    response.contentBody = cta.contentBody
+    response.body = cta.contentBody
+    // if (cta.contentImage) {
+    //   response.image = processForAsset(cta.image)
+    // }
+    response.settings = {}
+  }
+
+  return response
+}
+
 const processForSlide = slide => {
   let response = {}
   response.title = slide.title

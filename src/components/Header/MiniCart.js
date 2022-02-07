@@ -99,7 +99,7 @@ const MiniCart = () => {
         {orderItems.length > 0 ? (
           <>
             <div className="d-flex justify-content-center border-top border-bottom py-2 mb-4">
-              <label className="text-muted">{t('frontend.home.subtotal')}:</label> <span className="fw-bold">{formatCurrency(total)}</span>
+              <label className="text-muted">{t('frontend.home.subtotal')}: </label> <span className="fw-bold">&nbsp;{formatCurrency(total)}</span>
             </div>
             <Link to="/checkout" className="btn btn-dark d-block ">
               {t('frontend.header.checkout')}

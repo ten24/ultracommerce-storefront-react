@@ -43,27 +43,29 @@ const OrderDetails = ({ orderInfo, orderFulfillments, orderPayments }) => {
                 <strong>{formatCurrency(orderInfo.calculatedSubTotal)}</strong>
               </span>
             </li>
+            {showVat && (
             <li className="list-group-item">
+              {t('frontend.cart.shippingDelivery')}
+              <span className="float-end">
+                <strong>{formatCurrency(orderInfo.calculatedFulfillmentTotal + orderInfo.calculatedVATTotal)}</strong>
+              </span>
+            </li>
+            )}
+            {!showVat && (
+            <>
+              <li className="list-group-item">
               {t('frontend.cart.shippingDelivery')}
               <span className="float-end">
                 <strong>{formatCurrency(orderInfo.calculatedFulfillmentTotal)}</strong>
               </span>
-            </li>
-            {showVat && (
-              <li className="list-group-item">
-                {t('frontend.cart.vat')}
-                <span className="float-end">
-                  <strong>{formatCurrency(orderInfo.calculatedVATTotal)}</strong>
-                </span>
               </li>
-            )}
-            {!showVat && (
               <li className="list-group-item">
                 {t('frontend.cart.tax')}
                 <span className="float-end">
                   <strong>{formatCurrency(orderInfo.calculatedTaxTotal)}</strong>
                 </span>
               </li>
+              </>
             )}
             {orderInfo.calculatedDiscountTotal > 0 && (
               <li className="list-group-item">
@@ -79,6 +81,14 @@ const OrderDetails = ({ orderInfo, orderFulfillments, orderPayments }) => {
                 <strong>{formatCurrency(orderInfo.calculatedTotal)}</strong>
               </span>
             </li>
+            {showVat && (
+              <li className="list-group-item">
+                {t('frontend.cart.vat')}
+                <span className="float-end">
+                  <strong>{formatCurrency(orderInfo.calculatedVATTotal)}</strong>
+                </span>
+              </li>
+            )}
           </ul>
         </div>
       </div>

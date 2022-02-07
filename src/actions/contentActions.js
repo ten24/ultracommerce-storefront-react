@@ -52,12 +52,16 @@ export const getPageContent = (content = {}, slug = '') => {
         dispatch(receiveContent(response))
       })
     } else if (cmsProvider === 'contentful') {
-      ContentfulService.getEntryBySlug(content, slug)
+      ContentfulService.getEntryBySlugAndType(content, slug, 'page')
         .then(data => {
           if (Array.isArray(data)) {
-            data.forEach(object => {
-              dispatch(receiveContent(object))
-            })
+            if (data.length) {
+              data.forEach(object => {
+                dispatch(receiveContent(object))
+              })
+            } else {
+              dispatch(receiveContent())
+            }
           } else {
             dispatch(receiveContent(data))
           }
@@ -93,7 +97,7 @@ export const getContentByType = (content = {}, type = 'page', slug = '') => {
         if (type !== 'page') dispatch(receiveContentSiltently(response))
       })
     } else if (cmsProvider === 'contentful') {
-      ContentfulService.getEntryBySlug(content, slug)
+      ContentfulService.getEntryBySlugAndType(content, slug, type)
         .then(data => {
           if (Array.isArray(data)) {
             data.forEach(object => {

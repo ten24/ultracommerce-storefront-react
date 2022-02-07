@@ -10,7 +10,7 @@ const useAccountProfile = () => {
   const dispatch = useDispatch()
   const MySwal = withReactContent(Swal)
   const user = useSelector(state => state.userReducer)
-
+  
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
@@ -26,7 +26,9 @@ const useAccountProfile = () => {
         updateUser({
           firstName: values.accountFirstName,
           lastName: values.accountLastName,
-          emailAddress: values.accountEmailAddress,
+          primaryEmailAddress: {
+            emailAddress: values.accountEmailAddress
+          },
           company: values.accountCompany,
           returnJSONObjects: 'account',
         })

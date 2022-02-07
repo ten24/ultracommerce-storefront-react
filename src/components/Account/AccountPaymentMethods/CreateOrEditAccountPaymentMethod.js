@@ -361,13 +361,12 @@ const CreateOrEditAccountPaymentMethod = () => {
                 </div>
               </div>
             )}
-            <hr className="mt-4 mb-4" />
-            <div className="d-flex flex-wrap justify-content-end">
+            <div className="d-flex flex-wrap justify-content-end mt-2">
               <Button
                 disabled={isFetching}
                 isLoading={isFetching}
                 label={t('frontend.account.payment.saveNew')}
-                classList="btn btn-primary mt-3 mt-sm-0"
+                classList="btn btn-primary"
                 onClick={() => {
                   if (verifyOnSubmit()) {
                     setFetching(true)

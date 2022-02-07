@@ -1,4 +1,5 @@
-$primary: #F78F1E;
+$primary: #027CBA; // ultra blue
+$brand-secondary: #CC122B; // ultra red
 $link-color: #2478cc;
 $primary-blue: #146cda;
 $color-white: #f7f7f7;
@@ -11,7 +12,7 @@ $gray-low-level: #b4aca8;
 $mixed-white: #dae1e7;
 $card-shadow: #eeeeee;
 $dark: #212529;
-$color-orange: #f78f1e;
+$color-orange: $primary; // everywhere slatwall orange variable is used, use ultra blue (primary color variable)
 $color-red: #ff0000;
 $light-blue: #f2f8fb;
 $light-white: #fff;

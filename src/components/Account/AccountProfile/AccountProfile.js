@@ -28,7 +28,7 @@ const AccountProfile = ({ crumbs, title, contentBody, contentTitle }) => {
           <div className="col-sm-6 mt-1">
             <div className="form-group">
               <label htmlFor="accountEmailAddress">{t('frontend.account.email')}</label>
-              <input className="form-control" type="email" id="accountEmailAddress" value={formik.values.accountEmailAddress} onChange={formik.handleChange} disabled="disabled" />
+              <input className="form-control" type="email" id="accountEmailAddress" value={formik.values.accountEmailAddress} onChange={formik.handleChange} />
             </div>
           </div>
           {/* <div className="col-sm-4">

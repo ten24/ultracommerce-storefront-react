@@ -24,8 +24,8 @@ const BasicPage = () => {
           />
         )}
         {!content.isMarkup &&
-          content?.sections &&
-          content?.sections.map(({ title, text, imageUrl }) => {
+          content.sections &&
+          content.sections.map(({ title, text, imageUrl }) => {
             return (
               <div key={title}>
                 <h2>{title}</h2>
@@ -45,7 +45,7 @@ const BasicPage = () => {
               </div>
             </div>
             <div className="row justify-content-center">
-              {content.contentColumns.columns.map((column, index) => {
+              {content.contentColumns.columns?.map((column, index) => {
                 return (
                   <div key={`${column.title}-${index}`} className={`col-lg-${12 / content?.contentColumns?.columns?.length} pr-4-lg`}>
                     <ContentBlock {...column} />

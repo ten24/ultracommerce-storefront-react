@@ -326,6 +326,10 @@ a:hover * {
   }
 }
 
+.slick-arrow:before {
+  color : $dark !important;
+}
+
 // for IE browsers only
 @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) { 
   .max-height-img img {
@@ -339,4 +343,16 @@ a:hover * {
 
 @media print {
         .no-print { display: none; }
+}
+
+.zoom-hover {
+  img {
+    transition: transform .2s;
+  }
+  &:hover {
+    cursor: pointer;
+    img {
+      transform: scale(1.2);
+    }
+  }
 }

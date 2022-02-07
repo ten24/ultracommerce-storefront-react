@@ -17,7 +17,7 @@ const BasicPageWithSidebar = ({ children }) => {
               className="content-summary"
               onClick={eventHandlerForWSIWYG}
               dangerouslySetInnerHTML={{
-                __html: pageData.contentSummary || '',
+                __html: pageData?.contentSummary || '',
               }}
             />
           </div>

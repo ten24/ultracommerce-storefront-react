@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { useUtilities } from '../../hooks'
 import { useTranslation } from 'react-i18next'
 import { SimpleImage } from '..'
+
 import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min'
 
 const ContentSlider = ({ slider }) => {
@@ -34,7 +35,7 @@ const ContentSlider = ({ slider }) => {
             {slider.slides.map(({ contentBody, title, imagePath, linkUrl, linkLabel }, key) => {
               return (
                 <div key={title} className={key === 0 ? 'carousel-item active' : 'carousel-item'}>
-                  <div className="carousel-image" >
+                  <div className="carousel-image">
                     <SimpleImage src={imagePath} alt="carouselImage" />
                   </div>
                   <div className="carousel-caption">

@@ -11,7 +11,8 @@ const ListingToolBar = ({ sorting, orderBy, setSort, recordsCount }) => {
   if (sorting) {
     dropdownLabel = sorting.options.filter(data => data.value === orderBy)
   }
-
+  if (recordsCount < 1) return null
+  
   return (
     <div className="d-flex justify-content-end sort-options">
       <div className="text-right">

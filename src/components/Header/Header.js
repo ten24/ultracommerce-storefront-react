@@ -169,13 +169,13 @@ const Header = ({ logo }) => {
 
   return (
     <>
-      <nav className="my-4 no-print">
+      <nav className="my-3 no-print">
         <div className="container">
           <div className="row justify-content-center justify-content-lg-between align-items-center">
             <div className="col-xl-4 col-md-5 col-10 text-center text-md-start mb-3 mb-lg-0 order-xl-1">
               <Link className="d-block" to="/">
                 <span className="navbar-brand d-block">
-                  <img src={logo} className="img-fluid" alt={t('frontend.logo')} />
+                  <img src={logo} className="img-fluid" alt={t('frontend.logo')} style={{maxHeight: '60px'}} />
                 </span>
               </Link>
             </div>

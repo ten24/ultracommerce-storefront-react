@@ -5,7 +5,7 @@ import defaultMissingProductType from '../../assets/images/missing-product-type.
 import defaultMissingProduct from '../../assets/images/missing-product.png'
 import { useState } from 'react'
 
-const SimpleImage = ({ className = '', src, alt = '', style = {}, type = 'product' }) => {
+const SimpleImage = ({ className = '', src = '', alt = '', style = {}, type = 'product' }) => {
   const { host } = useSelector(state => state.configuration.theme)
   const [retryCount, setRetryCount] = useState(0)
   const [classList, setClassList] = useState([className])

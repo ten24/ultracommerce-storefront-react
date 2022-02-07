@@ -7,10 +7,14 @@ import { getMyAccountMenu } from '../../../selectors/'
 
 const isSelectedClass = 'active'
 
+/*
+ * TODO: Fix content menu
+ */
 const AccountSidebar = () => {
   const { t } = useTranslation()
-  let loc = useLocation()
   const accountMenu = useSelector(getMyAccountMenu)
+  let loc = useLocation()
+  const content = useSelector(state => state.content[loc.pathname.substring(1)])
 
   return (
     <>
@@ -26,6 +30,16 @@ const AccountSidebar = () => {
                   <i className="far pr-2" /> {t('frontend.account.overview')}
                 </Link>
               </li>
+              {content?.menu?.menuItems?.length > 0 &&
+                content.menu.menuItems.map(({ contentID, slug, title }) => {
+                  return (
+                    <li key={contentID} className="nav-item">
+                      <Link to={`/${slug}`} className={`nav-link  ${loc.pathname.startsWith(`/${slug}`) && isSelectedClass}`}>
+                        <i className="far pr-2" /> {title}
+                      </Link>
+                    </li>
+                  )
+                })}
               {accountMenu.length > 0 &&
                 accountMenu.map(({ contentID, urlTitlePath, title }) => {
                   return (

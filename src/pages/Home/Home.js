@@ -19,13 +19,6 @@ function Home() {
             'f:productFeaturedFlag': 1,
           }}
         />
-      {/* <ProductSliderWithList
-          title={product?.title || t('frontend.home.popular_products')}
-          params={{
-            'f:publishedFlag': 1,
-          }}
-          productList={product.products} 
-        /> */}
       </section>
       {contentColumns?.columns?.length > 0 && (
         <ContentColumns title={contentColumns.title}>
@@ -40,6 +33,7 @@ function Home() {
           </div>
         </ContentColumns>
       )}
+
       <BrandSlider params={{ 'f:brandFeatured': 1 }} />
       <LatestNews />
       <ActionBanner data={callToAction} />

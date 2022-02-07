@@ -31,15 +31,6 @@ const OrderSummary = () => {
               <strong>{fulfillmentChargeAfterDiscountTotal > 0 ? formatCurrency(fulfillmentChargeAfterDiscountTotal) : t('frontend.cart.shippingFree')}</strong>
             </span>
           </li>
-          {showVat && (
-            <li className="list-group-item d-flex justify-content-between ">
-              <h6 className="my-0">{t('frontend.cart.vat')}</h6>
-
-              <span className="float-end">
-                <strong>{VATTotal > 0 ? formatCurrency(VATTotal) : '--'}</strong>
-              </span>
-            </li>
-          )}
           {!showVat && (
             <li className="list-group-item d-flex justify-content-between">
               <h6 className="my-0">{t('frontend.cart.tax')}</h6>
@@ -91,6 +82,14 @@ const OrderSummary = () => {
             <h6 className="my-0">{t('frontend.cart.total')}</h6>
             <strong>{total > 0 ? formatCurrency(total) : '--'}</strong>
           </li>
+          {showVat && (
+            <li className="list-group-item d-flex justify-content-between ">
+              <h6 className="my-0">{t('frontend.cart.vat')}</h6>
+              <span className="float-end">
+                <strong>{VATTotal> 0 ? formatCurrency(VATTotal) : '--'}</strong>
+              </span>
+            </li>
+          )}
         </ul>
       </div>
     </>

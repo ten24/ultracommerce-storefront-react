@@ -17,7 +17,7 @@ const ContentBlock = ({ contentBody = '', title = '', imagePath, linkLabel, link
       <div className="card-body px-5 pt-4">
         {title && <h3 className="mb-3 mt-1 fw-light">{title}</h3>}
         <div onClick={eventHandlerForWSIWYG} dangerouslySetInnerHTML={{ __html: contentBody }} />
-        {linkLabel && linkUrl.trim().length > 0 && (
+        {linkLabel && linkLabel.trim().length > 0 && linkUrl.trim().length > 0 && (
           <div className="text-center">
             <a onClick={eventHandlerForWSIWYG} href={`/${linkUrl}`} className="btn btn-primary btn-lg text-white px-4 mt-4">
               {linkLabel}
