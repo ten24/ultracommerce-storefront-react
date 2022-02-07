@@ -4,7 +4,7 @@ import { ContentSlider, ProductSliderWithConfig, BrandSlider, ContentColumns, La
 import { useTranslation } from 'react-i18next'
 function Home() {
   const { home = {} } = useSelector(state => state.content)
-  const { callToAction, popularProducts, contentColumns, slider } = home
+  const { callToAction, contentColumns, popularProducts, slider } = home
 
   const { t } = useTranslation()
   return (
@@ -18,13 +18,6 @@ function Home() {
             'f:productFeaturedFlag': 1,
           }}
         />
-        {/* <ProductSliderWithList
-          title={product?.title || t('frontend.home.popular_products')}
-          params={{
-            'f:publishedFlag': 1,
-          }}
-          productList={product.products}
-        /> */}
       </section>
       {contentColumns?.columns && contentColumns?.columns?.length > 0 && (
         <ContentColumns title={contentColumns.title}>

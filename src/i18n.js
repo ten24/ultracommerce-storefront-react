@@ -11,7 +11,7 @@ i18n
     supportedLngs: ['de', 'en', 'en_gb', 'es', 'es_mx', 'fr', 'ga', 'ga'],
     nonExplicitSupportedLngs: true,
     fallbackLng: 'en',
-    debug: false,
+    debug: true,
     interpolation: {
       escapeValue: false, // not needed for react as it escapes by default
     },

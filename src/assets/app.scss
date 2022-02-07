@@ -1,11 +1,11 @@
 //font jost fontfamily
 @import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&display=swap');
 
-//Bootstrap icon
-@import 'bootstrap-icons/font/bootstrap-icons.css';
-
 // Custom Colors
 @import './custom/custom-colors';
+
+//Bootstrap icon
+@import 'bootstrap-icons/font/bootstrap-icons.css';
 
 // Bootstrap-5
 @import 'bootstrap/scss/bootstrap';
@@ -16,7 +16,6 @@
 
 //Custom variable
 @import '@slatwall/slatwall-storefront-react/src/assets/components/variables.scss';
-
 // Custom Styles
 
 @import '@slatwall/slatwall-storefront-react/src/assets/components/header.scss';
@@ -31,5 +30,4 @@
 @import '@slatwall/slatwall-storefront-react/src/assets/components/checkout.scss';
 @import '@slatwall/slatwall-storefront-react/src/assets/components/dropdown';
 
-// Custom Styles
-@import './custom/custom-client';
+@import './custom/custom-client.scss';
