@@ -11,7 +11,7 @@
     "type": "git",
     "url": "git+https://github.com/ten24/slatwall-storefront-react.git"
   },
-  "homepage": "https://www.slatwallcommerce.com/resources",
+  "homepage": "https://www.slatwallcommerce.com/",
   "dependencies": {
     "@contentful/rich-text-react-renderer": "^15.6.2",
     "@palmabit/react-cookie-law": "^0.6.2",
