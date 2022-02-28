@@ -5,7 +5,7 @@ import { useUtilities } from '../../hooks'
 const ActionBanner = ({ data }) => {
   let { eventHandlerForWSIWYG } = useUtilities()
 
-  if (!data) {
+  if (!data || !Object.keys(data)?.length) {
     return null
   }
 

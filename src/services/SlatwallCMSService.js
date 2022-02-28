@@ -114,6 +114,8 @@ const getHeaderBySlug = async (content = {}, slug = '') => {
       if (response?.utility_menu?.length) {
         hydrated.utility_menu = { menu_items: response.utility_menu[0].contentBody }
       }
+      hydrated.raw = response
+
       return hydrated
     })
     .then(response => {
@@ -152,6 +154,8 @@ const getFooterBySlug = async (content = {}, slug = '') => {
       let hydrated = {}
       const nestedFooter = nestContentByKey(response, 'footer')
       if (nestedFooter[0]?.children?.length) {
+        nestedFooter[0].children = nestedFooter[0]?.children?.filter(child => child?.contentElementType_systemCode?.trim()?.length === 0 || child?.contentElementType_systemCode === 'cetBlock')
+        nestedFooter[0].raw = response
         hydrated = { footer: nestedFooter[0] }
       }
       return hydrated
@@ -178,7 +182,8 @@ const getEntryBySlug = async (content = {}, slug = '') => {
     .then(response => {
       let hydrated = {}
       const pageStruc = processForPage(slug, Object.values(response))
-      hydrated = { ...hydrated, [slug]: { ...pageStruc, ...response[slug] } }
+      hydrated = { ...hydrated, [slug]: { ...pageStruc, ...response[slug], raw: response } }
+
       return hydrated
     })
 }
@@ -203,6 +208,7 @@ const processForPage = (slug, content) => {
       return processForBlock(item, content)
     })
     hydrated.menu = {}
+
     hydrated.contentPageType = 'BasicPage'
   }
   return hydrated

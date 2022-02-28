@@ -35,17 +35,19 @@ const useUtilities = () => {
         return
       }
       event.preventDefault()
-
-      if (event.target.getAttribute('href').includes('.pdf')) {
+      if (event.target.getAttribute('href').includes('http') || event.target.getAttribute('href').includes('.pdf')) {
         window.open(event.target.getAttribute('href'), '_blank')
         return
       }
+      event.preventDefault()
+      
       if (event.target.getAttribute('target') && (event.target.getAttribute('target').includes('blank') || event.target.getAttribute('target').includes('tab') || event.target.getAttribute('target').includes('new'))) {
         window.open(event.target.getAttribute('href'), '_blank')
         return
       }
       if (event.target.getAttribute('href').includes('http') && !event.target.getAttribute('href').includes('.pdf')) {
-        window.location.href = event.target.getAttribute('href')
+        window.open(event.target.getAttribute('href'), '_blank')
+        return
       } else {
         history.push(event.target.getAttribute('href'))
       }
@@ -53,10 +55,16 @@ const useUtilities = () => {
       event.preventDefault()
 
       if (event.target.closest('a')) {
+        if (event.target.closest('a').getAttribute('href').includes('http')) {
+        window.open(event.target.closest('a').getAttribute('href'), '_blank')
+        return
+        } else {
         history.push(event.target.closest('a').getAttribute('href'))
+        }
       }
-    }
+    } 
   }
+  
 
   return { convertToFullPath, nestDataByKey, eventHandlerForWSIWYG, cleanHTML, renameKeys, renameKeysInArrayOfObjects, isAuthenticated, containsHTML, isString, isBoolean, booleanToString, skuIdsToSkuCodes, parseErrorMessages, organizeProductTypes, augmentProductType, groupBy, processQueryParameters, getContentByType }
 }
