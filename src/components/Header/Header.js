@@ -164,11 +164,42 @@ const MainNavBar = () => {
   )
 }
 
+const UtilityBar =  ({ socialItems = [] }) => {
+  
+  if (!socialItems) {
+    return null
+  }
+  
+  return (
+   <nav className="navbar-default top-bar">
+    <div className="container">
+      <div className="row justify-content-end">
+        <div className="col-auto">
+          <ul className="nav d-none d-lg-block d-md-block d-xl-block ms-auto justify-content-end">
+          {socialItems.map(menuItem => {
+          return (
+            <li key={menuItem.linkTitle} className="nav-item">
+              <a href={menuItem.linkUrl} className="nav-link" target="_blank" rel="noreferrer">
+                <i className={`bi bi-${menuItem.linkTitle}`}></i>
+              </a>
+            </li>
+            )
+          })}
+          </ul>
+        </div>
+      </div>
+    </div>
+   </nav>
+  )
+}
+
 const Header = ({ logo }) => {
   const { t } = useTranslation()
+  const social_items = useSelector(state => state.content?.header?.social_menu?.social_items)
 
   return (
     <>
+    <UtilityBar socialItems={social_items}/>
       <nav className="my-3 no-print">
         <div className="container">
           <div className="row justify-content-center justify-content-lg-between align-items-center">

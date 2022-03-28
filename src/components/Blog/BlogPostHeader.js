@@ -3,7 +3,7 @@ import { BreadCrumb } from '../../components'
 
 const BlogPostHeader = () => {
   const loc = useLocation()
-  const titleizeWord = str => `${str[0].toUpperCase()}${str.slice(1)}`
+  const titleizeWord = str => `${str[0]?.toUpperCase()}${str.slice(1)}`
   const kebabToTitle = str => str.split('-').map(titleizeWord).join(' ')
   const toBreadcrumbs = (link, { rootName = 'Home', nameTransform = s => s } = {}) =>
     link

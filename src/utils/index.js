@@ -120,7 +120,7 @@ export const getContentByType = (content = [], code = '') => {
   return content.filter(con => code.split(',').includes(con?.contentElementType_systemCode)).sort((a, b) => a.sortOrder - b.sortOrder)
 }
 export const getContentPages = (content = []) => {
-  return content.filter(con => con?.isPageFlag).sort((a, b) => a.sortOrder - b.sortOrder)
+  return content.filter(con => con?.isPageFlag === true).sort((a, b) => a.sortOrder - b.sortOrder)
 }
 export const getAllChildrenContentByType = (content = [], code = '') => {
   const response = []
