@@ -1,5 +1,5 @@
 import { toast } from 'react-toastify'
-import { SlatwalApiService } from '../services'
+import { axios, sdkURL, SlatwalApiService } from '../services'
 import { receiveUser, requestUser } from './userActions'
 import { getErrorMessage } from '../utils'
 
@@ -41,7 +41,7 @@ export const clearCart = () => {
     type: CLEAR_CART,
   }
 }
-export const setOrderOnCart = orderID => {
+export const setOrderOnCart = (orderID, successMsg = '') => {
   return async dispatch => {
     dispatch(requestCart())
 
@@ -54,8 +54,10 @@ export const setOrderOnCart = orderID => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
       if (response.isSuccess()) {
         dispatch(receiveCart(response.success().cart))
+        if (successMsg !== '' && !Object.keys(response.success()?.errors || {}).length) {
+          toast.success(successMsg)
+        }
       } else {
-        dispatch(receiveCart())
       }
     })
   }
@@ -74,8 +76,7 @@ export const getCart = () => {
 export const clearCartData = () => {
   return async dispatch => {
     dispatch(requestCart())
-
-    await SlatwalApiService.cart.clear().then(response => {
+    await SlatwalApiService.cart.clear({ returnJSONObjects: 'cart' }).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
       if (response.isSuccess()) {
         dispatch(receiveCart(response.success().cart))
@@ -83,11 +84,35 @@ export const clearCartData = () => {
     })
   }
 }
+
+const getCookie = cname => {
+  let name = cname + '='
+  let decodedCookie = decodeURIComponent(document.cookie)
+  let ca = decodedCookie.split(';')
+  for (let i = 0; i < ca.length; i++) {
+    let c = ca[i]
+    while (c.charAt(0) === ' ') {
+      c = c.substring(1)
+    }
+    if (c.indexOf(name) === 0) {
+      return c.substring(name.length, c.length)
+    }
+  }
+  return ''
+}
 export const addToCart = (skuID, quantity = 1) => {
-  return async dispatch => {
+  return async (dispatch, getState) => {
     dispatch(requestCart())
 
-    await SlatwalApiService.cart
+    const accountCode = getState().cartReducer?.affiliateAccount?.accountCode
+    const affiliateAccountCookie = getCookie('affiliateCode')
+
+    if (!accountCode?.length && affiliateAccountCookie.length) {
+      const codePair = affiliateAccountCookie.split('=')
+      dispatch(addAffiliate(codePair[1], '', false))
+    }
+
+    return await SlatwalApiService.cart
       .addItem({
         skuID,
         quantity,
@@ -96,13 +121,39 @@ export const addToCart = (skuID, quantity = 1) => {
       .then(response => {
         if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
         if (response.isSuccess()) {
+          toast.success('Added to Cart')
           dispatch(receiveCart(response.success().cart))
         } else {
           dispatch(receiveCart())
 
           toast.error('Error')
         }
+        return response
       })
+  }
+}
+
+export const addAffiliate = (affiliateCode, skuCode, requestCartRefresh = true) => {
+  return async dispatch => {
+    if (requestCartRefresh) dispatch(requestCart())
+    return await axios({
+      method: 'POST',
+      withCredentials: true,
+      url: `${sdkURL}api/scope/setAffiliate`,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: {
+        affiliateCode: affiliateCode,
+        skuCode: skuCode,
+        returnJSONObjects: requestCartRefresh ? 'cart' : '',
+      },
+    }).then(response => {
+      if (response?.status === 200) {
+        if (requestCartRefresh) dispatch(receiveCart(response.data.cart))
+      }
+      return response
+    })
   }
 }
 
@@ -228,6 +279,7 @@ export const updateItemQuantity = (skuID, quantity = 1) => {
     await SlatwalApiService.cart.updateItemQuantity(payload).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
       if (response.isSuccess()) {
+        toast.success('Quantity Update')
         dispatch(receiveCart(response.success().cart))
       } else {
         dispatch(receiveCart())
@@ -243,11 +295,12 @@ export const removeItem = orderItemID => {
       orderItemID,
       returnJSONObjects: 'cart',
     }
-    await SlatwalApiService.cart.removeItem(payload).then(response => {
+    return await SlatwalApiService.cart.removeItem(payload).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
       if (response.isSuccess()) {
         dispatch(receiveCart(response.success().cart))
       }
+      return response
     })
   }
 }
@@ -312,7 +365,7 @@ export const updateFulfillment = (params = {}) => {
   }
 }
 
-export const applyPromoCode = promotionCode => {
+export const applyPromoCode = (promotionCode, successMsg = '') => {
   return async dispatch => {
     dispatch(requestCart())
     await SlatwalApiService.cart
@@ -324,12 +377,15 @@ export const applyPromoCode = promotionCode => {
         if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
         if (response.isSuccess()) {
           dispatch(receiveCart(response.success().cart))
+          if (successMsg !== '' && !Object.keys(response.success()?.errors || {}).length) {
+            toast.success(successMsg)
+          }
         } else {
         }
       })
   }
 }
-export const removePromoCode = (promotionCode, promotionCodeID) => {
+export const removePromoCode = (promotionCode, promotionCodeID, successMsg = '') => {
   return async dispatch => {
     dispatch(requestCart())
     await SlatwalApiService.cart
@@ -342,6 +398,9 @@ export const removePromoCode = (promotionCode, promotionCodeID) => {
         if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
         if (response.isSuccess()) {
           dispatch(receiveCart(response.success().cart))
+          if (successMsg !== '' && !Object.keys(response.success()?.errors || {}).length) {
+            toast.success(successMsg)
+          }
         } else {
         }
       })

@@ -1,10 +1,8 @@
 import { useLocation } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
 import { processQueryParameters } from '../../utils'
 
 const ListingToolBar = ({ sorting, orderBy, setSort, recordsCount }) => {
   const loc = useLocation()
-  const { t } = useTranslation()
   const qs = processQueryParameters(loc.search)
   if (qs.orderBy) {
     orderBy = qs.orderBy
@@ -13,18 +11,14 @@ const ListingToolBar = ({ sorting, orderBy, setSort, recordsCount }) => {
   if (sorting) {
     dropdownLabel = sorting.options.filter(data => data.value === orderBy)
   }
+  if (recordsCount < 1) return null
+  
   return (
-    <div className="d-flex flex-row align-items-center justify-content-between">
-      <div className="col-6">
-        <h6>
-          <strong>{recordsCount}</strong>
-          {t('frontend.product.availableProducts')}
-        </h6>
-      </div>
+    <div className="d-flex justify-content-end sort-options">
       <div className="text-right">
         <div className="btn-group">
           <button type="button" className="btn btn-secondary dropdown-toggle text-white" data-bs-toggle="dropdown" aria-expanded="false">
-            {orderBy === '' ? 'Sort By' : dropdownLabel.length > 0 && dropdownLabel[0].name}
+            {dropdownLabel.length > 0 ? dropdownLabel[0].name : sorting?.name ? sorting.name : 'Sort By'}
           </button>
           <ul className="dropdown-menu dropdown-menu-end" value={orderBy}>
             {sorting &&

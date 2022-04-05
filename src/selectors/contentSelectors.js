@@ -1,7 +1,25 @@
 import { createSelector } from 'reselect'
+import { groupBy } from '../utils'
 
 export const getAllContent = state => state.content
-
+export const getStructuredContent = createSelector(getAllContent, (content = {}) =>
+  Object.keys(content).map(key => {
+    return { ...content[key], key }
+  })
+)
+export const getNestedContent = createSelector(getStructuredContent, (content = {}) => {
+  let contentResponse = content.sort((a, b) => a.sortOrder - b.sortOrder)
+  if (contentResponse.length) {
+    const groupedItems = groupBy(contentResponse, 'parentContent_contentID')
+    contentResponse = contentResponse
+      .map(item => {
+        item.children = groupedItems.hasOwnProperty(item.contentID) ? groupedItems[item.contentID] : []
+        return item
+      })
+      .sort((a, b) => a.sortOrder - b.sortOrder)
+  }
+  return contentResponse
+})
 export const getMainBannerSlides = createSelector(getAllContent, (content = {}) => {
   return Object.keys(content)
     .map(key => {
@@ -101,6 +119,6 @@ export const getAllFooterContentSelector = createSelector(getAllContent, (conten
       return item
     })
     .sort((a, b) => {
-      return a.sortOrder - b.sortOrder
+      return a?.sortOrder - b?.sortOrder
     })
 })

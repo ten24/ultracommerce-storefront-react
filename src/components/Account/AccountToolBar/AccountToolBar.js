@@ -11,7 +11,7 @@ const AccountToolBar = ({ term, updateTerm, search }) => {
               event.preventDefault()
               updateTerm(event.target.value)
             }}
-            placeholder="Search item #, order #, or PO"
+            placeholder="Search items"
           />
           <div className="input-group-append-overlay ms-1 mt-1">
             <span className="input-group-text">
@@ -27,7 +27,7 @@ const AccountToolBar = ({ term, updateTerm, search }) => {
           </div>
         </div>
         {/* <a href="##" className="btn btn-outline-secondary">
-          <i className="far fa-file-alt mr-2"></i> {t('frontend.account.request_statement')}
+          <i className="bi bi-file-alt mr-2"></i> {t('frontend.account.request_statement')}
         </a> */}
       </div>
     </div>

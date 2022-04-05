@@ -18,7 +18,9 @@ const ContactForm = () => {
   const formik = useFormik({
     enableReinitialize: false,
     initialValues: {
-      'formResponse.formID': contactFormID,
+      formResponse: {
+        formID: contactFormID,
+      },
       context: 'addFormResponse',
       firstName: '',
       lastName: '',
@@ -90,9 +92,9 @@ const ContactForm = () => {
                   { name: 'Phone', value: 'phone' },
                 ].map(({ name, value }) => {
                   return (
-                    <div key={value} className="form-check form-check-inline custom-control custom-radio d-inline-flex">
+                    <div key={value} className="form-check form-check-inline custom-control custom-radio d-inline-flex align-items-center">
                       <input name="contactMethod" className="custom-control-input" type="radio" id={value} value={value} onChange={formik.handleChange} checked={formik.values.contactMethod === value} />
-                      <label className="custom-control-label" htmlFor={value}>
+                      <label className="custom-control-label m-0 mx-2 p-0" htmlFor={value}>
                         {name}
                       </label>
                     </div>
@@ -109,7 +111,7 @@ const ContactForm = () => {
               </div>
             </div>
           </div>
-          <button className="btn btn-primary btn-block">
+          <button className="btn btn-primary btn-block mt-2">
             <span className="d-none d-sm-inline">{t('frontend.core.submit')}</span>
           </button>
         </form>

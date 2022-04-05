@@ -3,7 +3,7 @@ import { addNewAddressAndAttachAsShipping, addShippingAddressUsingAccountAddress
 import { FulfilmentAddressSelector, SlideNavigation, Overlay, FulfillmentPicker, PickupLocationPicker, ShippingMethodPicker } from '../../'
 import { useEffect } from 'react'
 import { accountAddressSelector, fulfillmentSelector } from '../../../selectors/'
-
+import { Redirect } from 'react-router'
 const ShippingSlide = ({ currentStep }) => {
   const dispatch = useDispatch()
   const { orderRequirementsList } = useSelector(state => state.cart)
@@ -17,6 +17,9 @@ const ShippingSlide = ({ currentStep }) => {
     dispatch(getPickupLocations())
   }, [dispatch])
 
+  if (selectedFulfillmentMethod.fulfillmentMethod.fulfillmentMethodType === 'auto') {
+    return <Redirect to={currentStep.next} />
+  }
   return (
     <>
       <Overlay active={isFetching} spinner>
@@ -42,7 +45,7 @@ const ShippingSlide = ({ currentStep }) => {
             }}
           />
         )}
-        {selectedFulfillmentMethod.fulfillmentMethod.fulfillmentMethodType === 'shipping' && selectedAccountID.length > 0 && <ShippingMethodPicker />}
+        {selectedFulfillmentMethod.fulfillmentMethod.fulfillmentMethodType === 'shipping' && <ShippingMethodPicker />}
       </Overlay>
       <SlideNavigation currentStep={currentStep} nextActive={!orderRequirementsList.includes('fulfillment')} />
     </>

@@ -1,52 +1,27 @@
 const richTextQuery = `{
         json
-      }`
-
-const homeSliderQuery = `{
-  contentCollection(limit: 1, where: {slug: "home-contentslider"}) {
-    items {
-      title
-      slug
-      customBody ${richTextQuery}
-      sectionsCollection(limit: 9) {
-        items {
-          ... on ComponentHero {
-            title
-            slug
-            summary ${richTextQuery}
-            image{
-              url
-            }
-            ctaLink {
-              ... on ComponentLink {
-                title
-                linkUrl
+        links{
+          assets{
+            block{
+              sys {
+                id
               }
+              __typename
+              title
+              url
             }
           }
         }
-      }
-    }
-  }
-}
-`
-
-const homePopularProduct = `
-{
-  productsPickerCollection {
-    items {
-      title
-      products
-    }
-  }
-}`
+      }`
 
 const blogQuery = params => {
   let query = `{
   blogCollection(${params}) {
     items {
+      authorName,
       postTitle,
       postImage {
+        title
         url
       },
       publicationDate,
@@ -54,12 +29,13 @@ const blogQuery = params => {
       slug,
       postSummary,
       postContent ${richTextQuery},
-      blogcategory {
-        ... on Category {
+      catagoriesCollection(limit: 10){
+        total
+        items{
           category
+          slug
         }
-      },
-      authorName
+      }
     }
     total
   }
@@ -67,9 +43,58 @@ const blogQuery = params => {
   return query
 }
 
+const blogByCategory = (slug, limit = 10, skip = 0) => `
+{
+  # add your query
+  categoryCollection(limit: 1, where: { category: "${slug}" }) {
+    total
+    items {
+      category
+      linkedFrom {
+        blogCollection(limit: ${limit}, skip: ${skip}) {
+          items {
+            authorName
+            postTitle
+            postImage {
+              title
+              url
+            }
+            publicationDate
+            postUrl
+            slug
+            postSummary
+            postContent {
+              json
+              links {
+                assets {
+                  block {
+                  
+                    __typename
+                    title
+                    url
+                  }
+                }
+              }
+            }
+            catagoriesCollection(limit: 4) {
+              total
+              items {
+                category
+                slug
+              }
+            }
+          }
+          total
+        }
+      }
+    }
+  }
+}`
+
 const getBlogCategory = `
 {
   categoryCollection {
+    total
     items {
       linkedFrom {
         blogCollection {
@@ -81,24 +106,173 @@ const getBlogCategory = `
   }
 }`
 
-const myAccountQuery = `{
-  contentCollection(limit:1,	where: {slug: "my-account"}) {
+const getModernPageData = slug => `{ 
+  ucpageCollection(where: { slug_contains: "${slug}" }) {
+    total
     items {
+      sys {
+        id
+      }
       title
-      customBody ${richTextQuery}
-      sectionsCollection{
-        items {
-          ... on Content {
+      slug
+       body {
+         json
+       }
+       enhancedMenu{
+        title
+        body{
+          json
+        }
+        pagesCollection(limit:10){
+          total
+          items{
             title
             slug
-            customBody ${richTextQuery}
-            sectionsCollection{
-              items {
-                ... on ComponentLink {
+             body{
+               json
+             }
+          }
+        }
+      }
+      callToAction{
+        title
+         body{
+           json
+         }
+         summary{
+           json
+         }
+        linkTitle
+        linkUrl
+        image{
+          title
+          url
+        }
+      }
+      slider {
+        title
+        body {
+          json
+        }
+        slidesCollection(limit: 10) {
+          total
+          items {
+            title
+            body{
+              json
+            }
+            link
+            linkTitle
+            image {
+              title
+              url
+            }
+          }
+        }
+      }
+      products{
+        title
+        products
+      }
+      columns{
+        title
+         body{
+           json
+         }
+        link
+        linkUrl
+        columnsCollection(limit:10){
+          items{
+            title
+             body{
+               json
+             }
+            link
+          
+             summary{
+               json
+             }
+            image{
+              title
+              url
+            }
+          }
+        }
+      }
+    }
+    # add the fields you want to query
+  }
+}`
+
+const getModernHeader = `{
+  headerCollection(limit: 1){
+    total
+    items{
+      title
+      utilityMenu{
+         title
+        summary{
+          json
+        }
+        body{
+          json
+        }
+        image{
+          title
+          url
+        }
+        menuItemsCollection(limit: 10){
+          total
+          items{
+            title
+            linkUrl
+            bootstrapIconClass
+            blocksCollection(limit: 10){
+              total
+              items{
+                title
+                body{
+                  json
+                }
+                linkUrl
+                image{
                   title
-                  displayInNavigation
-                  linkUrl
-                  bootstrapIconClass
+                  url
+                }
+              }
+            }
+          }
+        }
+      }
+      megaMenu{
+        title
+        summary{
+          json
+        }
+        body{
+          json
+        }
+        image{
+          title
+          url
+        }
+        menuItemsCollection(limit: 10){
+          total
+          items{
+            title
+            linkUrl
+            bootstrapIconClass
+            blocksCollection(limit: 10){
+              total
+              items{
+                title
+                body{
+                  json
+                }
+                linkUrl
+                image{
+                  title
+                  url
                 }
               }
             }
@@ -108,80 +282,41 @@ const myAccountQuery = `{
     }
   }
 }`
-
-const headerQuery = `{
-  contentCollection(limit: 1, where: {slug: "header-main"}) {
-    items {
-      sectionsCollection {
-        items {
-          ... on ComponentLink {
-            title
-            linkUrl
-            displayInNavigation
-            bootstrapIconClass
-          }
-        }
-      }
-    }
-  }
-}
-`
-const getPagesQuery = params => {
-  let slug = `"${params}"`
-  const pageQuery = `{
-  contentCollection(limit: 1, where: {slug: ${slug}}) {
-    items {
+const getModernFooter = `{
+  footerCollection(limit:1){
+    total
+    items{
       title
-      seoDesc
-      sectionsCollection {
-        items {
-          ... on ComponentHero {
-            title
-            slug 
-            summary ${richTextQuery}
-            image {
-              url
+      body{
+        json
+      }
+      blocksCollection(limit:10){
+        total
+        items{
+          title
+          body{
+            json
+            links{
+              assets{
+                block{
+                  sys {
+                    id
+                  }
+                  __typename
+                  title
+                  url
+                }
+              }
             }
           }
-        }
-      }
-    }
-  }
-}`
-  return pageQuery
-}
-
-const CategoryQuery = `{
-   contentCollection(limit: 1, where: {slug: "categories"}) {
-    items {
-      title
-      customBody ${richTextQuery}
-    }
-  }
-  }`
-const ProductTypeQuery = `{
-   contentCollection(limit: 1, where: {slug: "product-types"}) {
-    items {
-      title
-      customBody ${richTextQuery}
-    }
-  }
-  }`
-
-const getFooterQuery = `{
-  contentCollection(limit: 1, where: {slug: "footer"}) {
-    items {
-      title
-      sectionsCollection {
-        items {
-          ... on Content {
+          linkUrl
+          image{
             title
-            slug
-            customBody  ${richTextQuery}
+            url
           }
         }
       }
     }
   }
 }`
-export { homeSliderQuery, homePopularProduct, blogQuery, getBlogCategory, headerQuery, myAccountQuery, getPagesQuery, CategoryQuery, ProductTypeQuery, getFooterQuery }
+export { blogByCategory, getModernFooter, getModernHeader, getModernPageData, blogQuery, getBlogCategory }

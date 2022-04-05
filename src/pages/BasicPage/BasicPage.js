@@ -1,63 +1,31 @@
-import { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
-import { useHistory, useLocation } from 'react-router-dom'
-import { ListingGrid, ListingPagination } from '../../components'
-import { useGetProducts } from '../../hooks'
-import queryString from 'query-string'
+import { Blocks, ContentBlock, ContentColumns, ListingGrid, ListingPagination, ListItem, SimpleTabs } from '../../components'
+import { useBasicPage, useUtilities } from '../../hooks'
 
 const BasicPage = () => {
-  let history = useHistory()
-  let loc = useLocation()
-  let params = queryString.parse(loc.search, { arrayFormat: 'separator', arrayFormatSeparator: ',' })
-  const content = useSelector(state => state.content[loc.pathname.substring(1)])
-  const { title, customBody, sections, isMarkup = true } = content || {}
-  const [path, setPath] = useState(loc.search)
-  let [request, setRequest] = useGetProducts(params)
-
-  const setPage = pageNumber => {
-    params['currentPage'] = pageNumber
-    request.data.currentPage = pageNumber
-    setRequest({ ...request, params: { currentPage: pageNumber, content_id: content.contentID, includePotentialFilters: false }, makeRequest: true, isFetching: true, isLoaded: false })
-  }
-
-  useEffect(() => {
-    let didCancel = false
-    if (!didCancel && ((!request.isFetching && !request.isLoaded) || loc.search !== path) && content.productListingPageFlag === '1') {
-      setPath(loc.search)
-      setRequest({ ...request, params: { ...params, content_id: content.contentID, includePotentialFilters: false }, makeRequest: true, isFetching: true, isLoaded: false })
-    }
-    return () => {
-      didCancel = true
-    }
-  }, [request, setRequest, params, loc, path, content])
-
+  const { content, request, setPage } = useBasicPage()
+  let { eventHandlerForWSIWYG } = useUtilities()
   return (
-    <div className="bg-light p-0">
+    <div className="p-0">
       <div className="page-title-overlap bg-lightgray pt-4">
         <div className="container d-lg-flex justify-content-between py-2 py-lg-3">
           <div className="order-lg-1 pr-lg-4 text-center">
-            <h1 className="h3 text-dark mb-0 font-accent">{title || ''}</h1>
+            <h1 className="h3 text-dark mb-0 font-accent">{content.title || ''}</h1>
           </div>
         </div>
       </div>
-      <div className="container bg-light box-shadow-lg rounded-3 p-5">
-        {isMarkup && (
+      <div className="container bg-white shadow-sm rounded-3 p-lg-5 mb-5">
+        {content.isMarkup && (
           <div
             className="content-body"
-            onClick={event => {
-              event.preventDefault()
-              if (event.target.getAttribute('href')) {
-                history.push(event.target.getAttribute('href'))
-              }
-            }}
+            onClick={eventHandlerForWSIWYG}
             dangerouslySetInnerHTML={{
-              __html: customBody || '',
+              __html: content.contentBody || '',
             }}
           />
         )}
-        {!isMarkup &&
-          sections &&
-          sections.map(({ title, text, imageUrl }) => {
+        {!content.isMarkup &&
+          content.sections &&
+          content.sections.map(({ title, text, imageUrl }) => {
             return (
               <div key={title}>
                 <h2>{title}</h2>
@@ -68,7 +36,32 @@ const BasicPage = () => {
               </div>
             )
           })}
-        {content?.productListingPageFlag === '1' && (
+        {content?.tabs?.length > 0 && <SimpleTabs data={content.tabs} />}
+        {content?.contentColumns?.columns?.length > 0 && (
+          <ContentColumns title={content.contentColumns?.title}>
+            <div className="row">
+              <div className="col">
+                <div onClick={eventHandlerForWSIWYG} dangerouslySetInnerHTML={{ __html: content?.contentColumns?.contentBody }} />
+              </div>
+            </div>
+            <div className="row justify-content-center">
+              {content.contentColumns.columns?.map((column, index) => {
+                return (
+                  <div key={`${column.title}-${index}`} className={`col-lg-${12 / content?.contentColumns?.columns?.length} pr-4-lg`}>
+                    <ContentBlock {...column} />
+                  </div>
+                )
+              })}
+            </div>
+          </ContentColumns>
+        )}
+
+        {content?.listItems?.map(item => {
+          return <ListItem {...item} />
+        })}
+        {content?.blocks?.length > 0 && <Blocks blocks={content.blocks} />}
+
+        {content?.productListingPageFlag && (
           <>
             <hr />
             <div className="col">

@@ -1,47 +1,58 @@
 import { useDispatch, useSelector } from 'react-redux'
-import { HeartButton, ProductImage, ProductPrice } from '..'
+import { HeartButton, SimpleImage, ProductPrice, Button, ProductImage } from '..'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { getBrandRoute, getProductRoute } from '../../selectors'
 import { addToCart } from '../../actions'
+import { useState } from 'react'
 
 const ProductCard = props => {
-  const dispatch = useDispatch()
-  const { productName, calculatedSalePrice, urlTitle, brand_brandName, brand_urlTitle, listPrice, imageFile, defaultSku_imageFile, productClearance, imagePath, skuID = '' } = props
+  const { productName, productCode, salePrice, urlTitle, brandName, imagePath, imageFile, brandUrlTitle, listPrice, images, productClearance, skuID = '', skuCode } = props
   const { t } = useTranslation()
+  const dispatch = useDispatch()
+  const [isFetching, setFetching] = useState(false)
   const brand = useSelector(getBrandRoute)
   const product = useSelector(getProductRoute)
-  let productLink = `/${product}/${urlTitle}` + (skuID.length ? `?skuid=${skuID}` : '')
+  const productLink = `/${product}/${urlTitle}` + (skuID.length ? `?skuid=${skuID}` : '')
+  const useResizedImage = images && images?.length > 0
+
   return (
-    <div className="card">
+    <div className="card p-3 pt-2 h-100">
       {productClearance === true && <span className="badge">{t('frontend.core.special')}</span>}
       <HeartButton skuID={skuID} />
-      <Link className="d-block overflow-hidden" to={`/${product}/${urlTitle}?skuid=${skuID}`}>
-        {/* to fix multiple image issue added ternary here */}
-        {imageFile ? <ProductImage customClass="card-image-height" imageFile={imageFile} skuID={skuID} /> : imagePath ? <ProductImage customClass="card-image-height" imageFile={imagePath} skuID={skuID} customPath="/" /> : <ProductImage customClass="card-image-height" imageFile={imageFile || defaultSku_imageFile} skuID={skuID} />}
+      <Link to={`/${product}/${urlTitle}?skuid=${skuID}`}>
+        {useResizedImage && <SimpleImage className="img-fluid card-image-height productImage" src={images[0]} alt={productName} type="product" />}
+        {!useResizedImage && imagePath && <ProductImage customClass="img-fluid card-image-height" imageFile={imagePath} skuID={skuID} customPath="/" />}
+        {!useResizedImage && imageFile && <ProductImage customClass="img-fluid card-image-height" imageFile={imageFile} skuID={skuID} />}
       </Link>
       <div className="card-body">
-        <Link to={`/${brand}/${brand_urlTitle}`}>
-          <div className="product-brand">{brand_brandName}</div>
+        <Link to={`/${brand}/${brandUrlTitle}`} className="text-capitalize mb-3" style={{ fontSize: 12 }}>
+          {brandName}
         </Link>
         <h2>
-          <Link to={productLink} className="product-name">
+          <Link to={productLink} className="product-name d-inline-block w-100">
             {productName}
           </Link>
         </h2>
-        <ProductPrice salePrice={calculatedSalePrice} listPrice={listPrice} className="d-flex" />
+        {!skuCode && productCode && <div className="product-brand">{productCode}</div>}
+        {skuCode && <div className="product-brand">{skuCode}</div>}
+
+        <ProductPrice salePrice={salePrice} listPrice={listPrice} className="d-flex" />
       </div>
-      <div className="text-center add-card-footer">
-        <button
+      <div className="text-center card-footer border-0 bg-transparent pb-3 pt-0">
+        <Button
+          disabled={isFetching}
+          isLoading={isFetching}
+          className="btn btn-primary btn-block my-3"
+          label={t('frontend.product.add_to_cart')}
           onClick={e => {
             e.preventDefault()
-            dispatch(addToCart(skuID, 1))
+            setFetching(true)
+            dispatch(addToCart(skuID)).then(() => {
+              setFetching(false)
+            })
           }}
-          type="submit"
-          className="btn btn-primary btn-block"
-        >
-          {t('frontend.product.add_to_cart')}
-        </button>
+        />
       </div>
     </div>
   )

@@ -5,28 +5,27 @@ import { deletePaymentMethod } from '../../../actions/'
 import { useTranslation } from 'react-i18next'
 
 const PaymentMethodItem = props => {
-  const { accountPaymentMethodID, accountPaymentMethodName, nameOnCreditCard, isPrimary = false, creditCardType, expirationYear, expirationMonth } = props
+  const { accountPaymentMethodID, isPrimary = false, creditCardType, expirationYear, expirationMonth, creditCardLastFour, accountPaymentMethodName } = props
   const MySwal = withReactContent(Swal)
   const dispatch = useDispatch()
   const { t } = useTranslation()
 
   return (
     <tr>
-      <td className="py-3 align-middle">
+      <td className="py-2">
         <div className="media align-items-center">
           <div className="media-body">
-            <span className="font-weight-medium text-heading mr-1">{creditCardType}</span>
-            {accountPaymentMethodName}
-            {isPrimary && <span className="align-middle badge bg-info ms-2">Primary</span>}
+            <div> {accountPaymentMethodName && <b>{`${creditCardType} Ending in x${creditCardLastFour} - ${accountPaymentMethodName}`}</b>}</div>
+            <div>{!accountPaymentMethodName && <b>{`${creditCardType} Ending in x${creditCardLastFour}`}</b>} </div>
+            <div>{`Exp: ${expirationMonth}/${expirationYear}`}</div>
           </div>
         </div>
       </td>
-      <td className="py-3 align-middle">{nameOnCreditCard}</td>
-      <td className="py-3 align-middle">{`${expirationMonth}/${expirationYear}`}</td>
-      <td className="py-3 align-middle">
+      <td className="py-2"> {isPrimary && <span className="badge bg-info">{t('frontend.core.prinary')}</span>} </td>
+      <td className="py-2">
         <button
           type="button"
-          className="link-button nav-link-style "
+          className="link-button nav-link-style link"
           onClick={() => {
             MySwal.fire({
               icon: 'info',
@@ -45,7 +44,7 @@ const PaymentMethodItem = props => {
           title=""
           data-original-title="Remove"
         >
-          <i className="bi bi-trash"></i>
+          {t(`frontend.core.remove`)}
         </button>
       </td>
     </tr>

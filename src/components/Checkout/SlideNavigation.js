@@ -13,14 +13,14 @@ const SlideNavigation = ({ currentStep, nextActive = true }) => {
           <>
             <div className="w-50 pl-2">
               <button
-                className="btn btn-primary btn-lg btn-block"
+                className="btn btn-primary btn-lg btn-block "
                 disabled={!nextActive}
                 onClick={e => {
                   e.preventDefault()
                   history.push(currentStep.next)
                 }}
               >
-                <span className="d-none d-sm-inline">{t('frontend.pagination.continue')}</span>
+                <span className=" d-sm-inline">{t('frontend.pagination.continue')}</span>
               </button>
             </div>
           </>

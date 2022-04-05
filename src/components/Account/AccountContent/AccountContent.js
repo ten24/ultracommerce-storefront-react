@@ -1,32 +1,21 @@
 import { useSelector } from 'react-redux'
-import { useHistory, useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 
-const AccountContent = () => {
-  let history = useHistory()
+const AccountContent = ({ displayTitle = true }) => {
   let loc = useLocation()
   const content = useSelector(state => state.content[loc.pathname.substring(1)])
-  const { customBody = '', contentTitle = '', isMarkup = true } = content || {}
+  const { title, contentBody = '' } = content || {}
   return (
     <>
-      <div className="d-flex justify-content-between align-items-center   mb-lg-3">
-        <div className="d-flex justify-content-between w-100">
-          <h2 className="h3">{contentTitle}</h2>
+      {displayTitle && (
+        <div className="d-flex justify-content-between align-items-center">
+          <div className="d-flex justify-content-between w-100">
+            <h2 className="h3">{title}</h2>
+          </div>
         </div>
-      </div>
-      {isMarkup && (
-        <div
-          onClick={event => {
-            event.preventDefault()
-            if (event.target.getAttribute('href')) {
-              history.push(event.target.getAttribute('href'))
-            }
-          }}
-          dangerouslySetInnerHTML={{
-            __html: customBody,
-          }}
-        />
       )}
-      {!isMarkup && customBody}
+
+      {!!contentBody && contentBody.length > 0 && <div className="content-body mb-4" dangerouslySetInnerHTML={{ __html: contentBody }} />}
     </>
   )
 }

@@ -7,16 +7,20 @@ import { getMyAccountMenu } from '../../../selectors/'
 
 const isSelectedClass = 'active'
 
+/*
+ * TODO: Fix content menu
+ */
 const AccountSidebar = () => {
   const { t } = useTranslation()
-  let loc = useLocation()
   const accountMenu = useSelector(getMyAccountMenu)
+  let loc = useLocation()
+  const content = useSelector(state => state.content[loc.pathname.substring(1)])
 
   return (
     <>
       <div className="col-md-4 col-lg-3">
         <nav className="navbar flex-column align-items-start navbar-expand-md navbar-light bg-light p-2 mb-5 text-left">
-          <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span className="navbar-toggler-icon"></span>
           </button>
           <div className="collapse navbar-collapse w-100" id="navbarNav">
@@ -26,6 +30,16 @@ const AccountSidebar = () => {
                   <i className="far pr-2" /> {t('frontend.account.overview')}
                 </Link>
               </li>
+              {content?.menu?.menuItems?.length > 0 &&
+                content.menu.menuItems.map(({ contentID, slug, title }) => {
+                  return (
+                    <li key={contentID} className="nav-item">
+                      <Link to={`/${slug}`} className={`nav-link  ${loc.pathname.startsWith(`/${slug}`) && isSelectedClass}`}>
+                        <i className="far pr-2" /> {title}
+                      </Link>
+                    </li>
+                  )
+                })}
               {accountMenu.length > 0 &&
                 accountMenu.map(({ contentID, urlTitlePath, title }) => {
                   return (
@@ -50,7 +64,7 @@ const AccountHeader = () => {
   const [disableButton, setdisableButton] = useState(false)
 
   return (
-    <div className="bg-light p-3 pt-4 mb-4 text-center">
+    <div className="bg-light p-3 pt-4 mb-4 text-center no-print">
       <h1 className="display-4">{t('frontend.account.myAccount')}</h1>
       <button
         type="button"
@@ -59,7 +73,7 @@ const AccountHeader = () => {
           setdisableButton(true)
           dispatch(logout(t('frontend.account.logout_success'), t('frontend.account.logout_failure')))
         }}
-        className="btn btn-light lead btn-link"
+        className="btn link-btn btn-link"
       >
         {t('frontend.core.logout')}
       </button>

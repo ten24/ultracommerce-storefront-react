@@ -1,0 +1,47 @@
+.addReviewModal .modal-header {
+    border-bottom: unset;
+    margin: auto;
+}
+
+.addReviewModal .modal-title {
+    height: 28px;
+    width: 237px;
+    color: #272525;
+    font-size: 21px;
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 28px;
+}
+
+.addReviewModal .btn-close {
+    position: absolute;
+    right: 25px;
+    opacity : 1;
+}
+
+.bi-star::before{
+    color : #027CBA;
+}
+
+.addReviewModal .product-title{
+    margin-left: 20px;
+}
+
+.stars {
+
+      i {
+        font-size: 2em;
+        margin: 2px;
+        cursor: pointer;
+        color: #292f3d;
+        transition: color 0.5s;
+
+        &.in-rate {
+          color: #ffcf87;
+        }
+
+        &.in-hover {
+          color: rgba(255, 207, 135, 0.3);
+        }
+      }
+}

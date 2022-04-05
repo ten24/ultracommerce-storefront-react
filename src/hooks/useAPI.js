@@ -3,6 +3,7 @@ import { SlatwalApiService, axios } from '../services'
 import { useHistory, useLocation } from 'react-router'
 import { toast } from 'react-toastify'
 import { getErrorMessage } from '../utils'
+import { useSelector } from 'react-redux'
 
 const headers = {}
 
@@ -11,7 +12,7 @@ export const useGetEntity = () => {
   useEffect(() => {
     let source = axios.CancelToken.source()
     if (request.makeRequest) {
-      const payload = { ...request.params, entityName: request.entity, includeAttributesMetadata: true }
+      const payload = { ...request.params, entityName: request.entity }
 
       SlatwalApiService.general.getEntity(payload, headers, source).then(response => {
         if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
@@ -32,7 +33,7 @@ export const useGetEntity = () => {
   return [request, setRequest]
 }
 
-export const useGetProductsByEntity = () => {
+export const useGetProductsByEntityModified = () => {
   let [request, setRequest] = useState({ isFetching: false, isLoaded: false, makeRequest: false, data: [], error: '', params: {}, entity: '' })
   useEffect(() => {
     let source = axios.CancelToken.source()
@@ -42,7 +43,10 @@ export const useGetProductsByEntity = () => {
       SlatwalApiService.general.getEntity(payload, headers, source).then(response => {
         if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
         if (response.isSuccess()) {
-          setRequest({ data: response.success().data, attributeSets: response.success().attributeSets, isFetching: false, isLoaded: true, makeRequest: false, params: {} })
+          const products = response.success().data.pageRecords.map(product => {
+            return { ...product, brandName: product.brand_brandName, brandUrlTitle: product.brand_urlTitle, imageFile: product.defaultSku_imageFile, skuCode: product.defaultSku_skuCode, product: product.defaultSku_imageFile, skuID: product.defaultSku_skuID }
+          })
+          setRequest({ data: products, attributeSets: response.success().attributeSets, isFetching: false, isLoaded: true, makeRequest: false, params: {} })
         } else {
           setRequest({ data: [], attributeSets: [], isFetching: false, makeRequest: false, isLoaded: true, params: {}, error: 'Something was wrong' })
         }
@@ -55,31 +59,33 @@ export const useGetProductsByEntity = () => {
 
   return [request, setRequest]
 }
-/*
-Currently this only wokrs for product
-*/
-export const useGetEntityByUrlTitle = () => {
-  let [request, setRequest] = useState({ isFetching: false, isLoaded: false, makeRequest: false, data: [], error: '', params: {}, entity: '' })
+const defaultParams = { products: [], potentialFilters: {}, total: 0, pageSize: 12, totalPages: 1 }
+
+export const useGetProductsWithPagination = filters => {
+  let [isFetching, setFetching] = useState(true)
+  let [data, setData] = useState(defaultParams)
+  let [error, setError] = useState({ isError: false, message: '' })
+
   useEffect(() => {
     let source = axios.CancelToken.source()
-    if (request.makeRequest) {
-      const payload = { ...request.params, entityName: request.entity, includeAttributesMetadata: true }
+    const payload = JSON.parse(filters)
+    setFetching(true)
+    SlatwalApiService.products.search(payload, headers, source).then(response => {
+      if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) setError({ isError: true, message: getErrorMessage(response.success().errors) })
+      if (response.isSuccess()) {
+        setData(response.success().data)
+      } else {
+        setData(defaultParams)
+        setError({ isError: true, message: 'Something was wrong' })
+      }
+      setFetching(false)
+    })
 
-      SlatwalApiService.general.getEntity(payload, headers, source).then(response => {
-        if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-        if (response.isSuccess()) {
-          setRequest({ data: response.success().data.product, attributeSets: response.success().data.attributeSets, isFetching: false, isLoaded: true, makeRequest: false, params: {} })
-        } else {
-          setRequest({ data: [], isFetching: false, makeRequest: false, isLoaded: true, params: {}, error: 'Something was wrong' })
-        }
-      })
-    }
     return () => {
       source.cancel()
     }
-  }, [request, setRequest])
-
-  return [request, setRequest]
+  }, [filters])
+  return { isFetching, records: data.products, potentialFilters: data.potentialFilters, total: data.total, totalPages: Math.ceil(data.total / data.pageSize), error }
 }
 
 export const useGetEntityByID = () => {
@@ -128,7 +134,74 @@ export const useGetProductDetails = () => {
   return [request, setRequest]
 }
 
+export const useGetEntityByUrlTitleAdvanced = (urlTitle, params = {}) => {
+  let [isFetching, setFetching] = useState(true)
+  let [data, setData] = useState({ product: {}, totalRecords: 0, totalPages: 1 })
+  let [error, setError] = useState({ isError: false, message: '' })
+
+  useEffect(() => {
+    let source = axios.CancelToken.source()
+    setFetching(true)
+    const payload = { urlTitle, entityName: 'product', includeAttributesMetadata: true, includeCategories: true, includeOptions: true, includeSkus: true, includeSettings: true, ...params }
+    SlatwalApiService.general.getEntity(payload, headers, source).then(response => {
+      if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
+      if (response.isSuccess()) {
+        let data = response.success().data
+        data.product?.skus?.forEach(sku => {
+          sku.slug = sku.options.map(opt => `${opt.optionGroupCode}=${opt.optionCode}`).join('&')
+        })
+        if (data.product?.defaultSku_skuID?.length && data.product?.skus?.length) {
+          const defaultSku = data.product?.skus.filter(sku => sku.skuID === data.product?.defaultSku_skuID)
+          if (defaultSku.length) {
+            data.product.defaultSku_slug = defaultSku[0].options.map(opt => `${opt.optionGroupCode}=${opt.optionCode}`).join('&')
+          }
+        }
+        setData(data)
+      } else {
+        setData([])
+        setError({ isError: true, message: 'Something was wrong' })
+      }
+      setFetching(false)
+    })
+
+    return () => {
+      source.cancel()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlTitle])
+  return { isFetching, product: data.product, attributeSets: data.attributeSets, productOptions: data?.product?.optionGroups, skus: data?.product?.skus, error }
+}
+export const useGetEntityWithPagination = (entity, currentPage, maxCount, orderBy, filters = '{}') => {
+  let [isFetching, setFetching] = useState(true)
+  let [data, setData] = useState({ pageRecords: [], totalRecords: 0, totalPages: 1 })
+  let [error, setError] = useState({ isError: false, message: '' })
+  useEffect(() => {
+    let source = axios.CancelToken.source()
+    const parsedFilters = JSON.parse(filters)
+    const payload = { 'f:activeFlag': 1, orderBy, 'p:current': currentPage, 'P:Show': maxCount, entityName: entity, ...parsedFilters }
+    setFetching(true)
+
+    SlatwalApiService.general.getEntity(payload, headers, source).then(response => {
+      if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) setError({ isError: true, message: getErrorMessage(response.success().errors) })
+      if (response.isSuccess() && response.success().data && response.success().data.pageRecords) {
+        setData(response.success().data)
+      } else if (response.isSuccess() && response.success().data && response.success().data[entity]) {
+        setData(response.success().data[entity])
+      } else {
+        setData([])
+        setError({ isError: true, message: 'Something was wrong' })
+      }
+      setFetching(false)
+    })
+
+    return () => {
+      source.cancel()
+    }
+  }, [entity, currentPage, maxCount, orderBy, filters])
+  return { isFetching, records: data.pageRecords, totalRecords: data.pageRecordsCount, totalPages: data.totalPages, error }
+}
 export const useGetProducts = params => {
+  const propertyIdentifierList = useSelector(state => state.configuration.listings.productListing.params)
   let [request, setRequest] = useState({
     isFetching: false,
     isLoaded: false,
@@ -150,19 +223,29 @@ export const useGetProducts = params => {
       totalPages: '',
     },
   })
+  if (!!params['brand_slug'] || !!params['productType_slug']) {
+    params['returnFacetList'] = 'brand,option,category,attribute,sorting,priceRange,productType' // if hide we should correct
+  } else {
+    params['returnFacetList'] = 'brand,sorting,productType'
+  }
+
   useEffect(() => {
     let source = axios.CancelToken.source()
     if (request.makeRequest) {
-      const payload = request.params
-      console.log('payload', payload)
+      const payload = { ...propertyIdentifierList, ...request.params, includePagination: true }
+
       SlatwalApiService.products.search(payload, headers, source).then(response => {
         if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
         if (response.isSuccess()) {
-          const { currentPage, pageSize, potentialFilters, products, total } = response.success().data
+          const { currentPage, pageSize, potentialFilters, total } = response.success().data
           const totalPages = Math.ceil(total / pageSize)
+          const products = response.success().data.products.map(sku => {
+            return { ...sku, salePrice: sku.skuPrice, productName: sku.product_productName, urlTitle: sku.product_urlTitle, productCode: sku.product_productCode, imageFile: sku.sku_imageFile, skuID: sku.sku_skuID, skuCode: sku.sku_skuCode }
+          })
+
           setRequest({
             ...request,
-            filtering: { ...request.filtering, ...potentialFilters },
+            filtering: { ...potentialFilters },
             data: { ...request.data.data, currentPage, pageSize, recordsCount: total, totalPages, pageRecords: products },
             isFetching: false,
             isLoaded: true,
@@ -193,7 +276,7 @@ export const useGetProducts = params => {
     return () => {
       source.cancel()
     }
-  }, [request, setRequest])
+  }, [request, setRequest, propertyIdentifierList])
 
   return [request, setRequest]
 }
@@ -276,7 +359,7 @@ export const useGetOrderDetails = () => {
     if (request.makeRequest) {
       const payload = request.params
 
-      SlatwalApiService.order.getOrderDetails(payload, headers, source).then(response => {
+      SlatwalApiService.order.get(payload, headers, source).then(response => {
         if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
         if (response.isSuccess()) {
           setRequest({ data: response.success().orderDetails, isFetching: false, isLoaded: true, makeRequest: false, params: {} })
@@ -327,7 +410,7 @@ export const useGetAccountCartsAndQuotes = () => {
       SlatwalApiService.account.cartsAndQuotes(payload, headers, source).then(response => {
         if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
         if (response.isSuccess()) {
-          setRequest({ data: response.success().cartsAndQuotesOnAccount.ordersOnAccount, isFetching: false, isLoaded: true, makeRequest: false, params: {} })
+          setRequest({ data: response.success().cartsAndQuotesOnAccount, isFetching: false, isLoaded: true, makeRequest: false, params: {} })
         } else {
           setRequest({ data: {}, isFetching: false, makeRequest: false, isLoaded: true, params: {}, error: 'Something was wrong' })
         }
@@ -468,26 +551,25 @@ export const useGetSkuOptionDetails = () => {
   return [request, setRequest]
 }
 
-export const useGetProductImageGallery = () => {
-  let [request, setRequest] = useState({ isFetching: false, isLoaded: false, makeRequest: false, data: {}, error: '', params: {} })
+export const useGetProductImageGallery = urlTitle => {
+  let [isFetching, setFetching] = useState(true)
+  let [imageGallery, setImageGallery] = useState([])
+  let [error, setError] = useState({ isError: false, message: '' })
   useEffect(() => {
     let source = axios.CancelToken.source()
-    if (request.makeRequest) {
-      const payload = request.params
-
-      SlatwalApiService.products.getGallery(payload, headers, source).then(response => {
-        if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-        if (response.isSuccess()) {
-          setRequest({ data: response.success(), isFetching: false, isLoaded: true, makeRequest: false, params: {} })
-        } else {
-          setRequest({ data: {}, isFetching: false, makeRequest: false, isLoaded: true, params: {}, error: 'Something was wrong' })
-        }
-      })
-    }
+    SlatwalApiService.products.getGallery({ urlTitle, resizeSizes: 'large,small' }, headers, source).then(response => {
+      if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) setError({ isError: false, message: getErrorMessage(response.success().errors) })
+      if (response.isSuccess()) {
+        setImageGallery(response.success().images)
+      } else {
+        setImageGallery({})
+      }
+      setFetching(false)
+    })
     return () => {
       source.cancel()
     }
-  }, [request, setRequest])
+  }, [urlTitle])
 
-  return [request, setRequest]
+  return { isFetching, imageGallery, error }
 }

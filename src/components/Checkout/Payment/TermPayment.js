@@ -1,24 +1,20 @@
 import { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { PaymentAddressSelector, Button } from '../../'
-import { addNewAccountAndSetAsBilling, addPayment } from '../../../actions/'
-import { orderPayment, billingAccountAddressSelector, fulfillmentSelector } from '../../../selectors'
+import { billingAccountAddressSelector } from '../../../selectors'
 import { useTranslation } from 'react-i18next'
+import { useTermPayment } from '../../../hooks'
 
 const TermPayment = ({ method }) => {
-  const dispatch = useDispatch()
-  const [accountAddressID, setAccountAddressID] = useState('')
-  const [saveShippingAsBilling, setSaveShippingAsBilling] = useState('')
-  const { purchaseOrderNumber } = useSelector(orderPayment)
-  const [termOrderNumber, setTermOrderNumber] = useState(purchaseOrderNumber)
-  const selectedAccountID = useSelector(billingAccountAddressSelector)
   const { t } = useTranslation()
-  const { fulfillmentMethod } = useSelector(fulfillmentSelector)
+  const selectedAccountID = useSelector(billingAccountAddressSelector)
+  const [saveShippingAsBilling, setSaveShippingAsBilling] = useState('')
+  const { onPaymentAddressSelect, onPaymentAddressSave, onSaveShippingAsBilling, fulfillmentMethodType, accountAddressID, setTermOrderNumber, termOrderNumber } = useTermPayment({ method })
 
   return (
     <>
       <div className="row mb-3">
-        <div className="col-sm-12">
+        <div className="col-sm-6">
           <div className="form-group">
             <label htmlFor="purchaseOrderNumber">{t('frontend.checkout.payment.po.number')}</label>
             <input
@@ -33,8 +29,8 @@ const TermPayment = ({ method }) => {
             />
           </div>
         </div>
-        {fulfillmentMethod.fulfillmentMethodType === 'shipping' && (
-          <div className="col-sm-12">
+        {fulfillmentMethodType === 'shipping' && (
+          <div className="col-sm-12 mt-2">
             <div className="form-group">
               <div className="custom-control custom-checkbox">
                 <input
@@ -46,81 +42,16 @@ const TermPayment = ({ method }) => {
                     setSaveShippingAsBilling(!saveShippingAsBilling)
                   }}
                 />
-                <label className="custom-control-label" htmlFor="saveShippingAsBilling">
-                  Same as shipping address
+                <label className="custom-control-label ms-1" htmlFor="saveShippingAsBilling">
+                  {t(`frontend.checkout.payment.sameAsShippingAddress`)}
                 </label>
               </div>
             </div>
           </div>
         )}
       </div>
-      {saveShippingAsBilling && termOrderNumber && termOrderNumber.length > 0 && (
-        <Button
-          label="Submit"
-          onClick={e => {
-            e.preventDefault()
-            console.log('saveShippingAsBilling', saveShippingAsBilling)
-            //TODO: BROKEN
-
-            dispatch(
-              addPayment({
-                newOrderPayment: {
-                  saveShippingAsBilling: 1,
-                  purchaseOrderNumber: termOrderNumber,
-                  paymentMethod: {
-                    paymentMethodID: method,
-                  },
-                },
-              })
-            )
-          }}
-        />
-      )}
-      {!saveShippingAsBilling && termOrderNumber && termOrderNumber.length > 0 && (
-        <PaymentAddressSelector
-          addressTitle={'Billing Address'}
-          selectedAccountID={selectedAccountID || accountAddressID}
-          onSelect={value => {
-            dispatch(
-              addPayment({
-                accountAddressID: value,
-                newOrderPayment: {
-                  purchaseOrderNumber: termOrderNumber,
-                  paymentMethod: {
-                    paymentMethodID: method,
-                  },
-                },
-              })
-            )
-            setAccountAddressID(value)
-          }}
-          onSave={values => {
-            if (values.saveAddress) {
-              dispatch(addNewAccountAndSetAsBilling({ ...values }))
-            } else {
-              dispatch(
-                addPayment({
-                  newOrderPayment: {
-                    billingAddress: {
-                      name: values.name,
-                      streetAddress: values.streetAddress,
-                      street2Address: values.street2Address,
-                      city: values.city,
-                      statecode: values.stateCode,
-                      postalcode: values.postalCode,
-                      countrycode: values.countryCode,
-                    },
-                    purchaseOrderNumber: termOrderNumber,
-                    paymentMethod: {
-                      paymentMethodID: method,
-                    },
-                  },
-                })
-              )
-            }
-          }}
-        />
-      )}
+      {saveShippingAsBilling && termOrderNumber && termOrderNumber.length > 0 && <Button label="Submit" onClick={onSaveShippingAsBilling} />}
+      {!saveShippingAsBilling && termOrderNumber && termOrderNumber.length > 0 && <PaymentAddressSelector addressTitle={'Billing Address'} selectedAccountID={selectedAccountID || accountAddressID} onSelect={onPaymentAddressSelect} onSave={onPaymentAddressSave} />}
     </>
   )
 }

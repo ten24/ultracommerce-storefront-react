@@ -9,7 +9,11 @@ const FulfillmentPicker = () => {
   const { eligibleFulfillmentMethods, orderItems } = useSelector(state => state.cart)
   let selectedFulfillmentMethod = useSelector(fulfillmentMethodSelector)
   const { t } = useTranslation()
-
+  const orderItemIDList = orderItems
+    .map(orderItem => {
+      return orderItem.orderItemID
+    })
+    .join()
   return (
     <div className="row mb-3">
       <div className="col-sm-12">
@@ -18,11 +22,6 @@ const FulfillmentPicker = () => {
             label={t('frontend.checkout.receive_option')}
             options={eligibleFulfillmentMethods}
             onChange={fulfillmentMethodID => {
-              const orderItemIDList = orderItems
-                .map(orderItem => {
-                  return orderItem.orderItemID
-                })
-                .join()
               dispatch(changeOrderFulfillment({ fulfillmentMethodID, orderItemIDList }))
             }}
             selectedValue={selectedFulfillmentMethod.fulfillmentMethodID}

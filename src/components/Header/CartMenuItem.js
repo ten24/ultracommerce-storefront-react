@@ -13,7 +13,7 @@ const CartMenuItem = () => {
     <div className="navbar-tool ms-3">
       <Link className="navbar-tool-icon-box bg-secondary" to="/shopping-cart">
         {cartQuantity > 0 && <span className="navbar-tool-label">{cartQuantity}</span>}
-        <i className="far fa-shopping-cart"></i>
+        <i className="bi bi-shopping-cart"></i>
       </Link>
       <Link className="navbar-tool-text" to="/shopping-cart">
         <small>{t('frontend.cart.my')}</small>

@@ -3,6 +3,38 @@ import defaultMissing from '../../assets/images/missing.png'
 import defaultMissingBrand from '../../assets/images/missing-brand.png'
 import defaultMissingProductType from '../../assets/images/missing-product-type.png'
 import defaultMissingProduct from '../../assets/images/missing-product.png'
+import { useState } from 'react'
+
+const SimpleImage = ({ className = '', src = '', alt = '', style = {}, type = 'product' }) => {
+  const { host } = useSelector(state => state.configuration.theme)
+  const [retryCount, setRetryCount] = useState(0)
+  const [classList, setClassList] = useState([className])
+  const applyHost = !(src?.includes('http://') || src?.includes('https://'))
+  const onErrorCallback = e => {
+    e.preventDefault()
+    e.target.onerror = null
+    const localRetryCount = retryCount + 1
+    const showDefault = localRetryCount > 0 ? 'defaultImage' : ''
+    setRetryCount(localRetryCount)
+    setClassList([className, showDefault])
+    if (type === 'product') {
+      e.target.src = defaultMissingProduct
+    } else if (type === 'productType') {
+      e.target.src = defaultMissingProductType
+    } else if (type === 'category') {
+      e.target.src = defaultMissingProductType
+    } else if (type === 'brand') {
+      e.target.src = defaultMissingBrand
+    } else {
+      e.target.src = defaultMissing
+    }
+  }
+
+  if (src) {
+    return <img className={classList.join(' ')} src={applyHost ? `${host}${src}` : src} alt={alt} style={style} onError={onErrorCallback} />
+  }
+  return <DefaultImage className={`${className} defaultImage`} style={style} type={type} />
+}
 
 const DefaultImage = ({ alt = '', style, type, className = '' }) => {
   if (type === 'product') {
@@ -14,34 +46,35 @@ const DefaultImage = ({ alt = '', style, type, className = '' }) => {
   }
   return <img className={className} style={style} src={defaultMissing} alt={alt} />
 }
-const SWImage = ({ className, customPath, src, alt = '', style = {}, type = 'product' }) => {
+const SWImage = ({ className = '', customPath, src, alt = '', style = {}, type = 'product', fallbackPath = '' }) => {
   const { host, basePath } = useSelector(state => state.configuration.theme)
-
+  const [retryCount, setRetryCount] = useState(0)
+  const [classList, setClassList] = useState(['productImage', className])
   const path = customPath ? customPath : basePath
+
+  const onErrorCallback = e => {
+    e.preventDefault()
+    e.target.onerror = null
+    const localRetryCount = retryCount + 1
+    const showFallback = fallbackPath.length && localRetryCount === 1 ? 'fallbackImage' : ''
+    const showDefault = (fallbackPath.length && localRetryCount > 1) || (!fallbackPath.length && localRetryCount === 1) ? 'defaultImage' : ''
+    setRetryCount(localRetryCount)
+    setClassList(['productImage', className, showFallback, showDefault])
+    if (type === 'product') {
+      e.target.src = showFallback ? `${host}${fallbackPath}` : defaultMissingProduct
+    } else if (type === 'productType') {
+      e.target.src = defaultMissingProductType
+    } else if (type === 'brand') {
+      e.target.src = defaultMissingBrand
+    } else {
+      e.target.src = defaultMissing
+    }
+  }
+
   if (src) {
-    return (
-      <img
-        className={className}
-        src={path ? host + path + src : host + src}
-        alt={alt}
-        style={style}
-        onError={e => {
-          e.preventDefault()
-          e.target.onerror = null
-          if (type === 'product') {
-            e.target.src = defaultMissingProduct
-          } else if (type === 'productType') {
-            e.target.src = defaultMissingProductType
-          } else if (type === 'brand') {
-            e.target.src = defaultMissingBrand
-          } else {
-            e.target.src = defaultMissing
-          }
-        }}
-      />
-    )
+    return <img className={classList.join(' ')} src={path ? host + path + src : host + src} alt={alt} style={style} onError={onErrorCallback} />
   }
   return <DefaultImage className={className} style={style} type={type} />
 }
 
-export { SWImage }
+export { SWImage, SimpleImage }

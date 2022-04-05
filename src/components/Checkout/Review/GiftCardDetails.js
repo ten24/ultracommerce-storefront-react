@@ -4,8 +4,8 @@ const GiftCardDetails = ({ hideHeading }) => {
   const { t } = useTranslation()
   return (
     <>
-      {!hideHeading && <h3 className="h6">{t('frontend.checkout.payment_method')}</h3>}
-      <p>{t('frontend.checkout.payment.giftCard.title')}</p>
+      {!hideHeading && <h6 className="h6">{t('frontend.checkout.payment_method')}</h6>}
+      <p>{t('frontend.checkout.payment.giftCard.heading')}</p>
     </>
   )
 }

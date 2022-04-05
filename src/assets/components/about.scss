@@ -1,3 +1,45 @@
 .about-Img {
   width: 400px;
 }
+
+.nav-tabs {
+	line-height: 2.25;
+	border: 0;
+	.nav-item {
+		.nav-link {
+			color: $dark;
+			font-weight: 500;
+			white-space: nowrap;
+			letter-spacing: 0.06rem;
+			background-color: $gray-100;
+			&:hover {
+				background-color: $gray-200;
+			}
+		}
+	}
+	.nav-link.active {
+		border-width: 0;
+		border-bottom-width: 5px;
+		background: $white !important;
+		border-color: $white $white $primary !important;
+	}
+}
+
+.modal {
+	background: rgba(0,0,0,0.6);
+}
+
+.blockProfile .modal {
+	.modal-header {
+		border: 0;
+	}
+	.modal-content {
+		background-color: $gray-200;
+	}
+	.card-body p span {
+		background: none!important;
+		color: inherit!important;
+		font-family: inherit!important;
+		font-size: inherit!important;
+	}
+}

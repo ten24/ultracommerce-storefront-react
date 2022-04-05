@@ -1,53 +1,29 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { getCountries, getStateCodeOptionsByCountryCode } from '../../../actions/'
-import { useFormik } from 'formik'
+import { getStateCodeOptionsByCountryCode } from '../../../actions/'
 import { SwRadioSelect, SwSelect } from '../..'
 import { useTranslation } from 'react-i18next'
 import { clearOrderFulfillment } from '../../../actions'
-let initialValues = {
-  name: '',
-  company: '',
-  streetAddress: '',
-  street2Address: '',
-  city: '',
-  stateCode: '',
-  emailAddress: '',
-  postalCode: '',
-  countryCode: 'US',
-  accountAddressName: '',
-  saveAddress: false,
-  blindShip: false,
-}
-const BillingAddress = ({ onSave }) => {
+import { useFulfilmentAddress } from '../../../hooks'
+
+const BillingAddress = ({ onSave, onCancel }) => {
+  const { t } = useTranslation()
   const dispatch = useDispatch()
-  const isFetching = useSelector(state => state.content.isFetching)
   const countryCodeOptions = useSelector(state => state.content.countryCodeOptions)
   const stateCodeOptions = useSelector(state => state.content.stateCodeOptions)
-  const [isEdit, setEdit] = useState(true)
-  const { t } = useTranslation()
-
-  const formik = useFormik({
-    enableReinitialize: false,
-    initialValues: initialValues,
-    onSubmit: values => {
-      setEdit(!isEdit)
-      onSave(values)
-    },
-  })
-  useEffect(() => {
-    if (countryCodeOptions.length === 0 && !isFetching) {
-      dispatch(getCountries())
-    }
-    if (!stateCodeOptions[formik.values.countryCode] && !isFetching) {
-      dispatch(getStateCodeOptionsByCountryCode(formik.values.countryCode))
-    }
-  }, [dispatch, formik, stateCodeOptions, countryCodeOptions, isFetching])
+  const { formik, isEdit } = useFulfilmentAddress({ onSave })
 
   return (
     <>
       <form onSubmit={formik.handleSubmit}>
         <div className="row mt-3">
+          <div className="col-sm-6">
+            <div className="form-group">
+              <label htmlFor="name">{t('frontend.account.name')}</label>
+              <input disabled={!isEdit} className="form-control" type="text" id="name" value={formik.values.name} onChange={formik.handleChange} />
+              {formik.errors.name && <span className="form-error-msg">{formik.errors.name}</span>}
+            </div>
+          </div>
           <div className="col-sm-6">
             <div className="form-group">
               <label htmlFor="checkout-country">{t('frontend.account.countryCode')}</label>
@@ -64,29 +40,13 @@ const BillingAddress = ({ onSave }) => {
               />
             </div>
           </div>
-          <div className="col-sm-6">
-            <div className="form-group">
-              <label htmlFor="name">{t('frontend.account.name')}</label>
-              <input disabled={!isEdit} className="form-control" type="text" id="name" value={formik.values.name} onChange={formik.handleChange} />
-            </div>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col-sm-6">
-            <div className="form-group">
-              <label htmlFor="emailAddress">{t('frontend.account.emailAddress')}</label>
-              <input disabled={!isEdit} className="form-control" type="text" id="emailAddress" value={formik.values.emailAddress} onChange={formik.handleChange} />
-            </div>
-          </div>
-          <div className="col-sm-6">
-            <div className="form-group"></div>
-          </div>
         </div>
         <div className="row">
           <div className="col-sm-6">
             <div className="form-group">
               <label htmlFor="streetAddress">{t('frontend.account.streetAddress')}</label>
               <input disabled={!isEdit} className="form-control" type="text" id="streetAddress" value={formik.values.streetAddress} onChange={formik.handleChange} />
+              {formik.errors.streetAddress && <span className="form-error-msg">{formik.errors.streetAddress}</span>}
             </div>
           </div>
           <div className="col-sm-6">
@@ -101,6 +61,7 @@ const BillingAddress = ({ onSave }) => {
             <div className="form-group">
               <label htmlFor="city">{t('frontend.account.city')}</label>
               <input disabled={!isEdit} className="form-control" type="text" id="city" value={formik.values.city} onChange={formik.handleChange} />
+              {formik.errors.city && <span className="form-error-msg">{formik.errors.city}</span>}
             </div>
           </div>
           {stateCodeOptions[formik.values.countryCode] && stateCodeOptions[formik.values.countryCode].length > 0 && (
@@ -117,6 +78,7 @@ const BillingAddress = ({ onSave }) => {
                   }}
                   options={stateCodeOptions[formik.values.countryCode]}
                 />
+                {formik.errors.stateCode && <span className="form-error-msg">{formik.errors.stateCode}</span>}
               </div>
             </div>
           )}
@@ -125,12 +87,29 @@ const BillingAddress = ({ onSave }) => {
             <div className="form-group">
               <label htmlFor="postalCode">{t('frontend.account.postalCode')}</label>
               <input disabled={!isEdit} className="form-control" type="text" id="postalCode" value={formik.values.postalCode} onChange={formik.handleChange} />
+              {formik.errors.postalCode && <span className="form-error-msg">{formik.errors.postalCode}</span>}
             </div>
           </div>
         </div>
 
         <div className="row">
-          <div className="col-sm-12">
+          <div className="col-sm-6">
+            <div className="form-group">
+              <label htmlFor="emailAddress">{t('frontend.account.emailAddress')}</label>
+              <input disabled={!isEdit} className="form-control" type="text" id="emailAddress" value={formik.values.emailAddress} onChange={formik.handleChange} />
+            </div>
+          </div>
+          <div className="col-sm-6">
+            <div className="form-group">
+              <label htmlFor="phoneNumber">{t('frontend.account.phoneNumber')} </label>
+              <input className="form-control" type="text" id="phoneNumber" value={formik.values['phoneNumber']} onChange={formik.handleChange} />
+              {formik.errors.emailAddress && <span className="form-error-msg">{formik.errors.emailAddress}</span>}
+            </div>
+          </div>
+        </div>
+
+        <div className="row">
+          <div className="col-sm-6">
             <div className="form-group">
               <div className="custom-control custom-checkbox mt-1">
                 <input className="custom-control-input" type="checkbox" id="saveAddress" checked={formik.values.saveAddress} onChange={formik.handleChange} />
@@ -139,14 +118,24 @@ const BillingAddress = ({ onSave }) => {
                 </label>
               </div>
             </div>
-          </div>
-        </div>
 
-        <div className="d-lg-flex pt-4 mt-2">
-          <div className="w-50 pl-2">
-            <button className="btn btn-primary btn-block " onClick={formik.handleSubmit}>
-              <span className="d-none d-sm-inline">{t('frontend.core.save')}</span>
+            {/* only display nickname field if "save address" is checked */}
+            {!!formik.values.saveAddress && (
+              <div className="form-group">
+                <label htmlFor="accountAddressName">{t('frontend.account.nickname')}</label>
+                <input className="form-control" type="text" id="accountAddressName" value={formik.values.accountAddressName} onChange={formik.handleChange} />
+              </div>
+            )}
+          </div>
+          <div className="col-sm-6 d-flex justify-content-end align-items-start mt-2">
+            <button className="btn btn-primary " onClick={formik.handleSubmit}>
+              <span className="d-inline">{t('frontend.core.save')}</span>
             </button>
+            {onCancel && (
+              <button className="btn btn-secondary mx-2" onClick={onCancel}>
+                <span className="d-inline">{t('frontend.account.address.cancel')}</span>
+              </button>
+            )}
           </div>
         </div>
       </form>
@@ -165,24 +154,26 @@ const FulfilmentAddressSelector = ({ onSelect, onSave, selectedAccountID, addres
     selectedAccountID = 'new'
   }
   const hasShippingAddress = fulfillments.length > 0 && fulfillments[0].shippingAddress.addressID.length > 0
+  const showNewAddress = showAddress || selectedAccountID === 'new'
+
   return (
     <>
-      <h2 className="h3 pt-1 pb-3 mb-3 ">{t(addressTitle)}</h2>
+      <h2 className="h6 pt-1 pb-2 mb-3 border-bottom">{t(addressTitle)}</h2>
 
       {hasShippingAddress && (
         <div className="row ">
           {fulfillments.map(({ shippingAddress, orderFulfillmentID }) => {
             return (
-              <div className="bg-lightgray rounded mb-5 col-md-4" key={shippingAddress?.addressID}>
-                <p>
-                  <em>{shippingAddress.name}</em>
+              <div className="bg-lightgray rounded mb-2 col-md-4 p-3" key={shippingAddress?.addressID}>
+                <div>
+                  <b>{shippingAddress.name}</b>
                   <br />
                   {shippingAddress.streetAddress} <br />
                   {`${shippingAddress.city}, ${shippingAddress.stateCode} ${shippingAddress.postalCode}`} <br />
-                </p>
+                </div>
                 <hr />
                 <button
-                  className="btn btn-link px-0 text-danger"
+                  className="btn btn-link p-0 text-danger"
                   type="button"
                   disabled={false}
                   onClick={event => {
@@ -191,7 +182,7 @@ const FulfilmentAddressSelector = ({ onSelect, onSave, selectedAccountID, addres
                   }}
                 >
                   <i className="bi bi-times-circle"></i>
-                  <span className="font-size-sm"> Remove</span>
+                  <span className="small"> {t(`frontend.core.changeSelection`)}</span>
                 </button>
               </div>
             )
@@ -199,35 +190,44 @@ const FulfilmentAddressSelector = ({ onSelect, onSave, selectedAccountID, addres
         </div>
       )}
       {!hasShippingAddress && accountAddresses && (
-        <div className="row">
+        <div className="row mb-2">
           <div className="col-sm-12">
-            <SwRadioSelect
-              options={accountAddresses.map(({ accountAddressName, accountAddressID, address: { streetAddress } }) => {
-                return { name: `${accountAddressName} - ${streetAddress}`, value: accountAddressID }
-              })}
-              onChange={value => {
-                setShowAddress(false)
-                onSelect(value)
-              }}
-              customLabel={t('frontend.checkout.receive_option')}
-              selectedValue={selectedAccountID}
-              displayNew={true}
-            />
-            <button className="btn btn-secondary mt-2" onClick={() => setShowAddress(true)}>
-              {t('frontend.account.address.add')}
-            </button>
+            {!showAddress && (
+              <SwRadioSelect
+                options={accountAddresses.map(({ accountAddressName, accountAddressID, address }) => {
+                  const addressString = ` ${address.streetAddress}, ${address.city}, ${address.stateCode} ${address.postalCode}`
+                  const name = accountAddressName ? `${accountAddressName} - ${addressString} ` : addressString
+                  return { name, value: accountAddressID }
+                })}
+                onChange={value => {
+                  !hasShippingAddress && setShowAddress(false)
+                  onSelect(value)
+                }}
+                customLabel={t('frontend.checkout.receive_option')}
+                selectedValue={selectedAccountID}
+                displayNew={true}
+              />
+            )}
+            {!showNewAddress && (
+              <button className="btn btn-secondary mt-2" onClick={() => setShowAddress(true)}>
+                {t('frontend.account.address.add')}
+              </button>
+            )}
           </div>
         </div>
       )}
-      {showAddress && (
-        <BillingAddress
-          isShipping={isShipping}
-          setShowAddress={showAddress}
-          onSave={values => {
-            setShowAddress(false)
-            onSave(values)
-          }}
-        />
+      {showNewAddress && (
+        <>
+          <BillingAddress
+            isShipping={isShipping}
+            setShowAddress={showAddress}
+            onSave={values => {
+              setShowAddress(false)
+              onSave(values)
+            }}
+            onCancel={() => setShowAddress(false)}
+          />
+        </>
       )}
     </>
   )
