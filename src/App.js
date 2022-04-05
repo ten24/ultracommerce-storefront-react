@@ -1,12 +1,12 @@
 import React, { Suspense, useEffect } from 'react'
 import { Switch, Route, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { Loading, Footer, Header } from '@slatwall/slatwall-storefront-react/components'
-import { getConfiguration } from '@slatwall/slatwall-storefront-react/actions'
-import { Blog, NotFound, Search, Cart, MyAccount, Checkout, ProductDetail, Brand, ContentPage, Product, ProductType, Category, Account, OrderConfirmation, BlogPost, Manufacturer, ErrorFallback, Contact } from '@slatwall/slatwall-storefront-react/pages'
+import { Loading, Footer, Header } from '@ultracommerce/ultracommerce-storefront-react/components'
+import { getConfiguration } from '@ultracommerce/ultracommerce-storefront-react/actions'
+import { Blog, NotFound, Search, Cart, MyAccount, Checkout, ProductDetail, Brand, ContentPage, Product, ProductType, Category, Account, OrderConfirmation, BlogPost, Manufacturer, ErrorFallback, Contact } from '@ultracommerce/ultracommerce-storefront-react/pages'
 import logo from './assets/images/logo.svg'
 import { ErrorBoundary } from 'react-error-boundary'
-import { useCMSWrapper, useScrollToTop } from '@slatwall/slatwall-storefront-react/hooks'
+import { useCMSWrapper, useScrollToTop } from '@ultracommerce/ultracommerce-storefront-react/hooks'
 import Home from './pages/Home/Home'
 
 const pageComponents = {

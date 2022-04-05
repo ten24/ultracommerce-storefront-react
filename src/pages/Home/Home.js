@@ -1,6 +1,6 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { ContentSlider, ProductSliderWithConfig, BrandSlider, ContentColumns, Layout, LatestNews, ContentBlock, ActionBanner } from '@slatwall/slatwall-storefront-react/components'
+import { ContentSlider, ProductSliderWithConfig, BrandSlider, ContentColumns, Layout, LatestNews, ContentBlock, ActionBanner } from '@ultracommerce/ultracommerce-storefront-react/components'
 import { useTranslation } from 'react-i18next'
 function Home() {
   const { home = {} } = useSelector(state => state.content)
@@ -22,9 +22,9 @@ function Home() {
       {contentColumns?.columns && contentColumns?.columns?.length > 0 && (
         <ContentColumns title={contentColumns.title}>
           <div className="row justify-content-center">
-            {contentColumns.columns.map(column => {
+            {contentColumns.columns.map((column, idx) => {
               return (
-                <div className={`col-lg-${12 / contentColumns.columns.length} pr-4-lg`}>
+                <div key={idx} className={`col-lg-${12 / contentColumns.columns.length} pr-4-lg`}>
                   <ContentBlock {...column} />
                 </div>
               )

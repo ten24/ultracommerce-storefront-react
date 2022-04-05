@@ -1,6 +1,6 @@
 {
-  "short_name": "Slatwall Demo Storefront",
-  "name": "Slatwall Demo Storefront",
+  "short_name": "UC Storefront",
+  "name": "Ultra Commerce Storefront",
   "icons": [
     {
       "src": "favicon.ico",

@@ -13,7 +13,7 @@ import TagManager from 'react-gtm-module'
 import devData from './preload'
 import * as Sentry from '@sentry/react'
 import { Integrations } from '@sentry/tracing'
-import { AnalyticsManager } from '@slatwall/slatwall-storefront-react/components'
+import { AnalyticsManager } from '@ultracommerce/ultracommerce-storefront-react/components'
 
 const release = process.env.REACT_APP_NAME + '@' + process.env.REACT_APP_VERSION
 const dsn = process.env.REACT_APP_SENTRY_DSN
