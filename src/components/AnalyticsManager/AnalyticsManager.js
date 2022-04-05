@@ -22,7 +22,7 @@ const AnalyticsManager = ({ cookieSettings }) => {
     preferencesDefaultChecked: true,
     statisticsDefaultChecked: true,
     marketingDefaultChecked: true,
-    managePreferencesButtonText : t('frontend.cookie.buttonNext'),
+    managePreferencesButtonText: t('frontend.cookie.buttonNext'),
     policyLink: '/governance-and-policies',
     privacyPolicyLinkText: t('frontend.cookie_policy'),
     ...cookieSettings,

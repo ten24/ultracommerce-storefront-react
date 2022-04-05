@@ -46,3 +46,15 @@ const ThreeDSRedirect = ({ url, payload, method }) => {
   )
 }
 export { ThreeDSRedirect }
+
+/*
+
+
+https://slatwallPrivate.ultracommerce-dev.co/threeDSHandover
+
+http://localhost:3006/threeDSHandover
+
+https://slatwallPrivate-admin.ultracommerce-dev.co/index.cfm/api/scope/pay360threeDSHandover
+
+http://slatwallPrivate:8906/index.cfm/api/scope/pay360threeDSHandover
+*/

@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux'
 import { SwRadioSelect } from '../../'
-import { fulfillmentSelector, shippingMethodSelector, pickupLocationOptions } from '../../../selectors/'
+import { fulfillmentSelector, pickupLocationSelector, pickupLocationOptions } from '../../../selectors/'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { useTranslation } from 'react-i18next'
@@ -9,10 +9,9 @@ import { usePickupLocation } from '../../../hooks'
 const PickupLocationPicker = () => {
   const { t } = useTranslation()
   const pickupLocations = useSelector(pickupLocationOptions)
-  const selectedLocation = useSelector(shippingMethodSelector)
+  const selectedLocation = useSelector(pickupLocationSelector)
   const { estimatedShippingDate } = useSelector(fulfillmentSelector)
   const { isFutureDate, onChangeDate, onChangeLocation } = usePickupLocation()
-
   return (
     <>
       <div className="row mb-3">

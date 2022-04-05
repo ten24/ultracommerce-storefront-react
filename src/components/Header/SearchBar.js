@@ -3,7 +3,7 @@ import { useHistory, useLocation } from 'react-router'
 import queryString from 'query-string'
 import { useTranslation } from 'react-i18next'
 
-function SearchBar() {
+const SearchBar = ({ redirectToSearchPage = false }) => {
   const textInput = useRef(null)
   let history = useHistory()
   const { t } = useTranslation()
@@ -23,15 +23,15 @@ function SearchBar() {
   }, [location])
 
   const makeSearch = searchValue => {
-    if (!searchValue || searchValue.length === 0) {
+    if (redirectToSearchPage) {
       history.push({
         pathname: '/shop',
+        search: queryString.stringify({ keyword: searchValue }, { arrayFormat: 'comma' }),
       })
       return
     }
     history.push({
-      pathname: '/shop',
-      search: queryString.stringify({ keyword: searchValue }, { arrayFormat: 'comma' }),
+      search: queryString.stringify({ ...queryString.parse(location.search), keyword: searchValue }, { arrayFormat: 'comma' }),
     })
     textInput.current.value = ''
   }

@@ -3,7 +3,7 @@ import { Switch, Route, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { Loading, Header, Footer } from './components'
 import { getConfiguration } from './actions'
-import { Blog, NotFound, Home, Cart, MyAccount, Search, Checkout, ThreeDSHandover, ProductDetail, Brand, ContentPage, Product, ProductType, Category, Account, OrderConfirmation, BlogPost, Manufacturer, ErrorFallback, Contact } from './pages'
+import { Blog, NotFound, Home, Cart, MyAccount, Search, Checkout, ThreeDSHandover, ProductDetail, Brand, ContentPage, Product, ProductType, Category, Account, OrderConfirmation, BlogPost, Manufacturer, ErrorFallback, Contact, BulkOrder } from './pages'
 import logo from './assets/images/logo.svg'
 import mobileLogo from './assets/images/logo-mobile.svg'
 import { ErrorBoundary } from 'react-error-boundary'
@@ -45,6 +45,7 @@ export default function App() {
   const scroll = useScrollToTop()
 
   const dispatch = useDispatch()
+
   useEffect(() => {
     dispatch(getConfiguration())
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -81,6 +82,7 @@ export default function App() {
           <Route path="/threeDSHandover" component={ThreeDSHandover} />
           <Route path="/MyAccount" component={MyAccount} />
           <Route path="/shopping-cart" component={Cart} />
+          <Route path="/bulkorder" component={BulkOrder} />
           <Route exact path="/" component={Home} />
           <Route path="" component={ContentPage} />
         </Switch>

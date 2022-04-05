@@ -4,7 +4,7 @@ import { useHistory, useLocation } from 'react-router'
 
 // selection is an object of current paramters
 // optionGroupPairs is an array of current paramters key=value
-const SkuOptions = ({ productOptions, selection, skus = [] }) => {
+const SkuOptions = ({ productOptions, selection, skus = [], selectedOptionInModel }) => {
   const { filterSkusBySelectedOptions, generateOptionGroupPair } = useProductDetail()
   const { t } = useTranslation()
   let loc = useLocation()
@@ -70,7 +70,11 @@ const SkuOptions = ({ productOptions, selection, skus = [] }) => {
                 value={selectedOptionCode}
                 id={optionGroupID}
                 onChange={e => {
-                  selectedOption(skus, optionGroupCode, e.target.value, selection)
+                  if (selectedOptionInModel) {
+                    selectedOptionInModel(optionGroupCode, e.target.value)
+                  } else {
+                    selectedOption(skus, optionGroupCode, e.target.value, selection)
+                  }
                 }}
               >
                 {selectedOptionCode === 'select' && (

@@ -5,22 +5,8 @@ import { getUser } from '../../actions/userActions'
 
 import { isAuthenticated } from '../../utils'
 import queryString from 'query-string'
-import { Layout, CreateAccount, ForgotPassword, ForgotPasswordReset, AccountCarts, AccountLogin, AccountOverview, AccountProfile, AccountFavorites, AccountAddresses, CreateOrEditAccountAddress, AccountOrderDetail, AccountPaymentMethods, AccountOrderHistory, CreateOrEditAccountPaymentMethod, UpdatePassword } from '../../components'
+import { Layout, CreateAccount, ForgotPassword, ForgotPasswordReset, AccountCarts, AccountLogin, AccountOverview, AccountProfile, AccountFavorites, AccountAddresses, CreateOrEditAccountAddress, AccountOrderDetail, AccountPaymentMethods, AccountOrderHistory, CreateOrEditAccountPaymentMethod, UpdatePassword, AccountImpersonation } from '../../components'
 
-// eslint-disable-next-line no-unused-vars
-const pageComponents = {
-  AccountLogin,
-  AccountOverview,
-  AccountProfile,
-  AccountFavorites,
-  AccountAddresses,
-  CreateOrEditAccountAddress,
-  AccountOrderDetail,
-  AccountPaymentMethods,
-  AccountOrderHistory,
-  CreateOrEditAccountPaymentMethod,
-  AccountCarts,
-}
 const MyAccount = () => {
   let match = useRouteMatch()
   let loc = useLocation()
@@ -71,6 +57,9 @@ const MyAccount = () => {
           </Route>
           <Route path={`${match.path}/updatePassword`}>
             <UpdatePassword />
+          </Route>
+          <Route path={`${match.path}/impersonation`}>
+            <AccountImpersonation />
           </Route>
           <Route path={match.path}>{isAuthenticated() && <AccountOverview />}</Route>
         </Switch>

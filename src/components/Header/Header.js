@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import queryString from 'query-string'
 import { useSelector } from 'react-redux'
-import { AccountBubble, MiniCart } from '../../components'
+import { AccountBubble, MiniCart, AccountImpersonationBanner } from '../../components'
 import { useLocation } from 'react-use'
 import { useUtilities } from '../../hooks'
 import { SearchBar } from './SearchBar'
@@ -164,32 +164,31 @@ const MainNavBar = () => {
   )
 }
 
-const UtilityBar =  ({ socialItems = [] }) => {
-  
+const UtilityBar = ({ socialItems = [] }) => {
   if (!socialItems) {
     return null
   }
-  
+
   return (
-   <nav className="navbar-default top-bar">
-    <div className="container">
-      <div className="row justify-content-end">
-        <div className="col-auto">
-          <ul className="nav d-none d-lg-block d-md-block d-xl-block ms-auto justify-content-end">
-          {socialItems.map(menuItem => {
-          return (
-            <li key={menuItem.linkTitle} className="nav-item">
-              <a href={menuItem.linkUrl} className="nav-link" target="_blank" rel="noreferrer">
-                <i className={`bi bi-${menuItem.linkTitle}`}></i>
-              </a>
-            </li>
-            )
-          })}
-          </ul>
+    <nav className="navbar-default top-bar">
+      <div className="container">
+        <div className="row justify-content-end">
+          <div className="col-auto">
+            <ul className="nav d-none d-lg-block d-md-block d-xl-block ms-auto justify-content-end">
+              {socialItems.map(menuItem => {
+                return (
+                  <li key={menuItem.linkTitle} className="nav-item">
+                    <a href={menuItem.linkUrl} className="nav-link" target="_blank" rel="noreferrer">
+                      <i className={`bi bi-${menuItem.linkTitle}`}></i>
+                    </a>
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
         </div>
       </div>
-    </div>
-   </nav>
+    </nav>
   )
 }
 
@@ -199,21 +198,22 @@ const Header = ({ logo }) => {
 
   return (
     <>
-    <UtilityBar socialItems={social_items}/>
+      <AccountImpersonationBanner />
+      <UtilityBar socialItems={social_items} />
       <nav className="my-3 no-print">
         <div className="container">
           <div className="row justify-content-center justify-content-lg-between align-items-center">
             <div className="col-xl-4 col-md-5 col-10 text-center text-md-start mb-3 mb-lg-0 order-xl-1">
               <Link className="d-block" to="/">
                 <span className="navbar-brand d-block">
-                  <img src={logo} className="img-fluid" alt={t('frontend.logo')} style={{maxHeight: '60px'}} />
+                  <img src={logo} className="img-fluid" alt={t('frontend.logo')} style={{ maxHeight: '60px' }} />
                 </span>
               </Link>
             </div>
             <MainNavBar />
 
             <div className="col-xl-3 order-xl-2">
-              <SearchBar />
+              <SearchBar redirectToSearchPage={true} />
             </div>
           </div>
         </div>

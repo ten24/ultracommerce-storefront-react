@@ -40,10 +40,12 @@ const ProductForm = ({ sku, isDisabled, isLoading }) => {
               className="btn btn-primary btn-block my-3"
               label={t('frontend.product.add_to_cart')}
               onClick={event => {
-                dispatch(addToCart(sku.skuID, quantity))
-                window.scrollTo({
-                  top: 0,
-                  behavior: 'smooth',
+                event.preventDefault()
+                dispatch(addToCart(sku.skuID, quantity)).then(() => {
+                  window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth',
+                  })
                 })
               }}
             />

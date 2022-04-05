@@ -25,7 +25,16 @@ export const isAuthenticated = () => {
   }
   return false
 }
-
+export const isImpersonating = () => {
+  let token = localStorage.getItem('token')
+  if (token) {
+    try {
+      token = jwt_decode(token)
+      return token?.isImpersonating || false
+    } catch (error) {}
+  }
+  return false
+}
 export const containsHTML = str => /<[a-z][\s\S]*>/i.test(str)
 export const isString = val => 'string' === typeof val
 export const isBoolean = val => 'boolean' === typeof val

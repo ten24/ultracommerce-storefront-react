@@ -2,16 +2,20 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { SimpleImage } from '../../'
+import { useState } from 'react'
 import { addToCart } from '../../../actions/'
 import { useFormatCurrency } from '../../../hooks/'
 import { getProductRoute } from '../../../selectors/'
+import { Modal } from '../..'
+import { AddReview } from '../../../components'
 
-const OrderItem = ({ quantity, sku_skuID, sku_product_productName, sku_product_urlTitle, images, BrandName, isSeries, ProductSeries, calculatedExtendedPriceAfterDiscount, sku_calculatedSkuDefinition, sku_imageFile, price }) => {
+const OrderItem = ({ quantity, sku_skuID, sku_product_productName, sku_product_urlTitle, images, BrandName, isSeries, ProductSeries, calculatedExtendedPriceAfterDiscount, sku_calculatedSkuDefinition, sku_imageFile, price , sku_product_productID}) => {
   const [formatCurrency] = useFormatCurrency({})
   const dispatch = useDispatch()
   const { t } = useTranslation()
 
   const productRouting = useSelector(getProductRoute)
+  const [showModal, setModal] = useState(false)
 
   return (
     <div className="row border-bottom py-3">
@@ -53,24 +57,36 @@ const OrderItem = ({ quantity, sku_skuID, sku_product_productName, sku_product_u
             </div>
             <div className="row">
               <div className="col-12">
-                <button
-                  onClick={event => {
+                <Link className="link" onClick={event => {
+                    event.preventDefault()
+                    setModal(!showModal)
+                  }}>
+                      {t('frontend.cart.writeReview')}
+                </Link>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-12">
+                  <Link className="link" onClick={event => {
                     event.preventDefault()
                     dispatch(addToCart(sku_skuID, quantity))
                     window.scrollTo({
                       top: 0,
                       behavior: 'smooth',
                     })
-                  }}
-                  className="btn btn-outline-secondary mt-3"
-                >
-                  Re-order
-                </button>
+                  }}>
+                       {t('frontend.cart.reOrder')}
+                  </Link>
               </div>
             </div>
           </div>
         </div>
       </div>
+      <Modal show={showModal} setShow={setModal} title={t('frontend.product.review.heading')} modalClass="addReviewModal" size="large">
+        <div className="container">
+            <AddReview setModal={setModal} showModal={showModal} sku_product_productID={sku_product_productID} sku_product_productName={sku_product_productName} sku_product_urlTitle={sku_product_urlTitle} sku_skuID={sku_skuID} images={images} />
+        </div>
+      </Modal>
     </div>
   )
 }

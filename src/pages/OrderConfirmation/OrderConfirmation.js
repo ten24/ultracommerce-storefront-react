@@ -7,9 +7,11 @@ import { useGetAllOrders } from '../../hooks'
 import { useEffect } from 'react'
 import { confirmOrder } from '../../actions'
 import { isAuthenticated } from '../../utils'
+import { useCookies } from 'react-cookie';
 
 const OrderConfirmation = () => {
   let [orders, setRequest] = useGetAllOrders()
+  const [, , removeCookie] = useCookies();
   const { t } = useTranslation()
   let dispatch = useDispatch()
   let loc = useLocation()
@@ -22,11 +24,14 @@ const OrderConfirmation = () => {
     if (!orders.isFetching && !orders.isLoaded && !didCancel) {
       setRequest({ ...orders, isFetching: true, isLoaded: false, params: { pageRecordsShow: 1, currentPage: 1 }, makeRequest: true })
     }
+    if(!orders.isFetching && orders.isLoaded && !didCancel){
+      removeCookie('affiliateCode', {path:'/'})
+    }
     dispatch(confirmOrder(false))
     return () => {
       didCancel = true
     }
-  }, [orders, setRequest, dispatch])
+  }, [orders, setRequest, removeCookie, dispatch])
 
   if (!isAuthenticated()) {
     return <Redirect to={'/my-account'} />

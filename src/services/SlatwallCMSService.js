@@ -42,7 +42,7 @@ const nestContentByKey = (content, key) => {
     .map(key => (key.includes(key) ? content[key] : null))
     .filter(item => item)
     .sort((a, b) => a.sortOrder - b.sortOrder)
-    if (data.length) {
+  if (data.length) {
     const groupedItems = groupBy(data, 'parentContent_contentID')
     data = data
       .map(item => {
@@ -140,7 +140,7 @@ const getHeaderBySlug = async (content = {}) => {
         })
         hydrated.social_menu = { social_items }
       }
-      
+
       hydrated.raw = response
 
       return hydrated
@@ -201,139 +201,144 @@ const getEntryBySlug = (payload = {}) => {
       'Content-Type': 'application/json',
     },
     data: payload,
-  }).then(response => {
-    let hydrated = []
-    if (response?.status === 200) {
-      hydrated = response?.data?.data?.pageRecords || []
-    }
-    return hydrated
-
-  }).then(( response ) => {
-    let hydrated = {}
-    // now all the others
-    const globalProduct = response?.filter(item => item.urlTitlePath === 'product' || item.urlTitlePath.startsWith('product/'))
-    const globalProductType = response?.filter(item => item.urlTitlePath === 'products' || item.urlTitlePath.startsWith('products/'))
-    const globalBrand = response?.filter(item => item.urlTitlePath === 'brand' || item.urlTitlePath.startsWith('brand/'))
-    const globalCategory = response?.filter(item => item.urlTitlePath === 'category' || item.urlTitlePath.startsWith('category/'))
-    const globalconfig = response?.filter(item => item.urlTitlePath === 'globalconfig' || item.urlTitlePath.startsWith('globalconfig/'))
-    if (globalProduct.length) hydrated['globalProduct'] = globalProduct
-    if (globalProductType.length) hydrated['globalProductType'] = globalProductType
-    if (globalBrand.length) hydrated['globalBrand'] = globalBrand
-    if (globalCategory.length) hydrated['globalCategory'] = globalCategory
-    if (globalconfig.length) hydrated['globalconfig'] = globalconfig
-    return {response, hydrated}
-  }).then(({ response, hydrated }) => {
-    const newResponse = response?.reduce((accumulator, content) => {
+  })
+    .then(response => {
+      let hydrated = []
+      if (response?.status === 200) {
+        hydrated = response?.data?.data?.pageRecords || []
+      }
+      return hydrated
+    })
+    .then(response => {
+      let hydrated = {}
+      // now all the others
+      const globalProduct = response?.filter(item => item.urlTitlePath === 'product' || item.urlTitlePath.startsWith('product/'))
+      const globalProductType = response?.filter(item => item.urlTitlePath === 'products' || item.urlTitlePath.startsWith('products/'))
+      const globalBrand = response?.filter(item => item.urlTitlePath === 'brand' || item.urlTitlePath.startsWith('brand/'))
+      const globalCategory = response?.filter(item => item.urlTitlePath === 'category' || item.urlTitlePath.startsWith('category/'))
+      const globalconfig = response?.filter(item => item.urlTitlePath === 'globalconfig' || item.urlTitlePath.startsWith('globalconfig/'))
+      if (globalProduct.length) hydrated['globalProduct'] = globalProduct
+      if (globalProductType.length) hydrated['globalProductType'] = globalProductType
+      if (globalBrand.length) hydrated['globalBrand'] = globalBrand
+      if (globalCategory.length) hydrated['globalCategory'] = globalCategory
+      if (globalconfig.length) hydrated['globalconfig'] = globalconfig
+      return { response, hydrated }
+    })
+    .then(({ response, hydrated }) => {
+      const newResponse = response?.reduce((accumulator, content) => {
         accumulator[content.urlTitlePath] = content
         return accumulator
       }, {})
-    return {response: newResponse, hydrated}
-  }).then(({ response, hydrated }) => {
-    if (payload?.productUrlTitle) {
-      const productSlug = `${payload?.productRoute}/${payload?.productUrlTitle}`
-      const nestedProducContent = nestContentByKey(response, productSlug) 
-      if (nestedProducContent?.length) {
-        hydrated[productSlug] = nestedProducContent[0]
-      } else {
-        hydrated[productSlug] = {}
-      }
-    }
-    return {response, hydrated}
-  }).then(({ response, hydrated }) => {
-    // first lets looks for header
-    const headerContent = Object.keys(response)?.filter((itemKey) => itemKey === 'header' || itemKey.startsWith('header/')).reduce((obj, key) => {
-      obj[key] = response[key];
-      return obj
-    }, {})
-    if (Object.keys(headerContent)?.length) {
-      let hydtratedHeader = {}
-      const uril = generateUtilityMenu(headerContent)
-      const mega = generateMegaMenu(headerContent)
-      hydtratedHeader = { ...uril, ...mega }
-      if (hydtratedHeader?.mega_menu?.length) {
-        const menu_items = hydtratedHeader.mega_menu.map(menuItem => {
-          return processForMenuItem(menuItem)
-        })
-        hydtratedHeader.mega_menu = { menu_items }
-      }
-      if (hydtratedHeader?.utility_menu?.length) {
-        hydtratedHeader.utility_menu = { menu_items: hydtratedHeader.utility_menu[0].contentBody }
-      }
-      hydrated = {...hydrated, header: hydtratedHeader}
-
-    }
-    return {response ,hydrated}
-  })
-  .then(({ response, hydrated }) => {
-    // Now the footer
-    const footerContent = Object.keys(response)?.filter((itemKey) => itemKey === 'footer' || itemKey.startsWith('footer/')).reduce((obj, key) => {
-      obj[key] = response[key];
-      return obj
-    }, {})
-    if (Object.keys(footerContent)?.length) {
-      let hydtratedFooter = {}
-
-      let CTA = {}
-      if (footerContent['footer/contact-us']) {
-        CTA['home/callToAction'] = {
-          title: footerContent['footer/contact-us'].title,
-          body: footerContent['footer/contact-us'].contentBody,
-          summary: footerContent['footer/contact-us'].contentSummary,
-          image: footerContent['footer/contact-us'].imagePath,
-          linkTitle: footerContent['footer/contact-us'].linkLabel,
-          linkUrl: footerContent['footer/contact-us'].linkUrl,
+      return { response: newResponse, hydrated }
+    })
+    .then(({ response, hydrated }) => {
+      if (payload?.productUrlTitle) {
+        const productSlug = `${payload?.productRoute}/${payload?.productUrlTitle}`
+        const nestedProducContent = nestContentByKey(response, productSlug)
+        if (nestedProducContent?.length) {
+          hydrated[productSlug] = nestedProducContent[0]
+        } else {
+          hydrated[productSlug] = {}
         }
-        delete hydrated['footer/contact-us']
       }
-      const nestedFooter = nestContentByKey(footerContent, 'footer')
-      if (nestedFooter[0]?.children?.length) {
-        nestedFooter[0].children = nestedFooter[0]?.children?.filter(child => child?.contentElementType_systemCode?.trim()?.length === 0 || child?.contentElementType_systemCode === 'cetBlock')
-        hydtratedFooter =  nestedFooter[0] 
+      return { response, hydrated }
+    })
+    .then(({ response, hydrated }) => {
+      // first lets looks for header
+      const headerContent = Object.keys(response)
+        ?.filter(itemKey => itemKey === 'header' || itemKey.startsWith('header/'))
+        .reduce((obj, key) => {
+          obj[key] = response[key]
+          return obj
+        }, {})
+      if (Object.keys(headerContent)?.length) {
+        let hydtratedHeader = {}
+        const uril = generateUtilityMenu(headerContent)
+        const mega = generateMegaMenu(headerContent)
+        hydtratedHeader = { ...uril, ...mega }
+        if (hydtratedHeader?.mega_menu?.length) {
+          const menu_items = hydtratedHeader.mega_menu.map(menuItem => {
+            return processForMenuItem(menuItem)
+          })
+          hydtratedHeader.mega_menu = { menu_items }
+        }
+        if (hydtratedHeader?.utility_menu?.length) {
+          hydtratedHeader.utility_menu = { menu_items: hydtratedHeader.utility_menu[0].contentBody }
+        }
+        hydrated = { ...hydrated, header: hydtratedHeader }
       }
-      
-      hydrated = {...hydrated, footer: hydtratedFooter}
-    }
+      return { response, hydrated }
+    })
+    .then(({ response, hydrated }) => {
+      // Now the footer
+      const footerContent = Object.keys(response)
+        ?.filter(itemKey => itemKey === 'footer' || itemKey.startsWith('footer/'))
+        .reduce((obj, key) => {
+          obj[key] = response[key]
+          return obj
+        }, {})
+      if (Object.keys(footerContent)?.length) {
+        let hydtratedFooter = {}
 
-    return {response , hydrated}
-  })
+        let CTA = {}
+        if (footerContent['footer/contact-us']) {
+          CTA['home/callToAction'] = {
+            title: footerContent['footer/contact-us'].title,
+            body: footerContent['footer/contact-us'].contentBody,
+            summary: footerContent['footer/contact-us'].contentSummary,
+            image: footerContent['footer/contact-us'].imagePath,
+            linkTitle: footerContent['footer/contact-us'].linkLabel,
+            linkUrl: footerContent['footer/contact-us'].linkUrl,
+          }
+          delete hydrated['footer/contact-us']
+        }
+        const nestedFooter = nestContentByKey(footerContent, 'footer')
+        if (nestedFooter[0]?.children?.length) {
+          nestedFooter[0].children = nestedFooter[0]?.children?.filter(child => child?.contentElementType_systemCode?.trim()?.length === 0 || child?.contentElementType_systemCode === 'cetBlock')
+          hydtratedFooter = nestedFooter[0]
+        }
+
+        hydrated = { ...hydrated, footer: hydtratedFooter }
+      }
+
+      return { response, hydrated }
+    })
     .then(({ response, hydrated }) => {
       const pages = getContentPages(Object.values(response))
       pages.forEach(page => {
         const pageStruc = processForPage(page, Object.values(response))
-        hydrated[page.urlTitlePath] = { ...pageStruc, ...response[page.urlTitlePath]}
+        hydrated[page.urlTitlePath] = { ...pageStruc, ...response[page.urlTitlePath] }
       })
-          
-      
 
-    return hydrated
-  })
+      return hydrated
+    })
 }
 const processForPage = (page, content) => {
   let hydrated = {}
-    const descendants = getDescendants(content, page.contentID)
-    hydrated.tabs = getContentByType(descendants, 'cetTab')
-    hydrated.slider = processForSlider(descendants)
-    hydrated.contentColumns = processForContentColumn(descendants)
-    hydrated.callToAction = processForCTA(descendants)
-    hydrated.sidebar = processForSidebar(descendants)
-    hydrated.tabs = processForTabs(descendants)
-    const listItems = getContentByType(descendants, 'cetListItem,cetListItemWithImage')
-    hydrated.listItems = listItems.map(item => {
-      return processListItem(item, descendants)
-    })
-    const blocks = getContentByType(descendants, 'cetBlock,cetProfile')
-    hydrated.blocks = blocks.map(item => {
-      return processForBlock(item, descendants)
-    })
-    hydrated.menu = {}
+  const descendants = getDescendants(content, page.contentID)
+  hydrated.tabs = getContentByType(descendants, 'cetTab')
+  hydrated.slider = processForSlider(descendants)
+  hydrated.contentColumns = processForContentColumn(descendants)
+  hydrated.callToAction = processForCTA(descendants)
+  hydrated.sidebar = processForSidebar(descendants)
+  hydrated.tabs = processForTabs(descendants)
+  const listItems = getContentByType(descendants, 'cetListItem,cetListItemWithImage')
+  hydrated.listItems = listItems.map(item => {
+    return processListItem(item, descendants)
+  })
+  const blocks = getContentByType(descendants, 'cetBlock,cetProfile')
+  hydrated.blocks = blocks.map(item => {
+    return processForBlock(item, descendants)
+  })
+  hydrated.menu = {}
 
-    hydrated.contentPageType = 'BasicPage'
-  
+  hydrated.contentPageType = 'BasicPage'
+
   return hydrated
 }
 const getParent = (content = [], parentContentID) => content.filter(item => item.contentID === parentContentID)
 const getChildren = (content = [], contentID) => content.filter(item => item.parentContent_contentID === contentID).sort((a, b) => a.sortOrder - b.sortOrder)
-const getDescendants = (content = [], contentID) => content.filter(item => item.contentIDPath.includes(contentID) &&  item.contentID !== contentID).sort((a, b) => a.sortOrder - b.sortOrder)
+const getDescendants = (content = [], contentID) => content.filter(item => item.contentIDPath.includes(contentID) && item.contentID !== contentID).sort((a, b) => a.sortOrder - b.sortOrder)
 const processForCTA = content => {
   let cta = getContentByType(content, 'cetCallToCaction')
   let response = {}
@@ -520,4 +525,4 @@ const getBlogCatagories = () => {
     return hydrated
   })
 }
-export {  getEntryBySlugAndType, getEntryBySlug, getBlogPosts, getBlogPostData, getBlogCatagories }
+export { getEntryBySlugAndType, getEntryBySlug, getBlogPosts, getBlogPostData, getBlogCatagories }

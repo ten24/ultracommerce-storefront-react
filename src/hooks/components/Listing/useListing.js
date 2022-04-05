@@ -83,7 +83,7 @@ const useReconcile = ({ option, brand, attribute, category, priceRange, productT
   return { shouldUpdate: JSON.stringify(queryStringParams) !== JSON.stringify(core), queryStringParams }
 }
 
-const useListing = preFilter => {
+const useListing = (preFilter, type = 'productListing') => {
   let [isFetching, setFetching] = useState(true)
   let [records, setRecords] = useState([])
   let [total, setTotal] = useState(0)
@@ -93,13 +93,28 @@ const useListing = preFilter => {
   let [error, setError] = useState({ isError: false, message: '' })
 
   const loc = useLocation()
-  const productSearch = useSelector(state => state.configuration.listings.productListing.params)
-  const initialData = useSelector(state => state.configuration.listings.productListing.filters)
-
+  let productSearch = useSelector(state => state.configuration.listings.productListing.params)
+  let initialData = useSelector(state => state.configuration.listings.productListing.filters)
+  let initialForcedFilterOptions = useSelector(state => state.configuration.listings.productListing.forcedFilterOptions)
+  let bulkOrder = useSelector(state => state.configuration.listings.bulkOrder.params)
+  let initialBulkOrderData = useSelector(state => state.configuration.listings.bulkOrder.filters)
+  let initialBulkForcedFilterOptions = useSelector(state => state.configuration.listings.bulkOrder.forcedFilterOptions)
+  if (type === 'bulkOrder') {
+    productSearch = bulkOrder
+    initialData = initialBulkOrderData
+    initialData = initialBulkOrderData
+    initialForcedFilterOptions = initialBulkForcedFilterOptions
+  }
   let history = useHistory()
   let params = processQueryParameters(loc.search)
   params = { ...initialData, ...params, ...preFilter }
-  const returnFacetList = !!params['brand_slug'] || !!params['productType_slug'] ? 'brand,option,category,attribute,sorting,priceRange,productType' : 'brand,sorting,productType'
+  const hasValidFilter =
+    !initialForcedFilterOptions?.length ||
+    initialForcedFilterOptions.reduce((result, filterKey) => {
+      if (params[filterKey]?.length) return true
+      return result
+    }, false)
+  const returnFacetList = hasValidFilter ? 'brand,option,category,attribute,sorting,priceRange,productType' : 'category,brand,sorting,productType'
 
   const payload = { ...params, ...productSearch, returnFacetList }
 
@@ -113,6 +128,7 @@ const useListing = preFilter => {
         const products = data.products.map(sku => {
           return { ...sku, salePrice: sku.skuPrice, productName: sku.product_productName, urlTitle: sku.product_urlTitle, productCode: sku.product_productCode, imageFile: sku.sku_imageFile, skuID: sku.sku_skuID, skuCode: sku.sku_skuCode }
         })
+
         setRecords(products)
         setPotentialFilters(data.potentialFilters)
         setTotal(data.total)

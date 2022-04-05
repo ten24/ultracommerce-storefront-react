@@ -1,17 +1,19 @@
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { HeartButton, SimpleImage, ProductPrice, Button, ProductImage } from '..'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { getBrandRoute, getProductRoute } from '../../selectors'
-import { useAddToCart } from '../../hooks/useAPI'
+import { addToCart } from '../../actions'
+import { useState } from 'react'
 
 const ProductCard = props => {
   const { productName, productCode, salePrice, urlTitle, brandName, imagePath, imageFile, brandUrlTitle, listPrice, images, productClearance, skuID = '', skuCode } = props
   const { t } = useTranslation()
+  const dispatch = useDispatch()
+  const [isFetching, setFetching] = useState(false)
   const brand = useSelector(getBrandRoute)
   const product = useSelector(getProductRoute)
   const productLink = `/${product}/${urlTitle}` + (skuID.length ? `?skuid=${skuID}` : '')
-  const [request, setRequest] = useAddToCart(skuID)
   const useResizedImage = images && images?.length > 0
 
   return (
@@ -38,7 +40,19 @@ const ProductCard = props => {
         <ProductPrice salePrice={salePrice} listPrice={listPrice} className="d-flex" />
       </div>
       <div className="text-center card-footer border-0 bg-transparent pb-3 pt-0">
-        <Button disabled={request.isFetching} isLoading={request.isFetching} className="btn btn-primary btn-block my-3" label={t('frontend.product.add_to_cart')} onClick={() => setRequest({ makeRequest: true, isFetching: true })} />
+        <Button
+          disabled={isFetching}
+          isLoading={isFetching}
+          className="btn btn-primary btn-block my-3"
+          label={t('frontend.product.add_to_cart')}
+          onClick={e => {
+            e.preventDefault()
+            setFetching(true)
+            dispatch(addToCart(skuID)).then(() => {
+              setFetching(false)
+            })
+          }}
+        />
       </div>
     </div>
   )

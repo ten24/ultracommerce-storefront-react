@@ -1,5 +1,5 @@
 import useFormatCurrency from './useFormatCurrency'
-export { useGetProductsWithPagination, useGetEntityWithPagination, useGetEntityByUrlTitleAdvanced, useGetAccountCartsAndQuotes, useGetProductsByEntityModified, useResizedImageByProfileName, useGetEntity, useGetEntityByID, useGetProductDetails, useGetProducts, useGetAvailableShippingMethods, useGetAvailablePaymentMethods, useAddWishlistItem, useGetOrderDetails, useGetAllOrders, useAddOrderShippingAddress, useGetProductAvailableSkuOptions, useGetProductSkuSelected, useGetProductImageGallery, useAddToCart } from './useAPI'
+export { useGetProductsWithPagination, useGetEntityWithPagination, useGetEntityByUrlTitleAdvanced, useGetAccountCartsAndQuotes, useGetProductsByEntityModified, useResizedImageByProfileName, useGetEntity, useGetEntityByID, useGetProductDetails, useGetProducts, useGetAvailableShippingMethods, useGetAvailablePaymentMethods, useAddWishlistItem, useGetOrderDetails, useGetAllOrders, useAddOrderShippingAddress, useGetProductAvailableSkuOptions, useGetProductSkuSelected, useGetProductImageGallery } from './useAPI'
 export { useFormatDate, useFormatDateTime, useFormatTime } from './useFormatDate'
 export { useRedirect, usePush } from './useRedirect'
 export { useUtilities } from './useUtilities'
@@ -13,6 +13,7 @@ export { useGetBlogPosts, useGetBlogCatagories, useGetBlogPost } from './useBlog
 
 export { useManufacturer } from './pages/useManufacturer'
 export { useProductDetail } from './pages/useProductDetail'
+export { useProductDetailAdvanced } from './pages/useProductDetailAdvanced'
 export { useBrand } from './pages/useBrand'
 export { useProductType } from './pages/useProductType'
 export { useCategory } from './pages/useCategory'
@@ -47,7 +48,7 @@ export { useGiftCardPayment } from './components/Checkout/useGiftCardPayment'
 export { useProductImage } from './components/ProductImage/useProductImage'
 export { useProductDetailGallery } from './components/ProductDetail/useProductDetailGallery'
 export { useProductPrice } from './components/ProductPrice/useProductPrice'
-
+export { useReview } from './components/ProductDetail/useReview'
 export { useListing } from './components/Listing/useListing'
 export { useListingFilter } from './components/Listing/useListingFilter'
 export { useFilterFormater } from './components/Listing/useFilterFormater'

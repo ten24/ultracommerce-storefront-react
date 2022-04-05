@@ -3,8 +3,7 @@ import { SlatwalApiService, axios } from '../services'
 import { useHistory, useLocation } from 'react-router'
 import { toast } from 'react-toastify'
 import { getErrorMessage } from '../utils'
-import { useDispatch, useSelector } from 'react-redux'
-import { receiveCart } from '../actions'
+import { useSelector } from 'react-redux'
 
 const headers = {}
 
@@ -135,7 +134,7 @@ export const useGetProductDetails = () => {
   return [request, setRequest]
 }
 
-export const useGetEntityByUrlTitleAdvanced = urlTitle => {
+export const useGetEntityByUrlTitleAdvanced = (urlTitle, params = {}) => {
   let [isFetching, setFetching] = useState(true)
   let [data, setData] = useState({ product: {}, totalRecords: 0, totalPages: 1 })
   let [error, setError] = useState({ isError: false, message: '' })
@@ -143,7 +142,7 @@ export const useGetEntityByUrlTitleAdvanced = urlTitle => {
   useEffect(() => {
     let source = axios.CancelToken.source()
     setFetching(true)
-    const payload = { urlTitle, entityName: 'product', includeAttributesMetadata: true, includeCategories: true, includeOptions: true, includeSkus: true, includeSettings: true }
+    const payload = { urlTitle, entityName: 'product', includeAttributesMetadata: true, includeCategories: true, includeOptions: true, includeSkus: true, includeSettings: true, ...params }
     SlatwalApiService.general.getEntity(payload, headers, source).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
       if (response.isSuccess()) {
@@ -168,6 +167,7 @@ export const useGetEntityByUrlTitleAdvanced = urlTitle => {
     return () => {
       source.cancel()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlTitle])
   return { isFetching, product: data.product, attributeSets: data.attributeSets, productOptions: data?.product?.optionGroups, skus: data?.product?.skus, error }
 }
@@ -572,40 +572,4 @@ export const useGetProductImageGallery = urlTitle => {
   }, [urlTitle])
 
   return { isFetching, imageGallery, error }
-}
-
-/**
- * Add item to cart
- * @param {String} skuID - skuId of the product
- */
-export const useAddToCart = skuID => {
-  let [request, setRequest] = useState({ isFetching: false, makeRequest: false })
-  const dispatch = useDispatch()
-  useEffect(() => {
-    let source = axios.CancelToken.source()
-    if (request.makeRequest) {
-      SlatwalApiService.cart
-        .addItem({
-          skuID,
-          quantity: 1,
-          returnJSONObjects: 'cart',
-        })
-        .then(response => {
-          const hasError = Object.keys(response.success()?.errors || {}).length
-          if (response.isSuccess() && hasError) toast.error(getErrorMessage(response.success().errors))
-          if (response.isSuccess() && !hasError) {
-            toast.success('Added to Cart')
-            dispatch(receiveCart(response.success().cart))
-          } else {
-            dispatch(receiveCart({}))
-          }
-          setRequest({ isFetching: false, makeRequest: false })
-        })
-    }
-    return () => {
-      source.cancel()
-    }
-  }, [request, setRequest, skuID, dispatch])
-
-  return [request, setRequest]
 }

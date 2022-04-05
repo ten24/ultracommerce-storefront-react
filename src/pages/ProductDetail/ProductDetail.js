@@ -1,4 +1,4 @@
-import { BreadCrumb, Layout, RelatedProductsSlider, ProductPageHeader, ProductDetailGallery, ProductAdditionalInformation, ProductDetails, ProductPagePanels, SkuOptions, HeartButton, ProductForm, Spinner } from '../../components'
+import { BreadCrumb, Layout, RelatedProductsSlider, ProductReview, ProductPageHeader, ProductDetailGallery, ProductAdditionalInformation, ProductDetails, ProductPagePanels, SkuOptions, HeartButton, ProductForm, Spinner } from '../../components'
 import { useGetEntityByUrlTitleAdvanced, useProductDetail } from '../../hooks'
 import { Helmet } from 'react-helmet'
 import { useSelector } from 'react-redux'
@@ -12,7 +12,7 @@ const ProductDetail = () => {
   const productTypeRoute = useSelector(getProductTypeRoute)
   const productTypeBase = useSelector(state => state.configuration.filtering.productTypeBase)
   const cart = useSelector(disableInteractionSelector)
-  const { filterSkusBySelectedOptions, calculateAvaliableOptions, calculateAdditionalParamters } = useProductDetail()
+  const { filterSkusBySelectedOptions, calculateAvaliableOptions, calculateAdditionalParamters, selectionToSku } = useProductDetail()
   // selection is an object of current paramters
   // optionGroupPairs is an array of current paramters key=value
   let params = queryString.parse(location.search, { arrayFormat: 'separator', arrayFormatSeparator: ',' })
@@ -23,24 +23,8 @@ const ProductDetail = () => {
   const urlTitle = location.pathname.split('/').reverse()
   let { isFetching, product, productOptions, skus, error, attributeSets } = useGetEntityByUrlTitleAdvanced(urlTitle[0])
   if (error.isError) return null
-  const selectionToSku = (skus = [], params = []) => {
-    let found = skus.filter(sku => {
-      return (
-        params.filter(code => {
-          return sku.slug.includes(code)
-        }).length === productOptions.length
-      )
-    })
 
-    //check if product is of gift card type, if yes then return default sku from sku list (as it will not have options)
-    if (product?.productType_productTypeIDPath && product?.defaultSku_skuID && product.productType_productTypeIDPath.includes('50cdfabbc57f7d103538d9e0e37f61e4')) {
-      found = skus.filter(sku => sku.skuID === product.defaultSku_skuID)
-    }
-
-    return found.length === 1 ? found[0] : null
-  }
-
-  let selectedSKu = selectionToSku(skus, optionGroupPairs)
+  let selectedSKu = selectionToSku(product, skus, optionGroupPairs, productOptions)
   if (params?.skuid) {
     // If we have a skuID we need to redirect to codes
     console.log('skuID found, waiting for skus', !product)
@@ -108,7 +92,7 @@ const ProductDetail = () => {
             </div>
             <div className="col-sm-6 col-md-6 offset-md-1">
               {product?.productID && <ProductDetails sku={selectedSKu} product={product} />}
-              {!isFetching && !cart.isFetching && skus?.length && <SkuOptions sku={selectedSKu} selection={params} productOptions={updatedProductOptions} skus={skus} />}
+              {!isFetching && !cart.isFetching && !!skus?.length && <SkuOptions sku={selectedSKu} selection={params} productOptions={updatedProductOptions} skus={skus} />}
 
               {product?.productID && <ProductForm sku={selectedSKu} isDisabled={isDisabled} isLoading={isFetching || cart.isFetching} />}
               {product?.productID && (
@@ -123,6 +107,8 @@ const ProductDetail = () => {
         </>
       </div>
       <RelatedProductsSlider productUrlTitle={urlTitle[0]} />
+
+      <ProductReview productUrlTitle={urlTitle[0]} />
     </Layout>
   )
 }
