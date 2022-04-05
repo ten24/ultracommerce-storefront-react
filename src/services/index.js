@@ -1,3 +1,5 @@
 export { sdkURL, SlatwalApiService } from './SlatwalApiService'
-export { axios, axiosInstance } from './AxiosService'
-export { getEntryBySlug, getBlogCatagories, getBlogPostData, getBlogPosts } from './ContentfulService'
+export * as SlatwallCMSService from './SlatwallCMSService'
+export { axios } from './AxiosService'
+export * as ContentfulService from './ContentfulService'
+export * as KontentService from './KontentService'

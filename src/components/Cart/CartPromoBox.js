@@ -19,20 +19,21 @@ const CartPromoBox = () => {
             </div>
             <div className="card-body">
               <form>
-                <div className="input-group input-group-sm">
-                  <input disabled={disableInteraction} className="form-control form-control-sm" type="text" placeholder="Promo code" value={promoCode} required onChange={e => setPromoCode(e.target.value)} />
+                <div className="input-group input-group-lg rounded-pill">
+                  <input disabled={disableInteraction} className="form-control appended-form-control rounded-pill" type="text" placeholder="Promo code" value={promoCode} required onChange={e => setPromoCode(e.target.value)} />
                   <span className="input-group-append">
                     <button
-                      className="btn btn-secondary white-text "
+                      className="btn btn-primary"
                       onClick={e => {
                         e.preventDefault()
-                        dispatch(applyPromoCode(promoCode))
+                        dispatch(applyPromoCode(promoCode, t('frontend.cart.promo_code_applied')))
                         setPromoCode('')
                       }}
                       type="submit"
                     >
                       {t('frontend.cart.apply')}
                     </button>
+                    
                   </span>
                 </div>
               </form>

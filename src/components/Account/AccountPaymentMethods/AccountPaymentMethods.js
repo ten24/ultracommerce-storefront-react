@@ -11,7 +11,7 @@ const AccountPaymentMethods = () => {
   return (
     <AccountLayout>
       <AccountContent />
-      <h2 className="h3 mb-3">{t('frontend.account.payment_method.title')}</h2>
+      
       {accountPaymentMethods.length === 0 && (
         <div className="alert alert-info" role="alert">
           {t('frontend.account.payment_methods.none')}
@@ -20,14 +20,14 @@ const AccountPaymentMethods = () => {
       {accountPaymentMethods.length > 0 && (
         <div className="table-responsive font-size-md">
           <table className="table table-striped table-bordered mt-3">
-            <thead>
+            {/* <thead>
               <tr>
                 <th className="dark-grey-text h6">{t('frontend.account.payment_method.types')}</th>
                 <th className="dark-grey-text h6">{t('frontend.account.payment_method.name')}</th>
                 <th className="dark-grey-text h6">{t('frontend.account.payment_method.expires')}</th>
                 <th></th>
               </tr>
-            </thead>
+            </thead> */}
             <tbody>
               {accountPaymentMethods &&
                 accountPaymentMethods.map((card, index) => {

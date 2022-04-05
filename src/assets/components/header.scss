@@ -2,6 +2,120 @@
   background-image: linear-gradient(-47deg, rgb(33, 190, 185) 0%, rgb(51, 95, 198) 100%);
   min-height: 30px;
 }
-.price_color {
-  color: $color-orange;
+
+.input-group {
+  border: 2px solid #eeeeee;
+  &:hover,
+  &:focus,
+  &:active {
+    border-color: #dddddd;
+  }
+  .form-control {
+    border: none;
+    font-size: 0.9rem;
+    background: transparent;
+  }
+}
+.cart-product-name {
+  width: 100px;
+  padding-right: 3px;
+  font-size: 0.8rem;
+  line-height: normal;
+  color: $color-black;
+
+  &:hover {
+    color: $link-color;
+  }
+}
+
+.navbar-dark {
+  .container {
+    position: relative;
+  }
+  .navbar-nav {
+    &.mega-nav .nav-item {
+      margin: 0;
+      position: relative;
+      padding-left: 13px;
+      margin-left: 10px;
+      i {
+        position: absolute;
+        left: 0;
+        margin: auto;
+        font-size: 18px;
+        color: rgba(255, 255, 255, 0.7);
+      }
+    }
+    .nav-link {
+      color: $white;
+      font-size: 14px;
+      padding: 12px;
+      line-height: 1.2;
+      &:hover {
+        color: $color-orange !important;
+      }
+    }
+    &.nav-categories {
+      flex: 1 1;
+      width: 100%;
+      justify-content: space-evenly;
+    }
+  }
+}
+
+.mega-menu.dropdown-menu {
+  margin: 0;
+  border: 0;
+  box-shadow: 0 0.25rem 0.5625rem -0.0625rem rgb(0 0 0 / 3%), 0 0.275rem 1.25rem -0.0625rem rgb(0 0 0 / 5%);
+  a {
+    @extend .text-dark;
+    &:hover {
+      color: $color-orange !important;
+    }
+  }
+  ul a {
+    font-size: 0.875rem;
+    font-weight: 400;
+  }
+  i {
+    font-size: 15px;
+  }
+  .mega-dropdown-column > a {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    border-bottom: 1px solid #e3e9ef;
+    display: block;
+  }
+}
+
+.top-bar {
+  background: #777;
+  ul {
+    list-style: none;
+    padding: 0;
+    li {
+      margin-left: 20px;
+      display: inline-flex;
+      a {
+        i {
+          font-size: 16px;
+          line-height: 26px;
+          color: #fff;
+        }
+      }
+    }
+  }
+}
+
+.impersonation-banner {
+  .row {
+    height: '30px';
+  }
+  div {
+    color: #fff;
+    .link {
+      color: #fff;
+    }
+  }
 }

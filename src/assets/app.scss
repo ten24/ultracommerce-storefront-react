@@ -4,6 +4,9 @@
 //Bootstrap icon
 @import 'bootstrap-icons/font/bootstrap-icons.css';
 
+//Custom variable
+@import './components/variables.scss';
+
 // Bootstrap-5
 @import '../../node_modules/bootstrap/scss/bootstrap.scss';
 
@@ -11,14 +14,11 @@
 @import 'slick-carousel/slick/slick.css';
 @import 'slick-carousel/slick/slick-theme.css';
 
-//Custom variable
-@import './components/variables.scss';
-
 // Custom Styles
 
 @import './components/header.scss';
+@import './components/footer.scss';
 @import './components/productListing.scss';
-
 @import './components/home.scss';
 @import './components/blog.scss';
 @import './components/button';
@@ -26,3 +26,5 @@
 @import './components/about.scss';
 @import './components/checkout.scss';
 @import './components/dropdown';
+@import './components/spinner';
+@import './components/productReview.scss'

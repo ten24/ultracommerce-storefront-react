@@ -1,28 +1,63 @@
-import { PageHeader, Layout, CheckoutSideBar, StepsHeader, getCurrentStep, ShippingSlide, PaymentSlide, ReviewSlide } from '../../components'
-import { useSelector } from 'react-redux'
+import { PageHeader, Layout, CheckoutSideBar, StepsHeader, getCurrentStep, ShippingSlide, PaymentSlide, ReviewSlide, ThreeDSRedirect } from '../../components'
+import { useDispatch, useSelector } from 'react-redux'
 import { Redirect, Route, Switch, useHistory, useLocation, useRouteMatch } from 'react-router-dom'
 import './checkout.css'
-import { isAuthenticated } from '../../utils'
-import { useEffect } from 'react'
+import { getErrorMessage, isAuthenticated } from '../../utils'
+import { useEffect, useState } from 'react'
+import { clearUser, receiveCart, requestCart, requestLogOut } from '../../actions'
+import { SlatwalApiService } from '../../services'
+import { toast } from 'react-toastify'
+import { useTranslation } from 'react-i18next'
 
 const Checkout = () => {
   let match = useRouteMatch()
-  const loc = useLocation()
+  const { pathname } = useLocation()
   const history = useHistory()
-  const path = loc.pathname.split('/').reverse()[0].toLowerCase()
+  const path = pathname.split('/').reverse()[0].toLowerCase()
   const currentStep = getCurrentStep(path)
   const { verifiedAccountFlag, isFetching, accountID } = useSelector(state => state.userReducer)
   const enforceVerifiedAccountFlag = useSelector(state => state.configuration.enforceVerifiedAccountFlag)
+  const dispatch = useDispatch()
+  const { t } = useTranslation()
+  const cartState = useSelector(state => state.cart) // check if there is some change in state , just to run use effect
+  const [threeDSRedirect, setThreeDSRedirect] = useState()
+
+  const placeOrder = event => {
+    event.preventDefault()
+    dispatch(requestCart())
+    SlatwalApiService.cart.placeOrder({ returnJSONObjects: 'cart', transactionInitiator: 'ACCOUNT' }).then(response => {
+      if (response.isSuccess()) {
+        const placeOrderResp = response.success()
+        const orderHasError = Object.keys(placeOrderResp?.errors || {})?.length > 0
+        if (placeOrderResp?.redirectUrl) {
+          const { redirectUrl, redirectPayload, redirectMethod } = placeOrderResp
+          setThreeDSRedirect({ redirectUrl, redirectPayload, redirectMethod })
+        } else {
+          if (orderHasError) {
+            toast.error(getErrorMessage(response.success().errors))
+          } else {
+            setTimeout(() => {
+              dispatch(receiveCart(placeOrderResp.cart))
+              history.push('/order-confirmation')
+            }, 2000)
+          }
+        }
+      } else {
+        toast.error(t('frontend.core.error.network'))
+        dispatch(receiveCart())
+      }
+    })
+  }
 
   useEffect(() => {
     if (!isAuthenticated()) {
-      history.push(`/my-account?redirect=${loc.pathname}`)
+      dispatch(clearUser())
+      dispatch(requestLogOut())
+      history.push(`/my-account?redirect=${pathname}`)
     }
-  }, [history, loc])
+  }, [history, pathname, dispatch, cartState])
 
-  if (enforceVerifiedAccountFlag && !verifiedAccountFlag && isAuthenticated() && !isFetching && accountID.length > 0) {
-    return <Redirect to="/account-verification" />
-  }
+  if (enforceVerifiedAccountFlag && !verifiedAccountFlag && isAuthenticated() && !isFetching && accountID.length > 0) return <Redirect to="/account-verification" />
 
   return (
     <Layout>
@@ -53,7 +88,8 @@ const Checkout = () => {
             </Switch>
           </section>
           {/* <!-- Sidebar--> */}
-          <CheckoutSideBar />
+          <CheckoutSideBar placeOrder={placeOrder} />
+          {threeDSRedirect && <ThreeDSRedirect url={threeDSRedirect.redirectUrl} payload={threeDSRedirect.redirectPayload} method={threeDSRedirect.redirectMethod} />}
         </div>
       </div>
     </Layout>

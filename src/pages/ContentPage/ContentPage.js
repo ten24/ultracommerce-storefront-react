@@ -9,9 +9,9 @@ import BasicPage from '../BasicPage/BasicPage'
 
 const pageComponents = {
   BasicPageWithSidebar,
-  // ProductListingContent,
   BasicPage,
   NotFound,
+  default: BasicPage,
 }
 
 const ContentPage = () => {
@@ -19,10 +19,12 @@ const ContentPage = () => {
   const path = loc.pathname.split('/').reverse()[0].toLowerCase()
   const content = useSelector(state => state.content)
   let component = 'NotFound'
-  if (!content.isFetching && content[path]) {
-    component = content[path].settings.contentTemplateFile.replace('.cfm', '')
+  if (!content.isFetching && content[path] && content[path]?.contentPageType) {
+    component = content[path].contentPageType
   }
-
+  if (content.isFetching) {
+    component = 'BasicPage'
+  }
   return <Layout>{!content.isFetching && createElement(pageComponents[component])}</Layout>
 }
 

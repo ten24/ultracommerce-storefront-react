@@ -1,8 +1,5 @@
-import React, { useEffect } from 'react'
 import { SWImage } from '..'
-import { useResizedImageByProfileName } from '../../hooks/'
-import { useSelector } from 'react-redux'
-import { getImageFallbackFlag } from '../../selectors'
+import { useProductImage } from '../../hooks/'
 import ContentLoader from 'react-content-loader'
 
 const ImageSkeleton = props => {
@@ -13,31 +10,13 @@ const ImageSkeleton = props => {
   )
 }
 
-const ProductImage = ({ skuID, imageFile, defaultSku_imageFile, customPath, forceImageCall = false, customClass = '' }) => {
-  const imageFallbackFlag = useSelector(getImageFallbackFlag)
-  let [request, setRequest] = useResizedImageByProfileName()
-  const callForImage = (!imageFile || !defaultSku_imageFile) && (imageFallbackFlag || forceImageCall)
-  useEffect(() => {
-    let didCancel = false
-    if (!didCancel && !request.isFetching && !request.isLoaded && callForImage) {
-      setRequest({
-        ...request,
-        params: { skuIDs: skuID, profileName: 'listing' },
-        makeRequest: true,
-        isFetching: true,
-        isLoaded: false,
-      })
-    }
-    return () => {
-      didCancel = true
-    }
-  }, [request, setRequest, skuID, callForImage])
+const ProductImage = ({ customClass = '', skuID, imageFile, defaultSku_imageFile, customPath, forceImageCall = false, fallbackFileName = '' }) => {
+  const { callForImage, request } = useProductImage(skuID, imageFile, defaultSku_imageFile, forceImageCall)
 
   return (
     <>
-      {!callForImage && <SWImage className={customClass} customPath={customPath ? customPath : 'custom/assets/images/product/default/'} src={imageFile || defaultSku_imageFile} alt="Product" />}
-      {callForImage && request.isLoaded && <SWImage className={customClass} customPath="/" src={request.data[skuID]} alt="Product" />}
-      {/* {callForImage && request.isFetching && <ImageSkeleton />} */}
+      {!callForImage && <SWImage className={customClass} customPath={customPath ? customPath : 'custom/assets/images/product/default/'} src={imageFile || defaultSku_imageFile} alt="Product" fallbackPath={fallbackFileName.length ? `${fallbackFileName}` : ''} />}
+      {callForImage && request.isLoaded && <SWImage className={customClass} customPath="/" src={request.data[skuID]} alt="Product" fallbackPath={fallbackFileName.length ? `${fallbackFileName}` : ''} />}
     </>
   )
 }

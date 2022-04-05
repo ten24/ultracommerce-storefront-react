@@ -17,7 +17,7 @@ const AccountOrderDetail = props => {
   }, [order, orderID, setRequest])
   return (
     <AccountLayout title={`Order: ${(order.isLoaded && order.data.orderInfo[0].orderNumber) || ''}`}>
-      <OrderToolbar delivered={order.isLoaded && order.data.orderInfo[0].orderStatusType_typeName} />
+      {order.isLoaded && <OrderToolbar delivered={order.data.orderInfo[0].orderStatusType_typeName} orderPayments={order.data.orderPayments[0]} />}
       {order.isLoaded && <OrderDetails orderInfo={order.data.orderInfo[0]} orderFulfillments={order.data.orderFulfillments[0]} orderPayments={order.data.orderPayments[0]} />}
       {order.isLoaded && <OrderShipments shipments={[{ orderItems: order.data.orderItems }]} orderFulfillments={order.data.orderFulfillments[0]} orderPayments={order.data.orderPayments[0]} />}
     </AccountLayout>

@@ -13,39 +13,30 @@ const MyForm = ({ status, message, onValidated }) => {
       company &&
       email.value.indexOf('@') > -1 &&
       onValidated({
-        MERGE0: email.value,
-        MERGE2: lName.value,
-        MERGE1: fName.value,
-        MERGE3: company.value,
+        EMAIL: email.value,
+        LNAME: lName.value,
+        FNAME: fName.value,
+        COMPANY: company.value,
       })
   }
 
   return (
     <>
-      <div className="input-group input-group-overlay flex-nowrap">
-        <div className="input-group-prepend-overlay">
-          <span className="input-group-text text-muted font-size-base"></span>
-        </div>
-        <div className="row">
-          <div className="col-12 d-flex">
-            <input className={`${styles.customInput} form-control prepended-form-control me-3`} type="text" ref={node => (fName = node)} placeholder={t('frontend.account.first_name')} required />
-            <input className={`${styles.customInput} form-control prepended-form-control me-3`} type="text" ref={node => (lName = node)} placeholder={t('frontend.account.last_name')} required />
-            <input className={`${styles.customInput} form-control prepended-form-control`} type="text" ref={node => (company = node)} placeholder={t('frontend.account.company')} required />
-          </div>
-          <div className="col-12 d-flex pt-3">
-            <input className={`${styles.customInput} form-control prepended-form-control rounded-right-0`} type="email" ref={node => (email = node)} placeholder={t('frontend.account.email')} required />
-            <div className="input-group-append">
-              <button className="btn btn-primary  d-flex flex-row" type="submit" onClick={submit}>
-                <i className="bi bi-envelope p-1"></i>
-                {t('frontend.core.subscribe')}
-              </button>
-            </div>
-          </div>
+     <form
+          onSubmit={e => {
+            submit()
+            e.preventDefault()
+          }}
+        >
+      <div className="input-group input-group-lg rounded-pill">
+        <input className={`${styles.customInput} form-control appended-form-control rounded-pill px-4`} type="email" ref={node => (email = node)} placeholder={t('frontend.account.email')} required />
+        <div className="input-group-append">
+          <button className="btn btn-link" type="submit" onClick={submit} required>
+            <i className="bi bi-envelope fs-4"></i>
+          </button>
         </div>
       </div>
-      <small className="form-text text-light opacity-50" id="mc-helper">
-        {t('frontend.mc.info')}
-      </small>
+     </form>
       <div className="subscribe-status">
         {status === 'sending' && <div style={{ color: 'blue' }}>{t('frontend.mc.sending')}</div>}
         {status === 'error' && <div style={{ color: 'red' }} dangerouslySetInnerHTML={{ __html: message }} />}

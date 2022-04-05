@@ -28,7 +28,7 @@ const HeartButton = ({ skuID, className = 'link btn-wishlist' }) => {
         title=""
         data-original-title="Remove from wishlist"
       >
-        <i className="bi bi-heart-fill" style={{ color: `#${primaryColor}` }}></i>
+        <i className="bi bi-heart-fill link" style={{ color: `#${primaryColor}` }}></i>
       </button>
     )
   } else {

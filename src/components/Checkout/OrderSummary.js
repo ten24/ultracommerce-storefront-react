@@ -1,15 +1,15 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useFormatCurrency } from '../../hooks/'
-import { disableInteractionSelector } from '../../selectors'
+import { disableInteractionSelector, isVatCountry } from '../../selectors'
 import { removePromoCode } from '../../actions/cartActions'
 
 const OrderSummary = () => {
   const cart = useSelector(state => state.cart)
-  const { total, taxTotal, subtotal, discountTotal, fulfillmentChargeAfterDiscountTotal } = cart
+  const { total, taxTotal, VATTotal, subtotal, discountTotal, fulfillmentChargeAfterDiscountTotal, promotionCodes } = cart
   const [formatCurrency] = useFormatCurrency({})
+  const showVat = useSelector(isVatCountry)
   const { t } = useTranslation()
-  const promotionCodes = useSelector(state => state.cart.promotionCodes)
   const disableInteraction = useSelector(disableInteractionSelector)
   const dispatch = useDispatch()
   return (
@@ -28,65 +28,68 @@ const OrderSummary = () => {
           <li className="list-group-item d-flex justify-content-between ">
             <h6 className="my-0"> {t('frontend.cart.shippingDelivery')}</h6>
             <span className="float-end">
-              <strong>{fulfillmentChargeAfterDiscountTotal > 0 ? formatCurrency(fulfillmentChargeAfterDiscountTotal) : '--'}</strong>
+              <strong>{fulfillmentChargeAfterDiscountTotal > 0 ? formatCurrency(fulfillmentChargeAfterDiscountTotal) : t('frontend.cart.shippingFree')}</strong>
             </span>
           </li>
-          <li className="list-group-item d-flex justify-content-between ">
-            <h6 className="my-0"> {t('frontend.cart.tax')}</h6>
+          {!showVat && (
+            <li className="list-group-item d-flex justify-content-between">
+              <h6 className="my-0">{t('frontend.cart.tax')}</h6>
 
-            <span className="float-end">
-              <strong>{taxTotal > 0 ? formatCurrency(taxTotal) : '--'}</strong>
-            </span>
-          </li>
-          <li className="list-group-item d-flex justify-content-between bg-light">
-            <div className="text-success">
-              <h6 className="my-0"> {t('frontend.cart.discount')}</h6>
-            </div>
-            <span className="float-end align-center">
-              <span className="badge bg-success "> {discountTotal > 0 ? formatCurrency(discountTotal) : '--'}</span>
-            </span>
-          </li>
-
-          <li className="list-group-item d-flex justify-content-between bg-light">
-            <div className="text-success">
-              <h6 className="my-0">{t(`frontend.order.promo.promo_code`)}</h6>
-              {promotionCodes.length > 0 &&
-                promotionCodes.map(promotionCodeItem => {
-                  const { promotionCode, promotion } = promotionCodeItem
-                  const { promotionName } = promotion
+              <span className="float-end">
+                <strong>{taxTotal > 0 ? formatCurrency(taxTotal) : '--'}</strong>
+              </span>
+            </li>
+          )}
+          {promotionCodes.length > 0 && (
+            <>
+              <li className="list-group-item d-flex justify-content-between bg-light">
+                <div className="text-success">
+                  <h6 className="my-0"> {t('frontend.cart.discount')}</h6>
+                </div>
+                <span className="float-end align-center">
+                  <span className="text-success">{discountTotal > 0 ? formatCurrency(discountTotal) : '--'}</span>
+                </span>
+              </li>
+              <li className="list-group-item d-flex justify-content-between bg-light">
+                {promotionCodes.map(promotionCodeItem => {
+                  //TODO: Review
+                  const { promotionCode } = promotionCodeItem
                   return (
                     <div key={promotionCode}>
-                      <span
-                        className="badge bg-success"
-                        onClick={event => {
-                          event.preventDefault()
-                          dispatch(removePromoCode(promotionCode))
-                        }}
-                      >
-                        {promotionName} &times;
-                      </span>
                       <button
-                        className="btn btn-link px-0 text-danger"
+                        className="btn badge bg-success promo-btn"
                         type="button"
+                        data-toggle="tooltip"
+                        data-placement="bottom"
+                        title="Remove Promotion"
                         key={promotionCode}
                         disabled={disableInteraction}
                         onClick={event => {
                           event.preventDefault()
-                          dispatch(removePromoCode(promotionCode))
+                          dispatch(removePromoCode(promotionCode, undefined, t('frontend.cart.promo_code_removed')))
                         }}
                       >
-                        <i className="bi bi-times-circle"></i>
-                        <span className="font-size-sm"> {promotionName}</span>
+                        <i class="bi bi-x"></i>
+                        <span className="font-size-sm">{promotionCode}</span>
                       </button>
                     </div>
                   )
                 })}
-            </div>
-          </li>
+              </li>
+            </>
+          )}
           <li className="list-group-item d-flex justify-content-between">
             <h6 className="my-0">{t('frontend.cart.total')}</h6>
             <strong>{total > 0 ? formatCurrency(total) : '--'}</strong>
           </li>
+          {showVat && (
+            <li className="list-group-item d-flex justify-content-between ">
+              <h6 className="my-0">{t('frontend.cart.vat')}</h6>
+              <span className="float-end">
+                <strong>{VATTotal> 0 ? formatCurrency(VATTotal) : '--'}</strong>
+              </span>
+            </li>
+          )}
         </ul>
       </div>
     </>

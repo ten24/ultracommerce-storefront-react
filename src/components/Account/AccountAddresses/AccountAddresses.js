@@ -11,30 +11,35 @@ import { getAllAccountAddresses, getPrimaryAddress } from '../../../selectors/'
 
 const Address = props => {
   const { accountAddressID, address, isPrimary } = props
-  const { streetAddress, addressID, city, stateCode, postalCode } = address
+  const { streetAddress, addressID, city, stateCode, postalCode, name } = address
   const MySwal = withReactContent(Swal)
   const dispatch = useDispatch()
   const { t } = useTranslation()
 
   return (
     <tr>
-      <td className="py-3 align-middle">
-        {`${streetAddress} ${city},${stateCode} ${postalCode}`} {isPrimary && <span className="align-middle badge bg-info ml-2">{t('frontend.core.prinary')}</span>}
+      <td className="align-middle">
+        <b>{name}</b>
+        <br />
+        <span className="font-weight-normal">{`${streetAddress}, ${city}, ${stateCode} ${postalCode}`}</span>
       </td>
-      <td className="py-3 align-middle">
+      <td>{isPrimary && <span className="align-middle badge bg-info ">{t('frontend.core.prinary')}</span>}</td>
+      <td>
         <Link
-          className="nav-link-style me-2"
+          className="link-button link nav-link-style"
           to={{
             pathname: `/my-account/addresses/${addressID}`,
             state: { ...props },
           }}
           data-toggle="tooltip"
         >
-          <i className="bi bi-pencil"></i>
+          {t('frontend.core.edit')}
         </Link>
+      </td>
+      <td>
         <button
           type="button"
-          className="link-button nav-link-style "
+          className="link-button link nav-link-style"
           onClick={() => {
             MySwal.fire({
               icon: 'info',
@@ -50,21 +55,21 @@ const Address = props => {
             })
           }}
         >
-          <i className="bi bi-trash"></i>
+          {t(`frontend.core.remove`)}
         </button>
       </td>
     </tr>
   )
 }
 
-const AccountAddresses = ({ title, customBody, contentTitle }) => {
+const AccountAddresses = ({ title, contentBody = '', contentTitle }) => {
   const { t } = useTranslation()
   const accountAddresses = useSelector(getAllAccountAddresses)
   const primaryAddress = useSelector(getPrimaryAddress)
   return (
     <AccountLayout title={title}>
-      <AccountContent customBody={customBody} contentTitle={contentTitle} />
-      <h2 className="h3 mb-3">{t('frontend.account.address.title')}</h2>
+      <AccountContent />
+
       {accountAddresses.length === 0 && (
         <div className="alert alert-info" role="alert">
           {t('frontend.account.address.none')}
@@ -74,12 +79,12 @@ const AccountAddresses = ({ title, customBody, contentTitle }) => {
       {accountAddresses.length > 0 && (
         <div className="table-responsive font-size-md">
           <table className="table table-striped table-bordered mt-3">
-            <thead>
+            {/* <thead>
               <tr>
                 <th className="dark-grey-text h6">{t('frontend.account.address.heading')}</th>
                 <th className="dark-grey-text h6">{t('frontend.core.actions')}</th>
               </tr>
-            </thead>
+            </thead> */}
             <tbody>
               {accountAddresses &&
                 accountAddresses.map((address, index) => {

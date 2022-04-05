@@ -17,6 +17,4 @@ axios.interceptors.response.use(
   error => {}
 )
 
-const axiosInstance = axios.create() //used to bypass above axios interceptors
-
-export { axios, axiosInstance }
+export { axios }

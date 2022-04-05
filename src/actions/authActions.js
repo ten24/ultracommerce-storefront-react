@@ -3,6 +3,8 @@ import { SlatwalApiService } from '../services'
 import { getErrorMessage } from '../utils'
 import { getCart, receiveCart, requestCart } from './cartActions'
 import { requestUser, receiveUser, clearUser, getWishLists } from './userActions'
+import { isAuthenticated } from '../utils'
+
 export const REQUEST_LOGIN = 'REQUEST_LOGIN'
 export const RECEIVE_LOGIN = 'RECEIVE_LOGIN'
 export const ERROR_LOGIN = 'ERROR_LOGIN'
@@ -57,7 +59,8 @@ export const softLogout = () => {
 export const login = (email, password, success, failure) => {
   return async (dispatch, getState) => {
     let { accountID } = getState().userReducer
-    if (!accountID.length) {
+
+    if (!isAuthenticated() || !accountID.length) {
       dispatch(requestLogin())
       dispatch(requestUser())
       dispatch(requestCart())

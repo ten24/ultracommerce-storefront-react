@@ -10,7 +10,6 @@ const ShippingMethodPicker = () => {
   const selectedShippingMethod = useSelector(shippingMethodSelector)
   const orderFulfillment = useSelector(fulfillmentSelector)
   const { t } = useTranslation()
-
   return (
     <div className="row mb-3">
       <div className="col-sm-12">

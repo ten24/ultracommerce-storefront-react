@@ -6,7 +6,7 @@ const TermPaymentDetails = ({ termPayment, hideHeading }) => {
 
   return (
     <>
-      {!hideHeading && <h3 className="h6">{t('frontend.checkout.payment_method')}</h3>}
+      {!hideHeading && <h6 className="h6">{t('frontend.checkout.payment_method')}</h6>}
       <em>{paymentMethod.paymentMethodName}</em>
       <br />
       {purchaseOrderNumber}

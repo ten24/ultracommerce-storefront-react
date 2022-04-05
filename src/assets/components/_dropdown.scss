@@ -22,7 +22,7 @@
 .nav-shop-all {
   background-color: $gray-300;
   padding: 5px 20px;
-  font-size: 14px;
+  font-size: 15px;
   position: absolute;
 
   bottom: 0;
@@ -74,10 +74,6 @@
     transition: width 2s, height 4s;
     color: $link-color;
     text-decoration: none;
-    font: {
-      size: 12px;
-      weight: 500;
-    }
     &:hover {
       color: $color-orange;
     }
@@ -94,7 +90,7 @@
     list-style: none;
   }
   li {
-    margin-bottom: 1px;
+    margin-bottom: 0.5rem;
     &:last-child {
       margin-bottom: 0;
     }

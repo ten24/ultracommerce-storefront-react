@@ -1,110 +1,80 @@
-import { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import queryString from 'query-string'
+import { useProductDetail } from '../../hooks'
 import { useHistory, useLocation } from 'react-router'
-import { skuIdsToSkuCodes } from '../../utils'
 
-const getOptionByCode = (filteredOptions, optionGroupCode, optionCode) => {
-  return filteredOptions
-    .filter(optionGroup => optionGroupCode === optionGroup.optionGroupCode)
-    .map(optionGroup => optionGroup.options.filter(option => optionCode === option.optionCode))
-    .flat()
-    .shift()
-}
-const SkuOptions = ({ skuOptionDetails, availableSkuOptions, sku }) => {
-  const [lastOption, setLastOption] = useState({ optionCode: '', optionGroupCode: '' })
-  const { isFetching } = useSelector(state => state.cart)
-  const loc = useLocation()
-  const history = useHistory()
+// selection is an object of current paramters
+// optionGroupPairs is an array of current paramters key=value
+const SkuOptions = ({ productOptions, selection, skus = [], selectedOptionInModel }) => {
+  const { filterSkusBySelectedOptions, generateOptionGroupPair } = useProductDetail()
   const { t } = useTranslation()
+  let loc = useLocation()
+  let history = useHistory()
 
-  let params = queryString.parse(loc.search, { arrayFormat: 'separator', arrayFormatSeparator: ',' })
-  if (lastOption.optionGroupCode.length === 0 && Object.keys(params).length > 0) {
-    setLastOption({ optionCode: Object.entries(params)[0][0], optionGroupCode: Object.entries(params)[0][1] })
-  }
-  const calculateOptions = () => {
-    let filteredOptions = skuOptionDetails
-    filteredOptions.forEach(filteredOption => {
-      filteredOption.options = filteredOption.options.map(option => {
-        option.active = true
-        return option
-      })
+  // http://localhost:3006/product/test-product?colors=global-black&soccerBallColor=orange&soccerBallSize=3
+  const selectedOption = (skus = [], optionGroupCode, optionCode, selection) => {
+    const singlePair = generateOptionGroupPair(optionGroupCode, optionCode)
+    selection[optionGroupCode] = optionCode
+    const optionsToTest = Object.keys(selection).map(key => {
+      return generateOptionGroupPair(key, selection[key])
     })
-    if (lastOption.optionGroupCode.length > 0) {
-      filteredOptions.forEach(filteredOption => {
-        filteredOption.options = filteredOption.options.map(option => {
-          option.active = filteredOption.optionGroupCode === lastOption.optionGroupCode || availableSkuOptions.includes(option.optionID)
-          return option
+    const matchingSkus = filterSkusBySelectedOptions(skus, optionsToTest)
+
+    if (matchingSkus.length === 1) {
+      // http://localhost:3006/product/test-product?colors=global-black&soccerBallSize=3
+      console.log('Single Matching sku')
+      history.replace({
+        pathname: loc.pathname,
+        search: matchingSkus[0].slug,
+      })
+    } else if (matchingSkus.length === 0) {
+      const possibleSKus = filterSkusBySelectedOptions(skus, [singlePair])
+      if (possibleSKus.length === 1) {
+        console.log('Single Matching sku')
+        // http://localhost:3006/product/test-product?soccerBallColor=orange&colors=global-red&soccerBallSize=3  select 4
+        history.replace({
+          pathname: loc.pathname,
+          search: possibleSKus[0].slug,
         })
-      })
-    }
-    return filteredOptions
-  }
-  const setOption = (optionGroupCode, optionCode, active) => {
-    delete params['skuid']
-    setLastOption({ optionCode, optionGroupCode })
-    if (!active) {
-      params = {}
-    }
-    params[optionGroupCode] = optionCode
-    history.push({
-      pathname: loc.pathname,
-      search: queryString.stringify(params, { arrayFormat: 'comma' }),
-    })
-  }
-  let filteredOptions = calculateOptions()
-
-  useEffect(() => {
-    let forceSelcted = {}
-    filteredOptions.forEach(optionGroup => {
-      const selectedOptions = optionGroup.options.filter(({ active }) => {
-        return active
-      })
-      if (selectedOptions.length === 1) {
-        forceSelcted[optionGroup.optionGroupCode] = selectedOptions[0].optionCode
+      } else if (possibleSKus.length > 1) {
+        console.log('The selection was not valid so we will reset option selection to current selection')
+        // http://localhost:3006/product/test-product?soccerBallColor=yellow&colors=global-black&soccerBallSize=4 ==> select red
+        history.replace({
+          pathname: loc.pathname,
+          search: singlePair,
+        })
       }
-    })
-    // onkect sort order
-    if (Object.keys(forceSelcted) && JSON.stringify({ ...forceSelcted, ...params }).length !== JSON.stringify(params).length && !params.skuid) {
-      console.log('Redirect because of foreced Selection')
-      history.push({
+    } else {
+      console.log('Multiple remaining skus after new selection')
+      // http://localhost:3006/product/test-product?soccerBallColor=orange&soccerBallSize=3 select orange
+      history.replace({
         pathname: loc.pathname,
-        search: queryString.stringify({ ...forceSelcted, ...params }, { arrayFormat: 'comma' }),
+        search: optionsToTest.join('&'),
       })
     }
-
-    if (params.skuid && sku) {
-      console.log('Redirect to passed Sku', skuOptionDetails)
-      const cals = skuIdsToSkuCodes(sku.selectedOptionIDList, skuOptionDetails)
-      history.push({
-        pathname: loc.pathname,
-        search: queryString.stringify(Object.assign(...cals), { arrayFormat: 'comma' }),
-      })
-    }
-  }, [history, filteredOptions, loc, params, sku, skuOptionDetails])
-
+  }
   return (
     <div className="d-flex flex-row">
-      {filteredOptions.length > 0 &&
-        filteredOptions.map(({ optionGroupName, options, optionGroupID, optionGroupCode }) => {
-          const selectedOptionCode = params[optionGroupCode] || 'select'
+      {productOptions.length > 0 &&
+        productOptions.map(({ optionGroupName, options, optionGroupID, optionGroupCode }) => {
+          const selectedOptionCode = selection[optionGroupCode] || 'select'
           return (
-            <div className="form-group pe-2" key={optionGroupID}>
+            <div className="form-group pe-4 mb-4" key={optionGroupID}>
               <div className="d-flex justify-content-between align-items-center pb-1">
                 <label className="font-weight-medium" htmlFor={optionGroupID}>
                   {optionGroupName}
                 </label>
               </div>
               <select
-                className="custom-select pe-0 py-2"
+                className="custom-select rounded-pill"
                 required
-                disabled={isFetching}
                 value={selectedOptionCode}
                 id={optionGroupID}
                 onChange={e => {
-                  const selectedOption = getOptionByCode(filteredOptions, optionGroupCode, e.target.value)
-                  setOption(optionGroupCode, selectedOption.optionCode, selectedOption.active)
+                  if (selectedOptionInModel) {
+                    selectedOptionInModel(optionGroupCode, e.target.value)
+                  } else {
+                    selectedOption(skus, optionGroupCode, e.target.value, selection)
+                  }
                 }}
               >
                 {selectedOptionCode === 'select' && (
@@ -116,8 +86,8 @@ const SkuOptions = ({ skuOptionDetails, availableSkuOptions, sku }) => {
                   options.map(option => {
                     return (
                       <option className={`option ${option.active ? 'active' : 'nonactive'}`} key={option.optionID} value={option.optionCode}>
-                        {option.active && option.optionName}
-                        {!option.active && option.optionName + ' - ' + t('frontend.product.na')}
+                        {option.available && option.optionName}
+                        {!option.available && option.optionName + ' - ' + t('frontend.product.na')}
                       </option>
                     )
                   })}

@@ -1,0 +1,19 @@
+footer {
+  background: #D8D8D8;
+
+  ul {
+    padding: 0;
+    list-style: none;
+  }
+  
+  a {
+    color: #231f20;
+    &:hover {
+      color: $color-orange;
+    }
+  }
+
+  .input-group {
+    background: #FFF;
+  }
+}

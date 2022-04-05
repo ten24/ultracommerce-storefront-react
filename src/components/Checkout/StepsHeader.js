@@ -16,7 +16,7 @@ const StepsHeader = () => {
   const path = loc.pathname.split('/').reverse()[0].toLowerCase()
   const current = getCurrentStep(path)
   return (
-    <ul className="nav nav-pills border nav-fill mb-5 p-2 rounded">
+    <ul className="nav nav-pills border nav-fill mb-4 p-2 rounded">
       {checkOutSteps.map(step => {
         let progressSate = ''
         if (step.progress < current.progress) {
@@ -29,7 +29,7 @@ const StepsHeader = () => {
         return (
           <li className="nav-item" key={step.progress}>
             <span
-              className={`nav-link ${progressSate}`}
+              className={`nav-link link text-decoration-none ${progressSate}`}
               key={step.progress}
               onClick={e => {
                 history.push(step.link)

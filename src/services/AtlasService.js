@@ -21,7 +21,7 @@ const getContentBySlug = async (content = {}, slug = '') => {
   if (slug === 'home') {
     const slider = await Promise((resolve, reject) => {
       resolve({
-        'home/main-banner-slider': { customBody: '', isMarkup: false },
+        'home/main-banner-slider': { contentBody: '', isMarkup: false },
       })
     }).then(response => {
       return response
@@ -30,7 +30,7 @@ const getContentBySlug = async (content = {}, slug = '') => {
     const recentBlogs = await Promise((resolve, reject) => {
       resolve({
         'home/recentBlogPost': {
-          customBody: {
+          contentBody: {
             items: [],
           },
         },
@@ -47,7 +47,7 @@ const getContentBySlug = async (content = {}, slug = '') => {
   if (slug === 'header') {
     return Promise((resolve, reject) => {
       resolve({
-        'header/main-navigation': { customBody: '', isMarkup: false },
+        'header/main-navigation': { contentBody: '', isMarkup: false },
       })
     }).then(response => {
       return response
@@ -56,7 +56,7 @@ const getContentBySlug = async (content = {}, slug = '') => {
   if (slug === 'footer') {
     return Promise((resolve, reject) => {
       resolve({
-        'header/main-navigation': { customBody: '', isMarkup: false },
+        'header/main-navigation': { contentBody: '', isMarkup: false },
       })
     }).then(response => {
       return response
@@ -66,7 +66,7 @@ const getContentBySlug = async (content = {}, slug = '') => {
   // this will get the data for all generic pages
   return Promise((resolve, reject) => {
     resolve({
-      [slug]: { customBody: '', isMarkup: false },
+      [slug]: { contentBody: '', isMarkup: false },
     })
   }).then(response => {
     return response
@@ -76,7 +76,7 @@ const getContentBySlug = async (content = {}, slug = '') => {
 const getBlogPostData = params => {
   return Promise((resolve, reject) => {
     resolve({
-      example: { customBody: '', isMarkup: false },
+      example: { contentBody: '', isMarkup: false },
     })
   }).then(response => {
     return response
@@ -87,7 +87,7 @@ const getBlogPosts = params => {
   const { category, ...restParams } = params
   return Promise((resolve, reject) => {
     resolve({
-      example: { customBody: '', isMarkup: false },
+      example: { contentBody: '', isMarkup: false },
     })
   }).then(response => {
     return response

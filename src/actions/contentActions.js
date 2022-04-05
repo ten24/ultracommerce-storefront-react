@@ -1,6 +1,5 @@
 import { toast } from 'react-toastify'
-import { SlatwalApiService } from '../services'
-import { getEntryBySlug } from '../services/ContentfulService'
+import { SlatwalApiService, KontentService, ContentfulService, SlatwallCMSService } from '../services'
 import { getErrorMessage } from '../utils'
 
 import { setTitle } from './configActions'
@@ -8,13 +7,25 @@ import { setTitle } from './configActions'
 export const REQUEST_CONTENT = 'REQUEST_CONTENT'
 export const RECEIVE_CONTENT = 'RECEIVE_CONTENT'
 export const RECEIVE_STATE_CODES = 'RECEIVE_STATE_CODES'
+export const REQUEST_CONTENT_SILENTLY = 'REQUEST_CONTENT_SILENTLY'
+export const RECEIVE_CONTENT_SILENTLY = 'RECEIVE_CONTENT_SILENTLY'
 
 export const requestContent = () => {
   return {
     type: REQUEST_CONTENT,
   }
 }
-
+export const requestContentSiltently = () => {
+  return {
+    type: REQUEST_CONTENT_SILENTLY,
+  }
+}
+export const receiveContentSiltently = content => {
+  return {
+    type: RECEIVE_CONTENT_SILENTLY,
+    content,
+  }
+}
 export const receiveContent = content => {
   return {
     type: RECEIVE_CONTENT,
@@ -30,27 +41,34 @@ export const receiveStateCodes = codes => {
 
 export const getPageContent = (content = {}, slug = '') => {
   return async (dispatch, getState) => {
-    if (getState().content[slug]) {
+    if (getState().content[slug] || slug === 'product' || slug === 'blog' || slug === 'articles') {
       return
     }
     dispatch(requestContent())
     const { cmsProvider } = getState().configuration
     if (cmsProvider === 'slatwallCMS') {
-      const payload = { 'f:activeFlag': true, 'p:show': 250, ...content }
-      await SlatwalApiService.content.get(payload).then(response => {
-        if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-        if (response.isSuccess()) {
-          const data = response.success().data.pageRecords.reduce((accumulator, content) => {
-            accumulator[content.urlTitlePath] = content
-            return accumulator
-          }, {})
-          dispatch(receiveContent(data))
-        } else {
-          dispatch(receiveContent({}))
-        }
+      const payload = { 'f:activeFlag': true, 'p:show': 250, includeImages: true, includeSettings: true, ...content }
+      SlatwallCMSService.getEntryBySlug(payload, slug).then(response => {
+        dispatch(receiveContent(response))
       })
     } else if (cmsProvider === 'contentful') {
-      getEntryBySlug(content, slug)
+      ContentfulService.getEntryBySlugAndType(content, slug, 'page')
+        .then(data => {
+          if (Array.isArray(data)) {
+            if (data.length) {
+              data.forEach(object => {
+                dispatch(receiveContent(object))
+              })
+            } else {
+              dispatch(receiveContent())
+            }
+          } else {
+            dispatch(receiveContent(data))
+          }
+        })
+        .catch(thrown => {})
+    } else if (cmsProvider === 'kontent') {
+      KontentService.getEntryBySlug(content, slug)
         .then(data => {
           if (Array.isArray(data)) {
             data.forEach(object => {
@@ -65,11 +83,55 @@ export const getPageContent = (content = {}, slug = '') => {
   }
 }
 
+export const getContentByType = (content = {}, type = 'page', slug = '') => {
+  return async (dispatch, getState) => {
+    if (getState().content[slug]) {
+      return
+    }
+    if (type === 'page') dispatch(requestContent())
+    const { cmsProvider } = getState().configuration
+    if (cmsProvider === 'slatwallCMS') {
+      const payload = { 'f:activeFlag': true, 'p:show': 250, ...content }
+      SlatwallCMSService.getEntryBySlugAndType(payload, slug, type).then(response => {
+        if (type === 'page') dispatch(receiveContent(response))
+        if (type !== 'page') dispatch(receiveContentSiltently(response))
+      })
+    } else if (cmsProvider === 'contentful') {
+      ContentfulService.getEntryBySlugAndType(content, slug, type)
+        .then(data => {
+          if (Array.isArray(data)) {
+            data.forEach(object => {
+              if (type === 'page') dispatch(receiveContent(object))
+              if (type !== 'page') dispatch(receiveContentSiltently(object))
+            })
+          } else {
+            if (type === 'page') dispatch(receiveContent(data))
+            if (type !== 'page') dispatch(receiveContentSiltently(data))
+          }
+        })
+        .catch(thrown => {})
+    } else if (cmsProvider === 'kontent') {
+      KontentService.getEntryBySlugAndType(content, slug, type)
+        .then(data => {
+          if (Array.isArray(data)) {
+            data.forEach(object => {
+              if (type === 'page') dispatch(receiveContent(object))
+              if (type !== 'page') dispatch(receiveContentSiltently(object))
+            })
+          } else {
+            if (type === 'page') dispatch(receiveContent(data))
+            if (type !== 'page') dispatch(receiveContentSiltently(data))
+          }
+        })
+        .catch(thrown => {})
+    }
+  }
+}
+
 export const getStateCodeOptionsByCountryCode = (countryCode = 'US') => {
   return async dispatch => {
     dispatch(requestContent())
-    const payload = {}
-    await SlatwalApiService.location.states(payload).then(response => {
+    await SlatwalApiService.location.states({ countryCode }).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
       if (response.isSuccess()) {
         let responsePayload = {}

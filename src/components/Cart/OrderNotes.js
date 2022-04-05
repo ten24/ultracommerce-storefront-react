@@ -41,7 +41,6 @@ const OrderNotes = () => {
             event.preventDefault()
           }}
         >
-          {/* {t('frontend.order.complete')} */}
           {t('frontend.cart.save_Notes')}
         </button>
       )}

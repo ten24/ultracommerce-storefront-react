@@ -27,7 +27,7 @@ const ErrorFallback = ({ error, resetErrorBoundary }) => {
           <h1 className="display-404">{contentStore.title}</h1>
           <div
             dangerouslySetInnerHTML={{
-              __html: contentStore?.customSummary || t('frontend.core.error.summary'),
+              __html: contentStore?.contentSummary || t('frontend.core.error.summary'),
             }}
           ></div>
         </div>
@@ -38,7 +38,7 @@ const ErrorFallback = ({ error, resetErrorBoundary }) => {
           <div role="alert">
             <p
               dangerouslySetInnerHTML={{
-                __html: contentStore?.customBody || t('frontend.core.error.body'),
+                __html: contentStore?.contentBody || t('frontend.core.error.body'),
               }}
             />
           </div>

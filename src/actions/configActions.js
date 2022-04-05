@@ -28,16 +28,21 @@ export const requestConfiguration = () => {
 export const getConfiguration = () => {
   return async (dispatch, getState) => {
     dispatch(requestConfiguration())
-    const siteCode = getState().configuration.site.siteCode
+    const localConfig = getState().configuration
+    // const localRoutes = localConfig.router
 
     const payload = {
-      siteCode: siteCode,
+      siteCode: localConfig.site.siteCode,
     }
 
     await SlatwalApiService.content.getConfiguration(payload).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
       if (response.isSuccess()) {
-        dispatch(reciveConfiguration(response.success().config))
+        let serverConfig = response.success().config
+        // retail and local routes not found on the server
+        // const legacyRoutes = localRoutes.filter(localRoute => serverConfig.router.filter(route => route.URLKeyType === localRoute.URLKeyType).length === 0)
+        // serverConfig.router = [...serverConfig.router, ...legacyRoutes]
+        dispatch(reciveConfiguration(serverConfig))
       } else {
         dispatch(reciveConfiguration({}))
       }

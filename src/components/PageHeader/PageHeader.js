@@ -1,19 +1,15 @@
-import { BreadCrumb } from '../../components'
-import { useSelector } from 'react-redux'
-import { useLocation } from 'react-router-dom'
+import { BreadCrumb } from '../'
 
-const PageHeader = ({ title, children, ...props }) => {
-  let loc = useLocation()
-  const path = loc.pathname.split('/').reverse()[0].toLowerCase()
-  const contentStore = useSelector(state => state.content[path]) || {}
+const PageHeader = ({ title, subHeading, children, ...props }) => {
   return (
-    <div className="page-title-overlap bg-lightgray pt-4">
-      <div className="container d-lg-flex justify-content-between">
+    <div className="page-header bg-light p-4 text-center">
+      <div className="text-center">
+        <h1 className="display-6">{title}</h1>
+        <p className="lead mb-0">{subHeading}</p>
+      </div>
+
+      <div className="px-5">
         <BreadCrumb {...props} />
-        <div className="order-lg-1 pr-lg-4 text-center text-lg-left flex-1">
-          <h1 className="h3 text-dark mb-0 font-accent">{title || contentStore.title || ''}</h1>
-          {children}
-        </div>
       </div>
     </div>
   )

@@ -1,4 +1,4 @@
-import * as SlatwalSDK from '@slatwall/slatwall-sdk/dist/client/index'
+import * as SlatwalSDK from '@ultracommerce/ultracommerce-sdk/dist/client/index'
 
 const sdkURL = process.env.REACT_APP_API_URL
 const siteCode = process.env.REACT_APP_SITE_CODE
