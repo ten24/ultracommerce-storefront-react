@@ -17,7 +17,7 @@
     "@palmabit/react-cookie-law": "^0.6.2",
     "@sentry/react": "^6.19.3",
     "@sentry/tracing": "^6.19.3",
-    "@ultracommerce/ultracommerce-sdk": "1.2.2",
+    "@ultracommerce/ultracommerce-sdk": "^1.3.0",
     "bootstrap": "^5.1.3",
     "bootstrap-icons": "^1.8.1",
     "braintree-web": "^3.85.2",
