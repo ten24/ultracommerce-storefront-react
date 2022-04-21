@@ -18,5 +18,5 @@ https://github.com/ten24/ultracommerce-sdk-javascript
 
 The Ultra Commerce API contains example scripts and endpoints to connect and interact with Ultra Commerce.
 
-https://publicapi.slatwallcommerce.com/
+https://publicapi.ultracommerce.co/
 
