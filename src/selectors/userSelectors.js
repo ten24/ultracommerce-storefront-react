@@ -15,7 +15,8 @@ export const accountPaymentMethods = createSelector(getAllAccountPaymentMethods,
 })
 export const getSavedCreditCardMethods = createSelector(getAllAccountPaymentMethods, (accountPaymentMethods = []) => {
   return accountPaymentMethods
-    .filter(accountPayment => ![creditCardTypePaypal].includes(accountPayment.creditCardType))
+    .filter(accountPayment => ![creditCardTypePaypal].includes(accountPayment.creditCardType) )
+    .filter(accountPayment => accountPayment.creditCardLastFour !== '' || accountPayment.creditCardLastFour !== null || accountPayment.creditCardLastFour !== 'undefined')
     .map(({ accountPaymentMethodName, creditCardType, creditCardLastFour, accountPaymentMethodID }) => {
       return { name: `${accountPaymentMethodName} | ${creditCardType} - *${creditCardLastFour}`, value: accountPaymentMethodID }
     })

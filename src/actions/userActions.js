@@ -1,7 +1,8 @@
 import { softLogout } from './authActions'
 import { SlatwalApiService } from '../services'
 import { toast } from 'react-toastify'
-import { receiveCart } from './cartActions'
+import { receiveCart } from './'
+import { receiveSubscriptionCart } from './subscriptionCartActions'
 import { getErrorMessage, isAuthenticated } from '../utils'
 
 export const REQUEST_USER = 'REQUEST_USER'
@@ -100,22 +101,19 @@ export const receiveAccountOrders = ordersOnAccount => {
 }
 
 export const getUser = () => {
-  return async dispatch => {
+  return async (dispatch, getState) => {
     dispatch(requestUser())
-    const payload = { returnJSONObjects: 'cart' }
-    await SlatwalApiService.account.get(payload).then(response => {
+    return await SlatwalApiService.account.get({ returnJSONObjects: 'cart,orderTemplateCart' }).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
       if (response.isSuccess()) {
-        if (response.success().account.accountID.length) {
-          dispatch(receiveUser(response.success().account))
-        } else {
-          dispatch(softLogout())
-        }
-
+        dispatch(softLogout())
+        dispatch(receiveUser(response.success().account))
         dispatch(receiveCart(response.success().cart))
+        dispatch(receiveSubscriptionCart(response.success().orderTemplateCart))
       } else {
         dispatch(softLogout())
       }
+      return response
     })
   }
 }
@@ -124,9 +122,7 @@ export const updateUser = user => {
   return async dispatch => {
     dispatch(requestUser())
 
-    const payload = { ...user }
-
-    await SlatwalApiService.account.update(payload).then(response => {
+    return await SlatwalApiService.account.update(user).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
       if (response.isSuccess()) {
         toast.success('Update Successful')
@@ -134,52 +130,47 @@ export const updateUser = user => {
       } else {
         toast.error('Update Failed')
       }
+      return response
     })
   }
 }
 
-export const getAccountOrders = () => {
+export const getAccountOrders = (params = {}) => {
   return async dispatch => {
     dispatch(requestAccountOrders())
-
-    const payload = {}
-
-    await SlatwalApiService.account.accountOrders(payload).then(response => {
+    return await SlatwalApiService.account.accountOrders(params).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
       if (response.isSuccess()) {
         dispatch(receiveAccountOrders(response.success().ordersOnAccount.ordersOnAccount))
       } else {
         dispatch(receiveAccountOrders([]))
       }
+      return response
     })
   }
 }
 
-export const getAccountCartsAndQuotes = () => {
+export const getAccountCartsAndQuotes = (params = {}) => {
   return async dispatch => {
     dispatch(requestAccountOrders())
-    const payload = {}
 
-    await SlatwalApiService.account.cartsAndQuotes(payload).then(response => {
+    return await SlatwalApiService.account.cartsAndQuotes(params).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
       if (response.isSuccess()) {
         dispatch(receiveAccountOrders(response.success().cartsAndQuotesOnAccount.ordersOnAccount))
       } else {
         dispatch(receiveAccountOrders([]))
       }
+      return response
     })
   }
 }
 
-export const orderDeliveries = () => {
+export const orderDeliveries = (params = {}) => {
   return async () => {
-    const payload = {}
-
-    await SlatwalApiService.account.orderDeliveries(payload).then(response => {
+    return await SlatwalApiService.account.orderDeliveries(params).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-      if (response.isSuccess()) {
-      } else {
-      }
+      return response
     })
   }
 }
@@ -187,10 +178,7 @@ export const orderDeliveries = () => {
 export const addNewAccountAddress = address => {
   return async dispatch => {
     dispatch(requestUser())
-
-    const payload = { ...address, returnJSONObjects: 'account' }
-
-    await SlatwalApiService.account.addAddress(payload).then(response => {
+    return await SlatwalApiService.account.addAddress({ ...address, returnJSONObjects: 'account' }).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
       if (response.isSuccess()) {
         toast.success('Update Successful')
@@ -199,6 +187,7 @@ export const addNewAccountAddress = address => {
         dispatch(receiveUser({}))
         toast.error('Error')
       }
+      return response
     })
   }
 }
@@ -207,9 +196,7 @@ export const updateAccountAddress = user => {
   return async dispatch => {
     dispatch(requestUser())
 
-    const payload = { ...user, returnJSONObjects: 'account' }
-
-    await SlatwalApiService.account.updateAddress(payload).then(response => {
+    return await SlatwalApiService.account.updateAddress({ ...user, returnJSONObjects: 'account' }).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
       if (response.isSuccess()) {
         toast.success('Update Successful')
@@ -217,15 +204,14 @@ export const updateAccountAddress = user => {
       } else {
         toast.error('Update Failed')
       }
+      return response
     })
   }
 }
 
 export const deleteAccountAddress = accountAddressID => {
   return async dispatch => {
-    const payload = { accountAddressID, returnJSONObjects: 'account' }
-
-    await SlatwalApiService.account.deleteAddress(payload).then(response => {
+    return await SlatwalApiService.account.deleteAddress({ accountAddressID, returnJSONObjects: 'account' }).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
       if (response.isSuccess()) {
         toast.success('Update Successful')
@@ -233,15 +219,14 @@ export const deleteAccountAddress = accountAddressID => {
       } else {
         toast.error('Update Failed')
       }
+      return response
     })
   }
 }
 
 export const addPaymentMethod = paymentMethod => {
   return async dispatch => {
-    const payload = { ...paymentMethod, returnJSONObjects: 'account' }
-
-    await SlatwalApiService.account.addPaymentMethod(payload).then(response => {
+    return await SlatwalApiService.account.addPaymentMethod({ ...paymentMethod, returnJSONObjects: 'account' }).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
       if (response.isSuccess()) {
         if (response.success()?.failureActions.length) {
@@ -254,15 +239,14 @@ export const addPaymentMethod = paymentMethod => {
       } else {
         toast.error('Save Failed')
       }
+      return response
     })
   }
 }
 
 export const updatePaymentMethod = paymentMethod => {
   return async dispatch => {
-    const payload = { paymentMethod, returnJSONObjects: 'account' }
-
-    await SlatwalApiService.account.updatePaymentMethod(payload).then(response => {
+    return await SlatwalApiService.account.updatePaymentMethod({ paymentMethod, returnJSONObjects: 'account' }).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
       if (response.isSuccess()) {
         toast.success('Update Successful')
@@ -270,15 +254,14 @@ export const updatePaymentMethod = paymentMethod => {
       } else {
         toast.error('Update Failed')
       }
+      return response
     })
   }
 }
 
 export const deletePaymentMethod = accountPaymentMethodID => {
   return async dispatch => {
-    const payload = { accountPaymentMethodID, returnJSONObjects: 'account' }
-
-    await SlatwalApiService.account.deletePaymentMethod(payload).then(response => {
+    return await SlatwalApiService.account.deletePaymentMethod({ accountPaymentMethodID, returnJSONObjects: 'account' }).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
       if (response.isSuccess()) {
         toast.success('Delete Successful')
@@ -286,6 +269,7 @@ export const deletePaymentMethod = accountPaymentMethodID => {
       } else {
         toast.error('Delete Failed')
       }
+      return response
     })
   }
 }
@@ -296,16 +280,15 @@ export const getWishLists = (force = false) => {
     if ((!getState().userReducer.wishList.isListLoaded || force) && isAuthenticated()) {
       dispatch(getWishListItems(true))
 
-      const payload = {}
-
-      await SlatwalApiService.orderTemplate.getWishlists(payload).then(response => {
+      return await SlatwalApiService.orderTemplate.getWishlists({}).then(response => {
         if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
         if (response.isSuccess()) {
           dispatch(receiveWishlist(response.success().accountWishlistProducts))
-        } else {
         }
+        return response
       })
     }
+    return new Promise((resolve, reject) => resolve({}))
   }
 }
 export const getWishListItems = (force = false) => {
@@ -313,60 +296,60 @@ export const getWishListItems = (force = false) => {
     dispatch(requestWishlist())
 
     if ((!getState().userReducer.wishList.isListItemsLoaded || force) && isAuthenticated()) {
-      const payload = {}
-
-      await SlatwalApiService.orderTemplate.getWishListItems(payload).then(response => {
+      return await SlatwalApiService.orderTemplate.getWishListItems({}).then(response => {
         if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
         if (response.isSuccess()) {
           dispatch(receiveWishlistItems(response.success().accountWishlistProducts))
         } else {
           dispatch(receiveWishlistItems())
         }
+        return response
       })
     }
+    return new Promise((resolve, reject) => resolve({}))
   }
 }
 
 export const createListAndAddItem = (skuID = '') => {
   return async dispatch => {
     if (isAuthenticated()) {
-      const payload = { skuID }
-
-      await SlatwalApiService.orderTemplate.createAndAddItem(payload).then(response => {
+      return await SlatwalApiService.orderTemplate.createAndAddItem({ skuID }).then(response => {
         if (response.isSuccess()) {
           dispatch(getWishLists(true))
         }
+        return response
       })
     }
+    return new Promise((resolve, reject) => resolve({}))
   }
 }
 
 export const addSkuToWishList = (skuID = '', orderTemplateID = null) => {
   return async dispatch => {
     if (isAuthenticated()) {
-      const payload = { skuID, orderTemplateID }
-
-      await SlatwalApiService.orderTemplate.addWishlistItem(payload).then(response => {
+      return await SlatwalApiService.orderTemplate.addWishlistItem({ skuID, orderTemplateID }).then(response => {
         if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
         if (response.isSuccess()) {
           dispatch(getWishListItems(true))
         }
+        return response
       })
     }
+    return new Promise((resolve, reject) => resolve({}))
   }
 }
 export const removeWishlistItem = (removalSkuID = '', orderTemplateID) => {
   return async (dispatch, getState) => {
     dispatch(requestWishlist())
     if (isAuthenticated()) {
-      const payload = { removalSkuID, orderTemplateID }
-
-      await SlatwalApiService.orderTemplate.removeWishlistItem(payload).then(response => {
+      return await SlatwalApiService.orderTemplate.removeWishlistItem({ removalSkuID, orderTemplateID }).then(response => {
         if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
         if (response.isSuccess()) {
           dispatch(getWishListItems(true))
         }
+        return response
       })
     }
+    return new Promise((resolve, reject) => resolve({}))
   }
 }

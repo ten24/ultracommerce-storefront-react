@@ -3,41 +3,36 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useHistory, useLocation } from 'react-router'
 import { getWishLists, getPageContent, getContentByType, receiveContent, requestContent } from '../../../actions'
 import { getBlogRoute, getProductRoute } from '../../../selectors'
-import {  SlatwallCMSService } from '../../../services'
-
-
+import { SlatwallCMSService } from '../../../services'
 
 const useCMSWrapper = () => {
   const { pathname } = useLocation('home')
   const history = useHistory()
   const [isLoaded, setIsLoaded] = useState(false)
   const [currentPath, setCurrentPath] = useState(pathname)
-   const conData = useSelector(state => state.content)
+  const conData = useSelector(state => state.content)
   const cmsProvider = useSelector(state => state.configuration.cmsProvider)
   const blogRoute = useSelector(getBlogRoute)
   const productRoute = useSelector(getProductRoute)
-  
-  const dispatch = useDispatch()
-  const requestUltraPageContent = (payload) => {
-    if (payload.productUrlTitle && payload.urlTitle) {
 
+  const dispatch = useDispatch()
+  const requestUltraPageContent = payload => {
+    if (payload.productUrlTitle && payload.urlTitle) {
     } else if (payload.productUrlTitle) {
       if (conData[`${payload.productRoute}/${payload.productUrlTitle}`]) {
         return
       }
-    }else if (payload.urlTitle) {
+    } else if (payload.urlTitle) {
       if (conData[payload.urlTitle]) {
         return
-      }      
+      }
     }
     dispatch(requestContent())
-    SlatwallCMSService.getEntryBySlug(payload ).then(response => {
-      return response
-    }).then(response => {
-         dispatch(receiveContent(response))
-      })
+    SlatwallCMSService.getEntryBySlug(payload).then(({ hydrated }) => {
+      dispatch(receiveContent(hydrated))
+    })
   }
-  const requestKontentContent = (basePath) => {
+  const requestKontentContent = basePath => {
     dispatch(
       getContentByType(
         {
@@ -77,7 +72,7 @@ const useCMSWrapper = () => {
       )
     )
   }
-  const requestContentfulContent = (basePath) => {
+  const requestContentfulContent = basePath => {
     dispatch(
       getContentByType(
         {
@@ -116,8 +111,7 @@ const useCMSWrapper = () => {
         basePath
       )
     )
-  }  
-
+  }
 
   useEffect(() => {
     if (!isLoaded) {
@@ -125,9 +119,9 @@ const useCMSWrapper = () => {
       basePath = basePath.length ? basePath : 'home'
       dispatch(getWishLists())
       if (cmsProvider === 'slatwallCMS') {
-        if ( basePath === blogRoute) {
-            requestUltraPageContent({
-            urlTitle: "404",
+        if (basePath === blogRoute) {
+          requestUltraPageContent({
+            urlTitle: '404',
             'p:show': 500,
             includeImages: true,
             includeCategories: true,
@@ -142,11 +136,11 @@ const useCMSWrapper = () => {
             useAuthorizedPropertiesAsDefaultColumns: true,
             setDisplayPropertiesSearchable: true,
           })
-        }else if (basePath === productRoute) {
-            const productUrlTitle = pathname.split('/').reverse()[0].toLowerCase()
-            
-            requestUltraPageContent({
-            urlTitle: "404",
+        } else if (basePath === productRoute) {
+          const productUrlTitle = pathname.split('/').reverse()[0].toLowerCase()
+
+          requestUltraPageContent({
+            urlTitle: '404',
             productUrlTitle,
             productRoute,
             'p:show': 500,
@@ -165,7 +159,7 @@ const useCMSWrapper = () => {
           })
         } else {
           requestUltraPageContent({
-            urlTitle: pathname !== '/' ? basePath : 'home' ,
+            urlTitle: pathname !== '/' ? basePath : 'home',
             includeGlobalContent: true,
             includeAllBrand: true,
             includeAllCategory: true,
@@ -177,7 +171,7 @@ const useCMSWrapper = () => {
             includeCategories: true,
           })
           requestUltraPageContent({
-            urlTitle: "404",
+            urlTitle: '404',
             'p:show': 500,
             includeImages: true,
             includeCategories: true,
@@ -211,7 +205,7 @@ const useCMSWrapper = () => {
             })
           } else {
             requestUltraPageContent({
-              urlTitle: location.pathname !== '/' ?newPath: 'home',
+              urlTitle: location.pathname !== '/' ? newPath : 'home',
               'p:show': 500,
               includeImages: true,
               includeCategories: true,

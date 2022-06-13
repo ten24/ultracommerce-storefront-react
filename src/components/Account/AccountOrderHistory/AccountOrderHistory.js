@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom'
-
 import { AccountLayout, AccountContent, ListingPagination, AccountToolBar } from '../../'
 import { useTranslation } from 'react-i18next'
 import { useFormatCurrency, useFormatDateTime, useOrderHistoryList } from '../../../hooks/'
@@ -16,9 +15,10 @@ const OrderListItem = props => {
   return (
     <tr>
       <th>
-        <Link className="nav-link-style font-weight-medium font-size-sm" to={`/my-account/orders/${orderID}`}>
+        {orderID && <Link className="nav-link-style font-weight-medium font-size-sm" to={`/my-account/orders/${orderID}`}>
           {orderNumber}
         </Link>
+        }
         <br />
       </th>
       <td>{formateDate(createdDateTime)}</td>

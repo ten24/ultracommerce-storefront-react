@@ -1,11 +1,12 @@
 import { toast } from 'react-toastify'
-import { SlatwalApiService, KontentService, ContentfulService, SlatwallCMSService } from '../services'
+import { SlatwalApiService, KontentService, ContentfulService, SlatwallCMSService, sdkURL, axios } from '../services'
 import { getErrorMessage } from '../utils'
 
 import { setTitle } from './configActions'
 
 export const REQUEST_CONTENT = 'REQUEST_CONTENT'
 export const RECEIVE_CONTENT = 'RECEIVE_CONTENT'
+export const RECEIVE_COUNTRIES = 'RECEIVE_COUNTRIES'
 export const RECEIVE_STATE_CODES = 'RECEIVE_STATE_CODES'
 export const REQUEST_CONTENT_SILENTLY = 'REQUEST_CONTENT_SILENTLY'
 export const RECEIVE_CONTENT_SILENTLY = 'RECEIVE_CONTENT_SILENTLY'
@@ -39,17 +40,25 @@ export const receiveStateCodes = codes => {
   }
 }
 
+export const receiveCountries = countries => {
+  return {
+    type: RECEIVE_COUNTRIES,
+    payload: countries,
+  }
+}
+
 export const getPageContent = (content = {}, slug = '') => {
   return async (dispatch, getState) => {
     if (getState().content[slug] || slug === 'product' || slug === 'blog' || slug === 'articles') {
-      return
+      return new Promise((resolve, reject) => resolve({}))
     }
     dispatch(requestContent())
     const { cmsProvider } = getState().configuration
     if (cmsProvider === 'slatwallCMS') {
       const payload = { 'f:activeFlag': true, 'p:show': 250, includeImages: true, includeSettings: true, ...content }
-      SlatwallCMSService.getEntryBySlug(payload, slug).then(response => {
-        dispatch(receiveContent(response))
+      SlatwallCMSService.getEntryBySlug(payload, slug).then(({ hydrated }) => {
+        dispatch(receiveContent({ hydrated }))
+        return hydrated
       })
     } else if (cmsProvider === 'contentful') {
       ContentfulService.getEntryBySlugAndType(content, slug, 'page')
@@ -65,6 +74,7 @@ export const getPageContent = (content = {}, slug = '') => {
           } else {
             dispatch(receiveContent(data))
           }
+          return data
         })
         .catch(thrown => {})
     } else if (cmsProvider === 'kontent') {
@@ -77,24 +87,27 @@ export const getPageContent = (content = {}, slug = '') => {
           } else {
             dispatch(receiveContent(data))
           }
+          return data
         })
         .catch(thrown => {})
     }
+    return new Promise((resolve, reject) => resolve({}))
   }
 }
 
 export const getContentByType = (content = {}, type = 'page', slug = '') => {
   return async (dispatch, getState) => {
     if (getState().content[slug]) {
-      return
+      return new Promise((resolve, reject) => resolve({}))
     }
     if (type === 'page') dispatch(requestContent())
     const { cmsProvider } = getState().configuration
     if (cmsProvider === 'slatwallCMS') {
       const payload = { 'f:activeFlag': true, 'p:show': 250, ...content }
-      SlatwallCMSService.getEntryBySlugAndType(payload, slug, type).then(response => {
-        if (type === 'page') dispatch(receiveContent(response))
-        if (type !== 'page') dispatch(receiveContentSiltently(response))
+      SlatwallCMSService.getEntryBySlugAndType(payload, slug, type).then(({ hydrated }) => {
+        if (type === 'page') dispatch(receiveContent(hydrated))
+        if (type !== 'page') dispatch(receiveContentSiltently(hydrated))
+        return hydrated
       })
     } else if (cmsProvider === 'contentful') {
       ContentfulService.getEntryBySlugAndType(content, slug, type)
@@ -108,6 +121,7 @@ export const getContentByType = (content = {}, type = 'page', slug = '') => {
             if (type === 'page') dispatch(receiveContent(data))
             if (type !== 'page') dispatch(receiveContentSiltently(data))
           }
+          return data
         })
         .catch(thrown => {})
     } else if (cmsProvider === 'kontent') {
@@ -122,16 +136,18 @@ export const getContentByType = (content = {}, type = 'page', slug = '') => {
             if (type === 'page') dispatch(receiveContent(data))
             if (type !== 'page') dispatch(receiveContentSiltently(data))
           }
+          return data
         })
         .catch(thrown => {})
     }
+    return new Promise((resolve, reject) => resolve({}))
   }
 }
 
 export const getStateCodeOptionsByCountryCode = (countryCode = 'US') => {
   return async dispatch => {
     dispatch(requestContent())
-    await SlatwalApiService.location.states({ countryCode }).then(response => {
+    return await SlatwalApiService.location.states({ countryCode }).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
       if (response.isSuccess()) {
         let responsePayload = {}
@@ -140,6 +156,29 @@ export const getStateCodeOptionsByCountryCode = (countryCode = 'US') => {
       } else {
         dispatch(receiveStateCodes({}))
       }
+      return response
+    })
+  }
+}
+
+export const getCountriesAndAddressOptions = () => {
+  return async dispatch => {
+    dispatch(requestContent())
+    return await axios({
+      method: 'GET',
+      withCredentials: true,
+      url: `${sdkURL}api/scope/getCountriesAndAddressOptions`,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then(response => {
+      const countries = response?.data?.countries?.reduce((countryList, country) => {
+        country.value = country.value.toUpperCase()
+        countryList[country.value] = country
+        return countryList
+      }, {})
+      dispatch(receiveCountries(countries))
+      return response
     })
   }
 }
@@ -147,13 +186,14 @@ export const getCountries = () => {
   return async dispatch => {
     dispatch(requestContent())
 
-    await SlatwalApiService.location.countries().then(response => {
+    return await SlatwalApiService.location.countries().then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
       if (response.isSuccess()) {
         dispatch(receiveContent({ countryCodeOptions: response.success().countryCodeOptions }))
       } else {
         dispatch(receiveContent({}))
       }
+      return response
     })
   }
 }
@@ -163,20 +203,20 @@ export const addContent = (content = {}) => {
       dispatch(setTitle(content.settings.contentHTMLTitleString))
     }
     dispatch(receiveContent(content))
+    return new Promise((resolve, reject) => resolve({}))
   }
 }
 export const getProductTypes = () => {
   return async dispatch => {
     dispatch(requestContent())
-    const payload = { 'p:show': 500 }
-
-    await SlatwalApiService.productType.list(payload).then(response => {
+    return await SlatwalApiService.productType.list({ 'p:show': 500 }).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
       if (response.isSuccess()) {
         dispatch(receiveContent({ productTypes: response.success().data.pageRecords }))
       } else {
         dispatch(receiveContent({}))
       }
+      return response
     })
   }
 }

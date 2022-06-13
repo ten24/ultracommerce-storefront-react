@@ -1,6 +1,5 @@
-import { useGetEntityByUrlTitleAdvanced } from '../'
+import queryString from 'query-string'
 import { useState, useEffect } from 'react'
-
 /*
   This will generate a list of skus that match option selection
   */
@@ -10,8 +9,8 @@ const filterSkusBySelectedOptions = (skus = [], optionsTofilter = []) => {
   })
 }
 /*
-    Will check to see if optionPair exists in a list skus
-    */
+  Will check to see if optionPair exists in a list skus
+  */
 const optionIsValid = (optionGroupCode, optionCode, skus = []) => {
   return (
     skus.filter(sku => {
@@ -20,10 +19,10 @@ const optionIsValid = (optionGroupCode, optionCode, skus = []) => {
   )
 }
 /*
-    This function will flag options avaliable for
-    selection based on previous selection
-  
-    */
+  This function will flag options avaliable for
+  selection based on previous selection
+
+  */
 const calculateAvaliableOptions = (productOptions = [], selection, skus) => {
   return productOptions.map(optGrp => {
     if (Object.keys(selection).includes(optGrp.optionGroupCode)) {
@@ -42,10 +41,10 @@ const calculateAvaliableOptions = (productOptions = [], selection, skus) => {
   })
 }
 /*
-    This function will check to see if any additional
-    parmaters can be added as a result any options 
-    being labeled non-active. 
-    */
+  This function will check to see if any additional
+  parmaters can be added as a result any options 
+  being labeled non-active. 
+  */
 const calculateAdditionalParamters = (currentOptionGroupPairs, productOptions) => {
   const paramCandidates = productOptions
     .map(optGrp => {
@@ -83,49 +82,38 @@ const selectionToSku = (product, skus = [], params = [], options = []) => {
   return found.length === 1 ? found[0] : null
 }
 
-const usePopulateSlug = parentProduct => {
-  let { product } = useGetEntityByUrlTitleAdvanced(parentProduct?.urlTitle)
-  return product
-}
 
-const useUpdatedProductOptions = (product = {}, productOptions = [], skus = [], searchParams = {}) => {
-  const [location, setLocation] = useState({ pathname: null, search: '' })
+const useFindAllProductOptions = (product = {}, productOptions = [], skus = []) => {
+  const [criteria, setCriteria] = useState({ pathname: null, search: '' })
   const [updatedProductOptions, setUpdatedProductOptions] = useState([])
   const [params, setParams] = useState([])
   const [optionGroupPairs, setOptionGroupPairs] = useState([])
-  let searchParameter = { ...location }
+ 
 
   useEffect(() => {
     // selection is an object of current paramters
     // optionGroupPairs is an array of current paramters key=value
-
-    let searchOptionGroupPairs = location.search
-      ?.replace('?', '')
-      .split('&')
-      .filter(param => param.length)
+    let searchParams = queryString.parse(criteria.search, { arrayFormat: 'separator', arrayFormatSeparator: ',' })
+    let searchOptionGroupPairs = criteria.search?.replace('?', '').split('&').filter(param => param.length)
     let searchUpdatedProductOptions = {}
     if (searchOptionGroupPairs == null) searchOptionGroupPairs = []
 
     if (searchParams?.skuid) {
       // If we have a skuID we need to redirect to codes
-      console.log('skuID found, waiting for skus', !product)
       const found = skus?.filter(sku => sku.skuID === searchParams.skuid)
 
       if (found.length) {
-        console.log('Redirect based on found sku')
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        searchParameter = {
+        setCriteria( {
           pathname: `-/${product.urlTitle}?`,
           search: found[0].slug,
-        }
+        })
       }
     } else if (searchOptionGroupPairs.length === 0 && product.defaultSku_slug) {
       // This check is for no optionGroupPairs passed
-      console.log('<------- product.defaultSku_slug', searchOptionGroupPairs, product)
-      searchParameter = {
+      setCriteria({
         pathname: `-/${product.urlTitle}?`,
         search: product.defaultSku_slug,
-      }
+      })
     } else {
       const matchingSkus = filterSkusBySelectedOptions(skus, searchOptionGroupPairs)
       searchUpdatedProductOptions = calculateAvaliableOptions(productOptions, searchParams, matchingSkus)
@@ -133,39 +121,34 @@ const useUpdatedProductOptions = (product = {}, productOptions = [], skus = [], 
 
       if (updateParams.length) {
         // http://localhost:3006/product/test-product?soccerBallSize=5 ==>  soccerBallColor=green is added
-        console.log('Add additional optionGroupPairs because of option matrix')
-        searchParameter = {
+        setCriteria({
           pathname: `-/${product.urlTitle}?`,
           search: [...searchOptionGroupPairs, updateParams].join('&'),
-        }
+        })
       }
     }
     //http://localhost:3006/product/demo-product
 
-    if (JSON.stringify(updatedProductOptions) !== JSON.stringify(searchUpdatedProductOptions)) {
       setUpdatedProductOptions(searchUpdatedProductOptions)
-    }
-    if (JSON.stringify(params) !== JSON.stringify(searchParams)) {
+   
       setParams(searchParams)
-    }
-    if (JSON.stringify(optionGroupPairs) !== JSON.stringify(searchOptionGroupPairs)) {
+  
       setOptionGroupPairs(searchOptionGroupPairs)
-    }
-    if (JSON.stringify(searchParameter) !== JSON.stringify(location)) {
-      setLocation(searchParameter)
-    }
+   
+    
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParameter])
+  }, [criteria,product])
 
-  console.log(location)
-  return { product, location, setLocation, updatedProductOptions, params, optionGroupPairs }
+  return { product, criteria: criteria, setCriteria: setCriteria, updatedProductOptions, params, optionGroupPairs }
 }
 
-const useSelectedOption = (skus = [], selection, location, setLocation) => {
+
+
+
+const useFindSelectedOption = (skus = [], selection, criteria, setCriteria) => {
   const [optionGroupCodeStore, setOptionGroupCodeStore] = useState({ optionGroupCode: null, optionCode: null })
 
   useEffect(() => {
-    let selectedLocation = { ...location }
     const singlePair = generateOptionGroupPair(optionGroupCodeStore.optionGroupCode, optionGroupCodeStore.optionCode)
     selection[optionGroupCodeStore.optionGroupCode] = optionGroupCodeStore.optionCode
     const optionsToTest = Object.keys(selection).map(key => {
@@ -175,49 +158,49 @@ const useSelectedOption = (skus = [], selection, location, setLocation) => {
 
     if (matchingSkus.length === 1) {
       // http://localhost:3006/product/test-product?colors=global-black&soccerBallSize=3
-      console.log('Single Matching sku')
-      selectedLocation = {
-        pathname: location.pathname,
+      //console.log('Single Matching sku')
+      setCriteria({
+        pathname: criteria.pathname,
         search: matchingSkus[0].slug,
-      }
+      })
     } else if (matchingSkus.length === 0) {
       const possibleSKus = filterSkusBySelectedOptions(skus, [singlePair])
       if (possibleSKus.length === 1) {
-        console.log('Single Matching sku')
+        // console.log('Single Matching sku')
         // http://localhost:3006/product/test-product?soccerBallColor=orange&colors=global-red&soccerBallSize=3  select 4
-        selectedLocation = {
-          pathname: location.pathname,
+        setCriteria({
+          pathname: criteria.pathname,
           search: possibleSKus[0].slug,
-        }
+        })
       } else if (possibleSKus.length > 1) {
         console.log('The selection was not valid so we will reset option selection to current selection')
         // http://localhost:3006/product/test-product?soccerBallColor=yellow&colors=global-black&soccerBallSize=4 ==> select red
-        selectedLocation = {
-          pathname: location.pathname,
+        setCriteria( {
+          pathname: criteria.pathname,
           search: singlePair,
-        }
+        })
       }
     } else {
-      console.log('Multiple remaining skus after new selection')
+      //console.log('Multiple remaining skus after new selection')
       // http://localhost:3006/product/test-product?soccerBallColor=orange&soccerBallSize=3 select orange
-      selectedLocation = {
-        pathname: location.pathname,
+      setCriteria( {
+        pathname: criteria.pathname,
         search: optionsToTest.join('&'),
-      }
+      })
     }
 
-    if (JSON.stringify(location) !== JSON.stringify(selectedLocation)) {
-      setLocation(selectedLocation)
-    }
+    
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [optionGroupCodeStore])
 
+
   return setOptionGroupCodeStore
 }
 
+
 const useProductDetail = () => {
-  return { filterSkusBySelectedOptions, optionIsValid, calculateAvaliableOptions, calculateAdditionalParamters, generateOptionGroupPair, selectionToSku, useUpdatedProductOptions, usePopulateSlug, useSelectedOption }
+  return { filterSkusBySelectedOptions, optionIsValid, calculateAvaliableOptions, calculateAdditionalParamters, generateOptionGroupPair, selectionToSku, useFindAllProductOptions, useFindSelectedOption }
 }
 
 export { useProductDetail }

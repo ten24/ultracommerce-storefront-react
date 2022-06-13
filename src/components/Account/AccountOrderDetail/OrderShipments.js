@@ -4,18 +4,24 @@ import { Link } from 'react-router-dom'
 import { SimpleImage } from '../../'
 import { useState } from 'react'
 import { addToCart } from '../../../actions/'
-import { useFormatCurrency } from '../../../hooks/'
+import { transformShipping, transformPickup, useFormatCurrency } from '../../../hooks/'
 import { getProductRoute } from '../../../selectors/'
 import { Modal } from '../..'
 import { AddReview } from '../../../components'
+import { isAuthenticated } from '../../../utils'
+import { axios, sdkURL } from '../../../services'
+import { ShippingAddressDetails } from '../../Checkout/Review/ShippingAddressDetails'
+import { PickupLocationDetails } from '../../Checkout/Review/PickupLocationDetails'
 
-const OrderItem = ({ quantity, sku_skuID, sku_product_productName, sku_product_urlTitle, images, BrandName, isSeries, ProductSeries, calculatedExtendedPriceAfterDiscount, sku_calculatedSkuDefinition, sku_imageFile, price , sku_product_productID}) => {
+const OrderItem = ({ quantity, sku_skuID, sku_product_productName, sku_product_urlTitle, images, BrandName, isSeries, ProductSeries, calculatedExtendedPriceAfterDiscount, sku_calculatedSkuDefinition, sku_imageFile, price, sku_product_productID, files, showActions = true }) => {
   const [formatCurrency] = useFormatCurrency({})
   const dispatch = useDispatch()
   const { t } = useTranslation()
 
   const productRouting = useSelector(getProductRoute)
   const [showModal, setModal] = useState(false)
+  const [selectedRate, setSelectedRate] = useState(0)
+  const [hoveredRate, setHoveredRate] = useState(0)
 
   return (
     <div className="row border-bottom py-3">
@@ -37,6 +43,36 @@ const OrderItem = ({ quantity, sku_skuID, sku_product_productName, sku_product_u
           {BrandName} <span className="text-muted mr-2">{sku_calculatedSkuDefinition}</span>
         </div>
         {/* <!--- brand / sku ---> */}
+        {files && files.length > 0 && isAuthenticated() && (
+          <div>
+            {files
+              .filter(file => file.baseID === sku_product_productID)
+              .map(file => (
+                <span
+                  className="link-primary pe-auto text-decoration-underline"
+                  key={file.file_fileID}
+                  onClick={e => {
+                    e.preventDefault()
+
+                    axios({
+                      method: 'POST',
+                      url: `${sdkURL}api/scope/downloadFile?fileID=${file.file_fileID}`,
+                      responseType: 'blob', // had to add this one here
+                    }).then(response => {
+                      const url = window.URL.createObjectURL(new Blob([response.data]))
+                      const link = document.createElement('a')
+                      link.href = url
+                      link.setAttribute('download', `${file.file_fileName}.${file.file_fileType}`)
+                      document.body.appendChild(link)
+                      link.click()
+                    })
+                  }}
+                >
+                  {t('frontend.cart.download')}
+                </span>
+              ))}
+          </div>
+        )}
       </div>
       <div className="col-sm-12 col-md-6 d-none d-sm-block">
         <div className="row">
@@ -55,43 +91,53 @@ const OrderItem = ({ quantity, sku_skuID, sku_product_productName, sku_product_u
                 {/* <!--- total ---> */}
               </div>
             </div>
-            <div className="row">
-              <div className="col-12">
-                <Link className="link" onClick={event => {
-                    event.preventDefault()
-                    setModal(!showModal)
-                  }}>
-                      {t('frontend.cart.writeReview')}
-                </Link>
+            {isAuthenticated() && showActions && (
+              <div className="row">
+                <div className="col-12">
+                  <button
+                    className="link-button"
+                    onClick={event => {
+                      event.preventDefault()
+                      setModal(!showModal)
+                    }}
+                  >
+                    {t('frontend.cart.writeReview')}
+                  </button>
+                </div>
               </div>
-            </div>
-            <div className="row">
-              <div className="col-12">
-                  <Link className="link" onClick={event => {
-                    event.preventDefault()
-                    dispatch(addToCart(sku_skuID, quantity))
-                    window.scrollTo({
-                      top: 0,
-                      behavior: 'smooth',
-                    })
-                  }}>
-                       {t('frontend.cart.reOrder')}
-                  </Link>
+            )}
+            {showActions && (
+              <div className="row">
+                <div className="col-12">
+                  <button
+                    className="link-button"
+                    onClick={event => {
+                      event.preventDefault()
+                      dispatch(addToCart(sku_skuID, quantity))
+                      window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth',
+                      })
+                    }}
+                  >
+                    {t('frontend.cart.reOrder')}
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
       <Modal show={showModal} setShow={setModal} title={t('frontend.product.review.heading')} modalClass="addReviewModal" size="large">
         <div className="container">
-            <AddReview setModal={setModal} showModal={showModal} sku_product_productID={sku_product_productID} sku_product_productName={sku_product_productName} sku_product_urlTitle={sku_product_urlTitle} sku_skuID={sku_skuID} images={images} />
+          <AddReview setModal={setModal} showModal={showModal} selectedRate={selectedRate} setSelectedRate={setSelectedRate} hoveredRate={hoveredRate} setHoveredRate={setHoveredRate} sku_product_productID={sku_product_productID} sku_product_productName={sku_product_productName} sku_product_urlTitle={sku_product_urlTitle} sku_skuID={sku_skuID} images={images} />
         </div>
       </Modal>
     </div>
   )
 }
 
-const OrderShipments = ({ shipments }) => {
+const OrderShipments = ({ shipments, files }) => {
   const { t } = useTranslation()
   return (
     <div className="order-items mr-3">
@@ -135,7 +181,7 @@ const OrderShipments = ({ shipments }) => {
               <div className="card-body py-0">
                 {shipment.orderItems &&
                   shipment.orderItems.map((item, index) => {
-                    return <OrderItem key={index} {...item} />
+                    return <OrderItem key={index} {...item} files={files} />
                   })}
               </div>
             </div>
@@ -145,4 +191,67 @@ const OrderShipments = ({ shipments }) => {
   )
 }
 
-export { OrderShipments }
+const OrderFulfilments = ({ fulfilments, files }) => {
+  const { t } = useTranslation()
+  return (
+    <div className="order-items mr-3">
+      {fulfilments &&
+        fulfilments.map((fulfilment, index) => {
+          return (
+            <div className="card mb-4" key={index}>
+              <div className="card-header bg-secondary text-light">
+                <div className="row">
+                  <div className="col-sm-6">{`${t('frontend.checkout.fulfillment')} ${index + 1} of ${fulfilments.length}: ${fulfilment.orderFulfillmentMethodName}`}</div>
+                  {fulfilment.trackingNumbers.length > 0 && <div className="col-sm-6 text-right">{`Tracking: ${fulfilment.trackingNumbers.join(', ')}`}</div>}
+                </div>
+              </div>
+
+              {fulfilment.fulfillmentMethodType === 'shipping' && (
+                <div className="card-header ">
+                  <div className="row">
+                    <ShippingAddressDetails className="" orderFulfillment={{ shippingAddress: transformShipping(fulfilment.orderFulfillmentItems.at(0)) }} displayOnly={true} />
+                  </div>
+                </div>
+              )}
+              {fulfilment.fulfillmentMethodType === 'pickup' && (
+                <div className="card-header ">
+                  <div className="row">
+                    <PickupLocationDetails className="" pickupLocation={transformPickup(fulfilment.orderFulfillmentItems.at(0))} displayOnly={true} />{' '}
+                  </div>
+                </div>
+              )}
+
+              <div className="card-header">
+                <div className="row">
+                  <div className="col-sm-12 col-md-6">
+                    <h4 className="mb-0">{t('frontend.cart.orderItem')}</h4>
+                  </div>
+                  <div className="col-sm-12 col-md-6 d-none d-md-block">
+                    <div className="row">
+                      <div className="col-sm-3">
+                        <small>{t('frontend.product.price')}</small>
+                      </div>
+                      <div className="col-sm-3">
+                        <small>{t('frontend.cart.quantity')}</small>
+                      </div>
+                      <div className="col-sm-6">
+                        <small>{t('frontend.cart.total')}</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="card-body py-0">
+                {fulfilment.orderFulfillmentItems &&
+                  fulfilment.orderFulfillmentItems.map(item => {
+                    return <OrderItem key={item.orderItemID} {...item} files={files} />
+                  })}
+              </div>
+            </div>
+          )
+        })}
+    </div>
+  )
+}
+
+export { OrderShipments, OrderFulfilments, OrderItem }

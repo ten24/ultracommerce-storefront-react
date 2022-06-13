@@ -9,7 +9,7 @@ const ProductPagePanels = ({ product = {}, attributeSets = [] }) => {
     .map(set => {
       return {
         ...set,
-        attributes: set.attributes.filter(attr => attr.attributeCode in product).sort((a, b) => a.sortOrder - b.sortOrder),
+        attributes: set.attributes.filter(attr => attr.attributeCode in product && product[attr.attributeCode].trim().length > 0).sort((a, b) => a.sortOrder - b.sortOrder),
       }
     })
     .filter(set => set.attributes.length)
@@ -34,7 +34,7 @@ const ProductPagePanels = ({ product = {}, attributeSets = [] }) => {
                         <div key={attributeCode} className="col-6">
                           <div className="row">
                             <div className="col-6">{attributeName}</div>
-                            <div className="col-6 text-muted">{isBoolean(product[attributeCode]) ? booleanToString(product[attributeCode]) : product[attributeCode]}</div>
+                            <div className="col-6 text-muted" dangerouslySetInnerHTML={{ __html: isBoolean(product[attributeCode]) ? booleanToString(product[attributeCode]) : product[attributeCode] }} />
                           </div>
                         </div>
                       )

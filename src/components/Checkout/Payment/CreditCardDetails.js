@@ -1,25 +1,23 @@
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { SwSelect, Button, PaymentAddressSelector, TextInput, ThreeDSRedirect } from '../..'
 import { useTranslation } from 'react-i18next'
-import { requestCart, receiveCart, receiveUser } from '../../../actions/'
+import { addPaymentToOrder } from '../../../actions/'
 import { SlatwalApiService } from '../../../services'
 import { toast } from 'react-toastify'
-import { fulfillmentSelector } from '../../../selectors'
 import { getErrorMessage } from '../../../utils'
 import { useCheckoutUtilities } from '../../../hooks'
 import * as Yup from 'yup'
 import { useState } from 'react'
 import dayjs from 'dayjs'
 
-const CreditCardDetails = ({ onSubmit }) => {
+const CreditCardDetails = ({ onSubmit, fulfillment, isQuote = false, orderID }) => {
   const { t } = useTranslation()
   const dispatch = useDispatch()
-  const { fulfillmentMethod } = useSelector(fulfillmentSelector)
+  const { fulfillmentMethod } = fulfillment
   const { months, years, CREDIT_CARD } = useCheckoutUtilities()
   const [paymentMethodErrors, setPaymentMethodErrors] = useState({})
   const [savePaymentMethodToAccount, setSavePaymentMethodToAccount] = useState(false)
   const [saveShippingAsBilling, setSaveShippingAsBilling] = useState(false)
-  const billingAccountAddress = useSelector(state => state.cart.billingAccountAddress)
   let [redirectUrl, setRedirectUrl] = useState()
   let [redirectPayload, setRedirectPayload] = useState({})
   let [redirectMethod, setRedirectMethod] = useState('')
@@ -32,7 +30,7 @@ const CreditCardDetails = ({ onSubmit }) => {
     expirationMonth: dayjs().add(1, 'month').format('MM'),
     expirationYear: dayjs().add(1, 'month').format('YYYY'),
     securityCode: '',
-    accountAddressID: billingAccountAddress ? billingAccountAddress.accountAddressID : '',
+    accountAddressID: '',
     saveShippingAsBilling: false,
     savePaymentMethodToAccount: false,
     returnJSONObjects: 'cart',
@@ -41,13 +39,17 @@ const CreditCardDetails = ({ onSubmit }) => {
   let validCreditCard = paymentMethod.nameOnCreditCard.length > 0 && paymentMethod.creditCardNumber.length > 0 && paymentMethod.securityCode.length > 0
 
   const addPayment = (params = {}) => {
-    dispatch(requestCart())
-    SlatwalApiService.cart
-      .addPayment({
-        ...params,
-        transactionInitiator: 'CHECKOUT_PAYMENT',
-        returnJSONObjects: 'cart,account',
+    params = {
+      ...params,
+      transactionInitiator: 'CHECKOUT_PAYMENT',
+    }
+    if (isQuote) params['orderID'] = orderID
+    return dispatch(
+      addPaymentToOrder({
+        params,
+        isQuote,
       })
+    )
       .then(response => {
         if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
         if (response.isSuccess()) {
@@ -55,14 +57,15 @@ const CreditCardDetails = ({ onSubmit }) => {
             setRedirectUrl(response.success().redirectUrl)
             setRedirectPayload(response.success().redirectPayload)
             setRedirectMethod(response.success().redirectMethod)
-          } else {
-            dispatch(receiveCart(response.success().cart))
-            dispatch(receiveUser(response.success().account))
           }
         } else {
-          dispatch(receiveCart({}))
           toast.error('An Error Occured')
         }
+        return response
+      })
+      .then(response => {
+        onSubmit()
+        return response
       })
   }
   //http://slatwallPrivate:8906/index.cfm/api/scope/pay360threeDSHandover?MD=10145770911&reload=true

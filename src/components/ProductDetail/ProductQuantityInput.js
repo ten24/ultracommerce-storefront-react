@@ -23,15 +23,19 @@ function ProductQuantityInput({ setQuantity, quantity, sku, stock = 0 }) {
   return (
     <div className="mb-3">
       {quantityInput === 'text' && (
+      <>
+        <label>Quantity</label>
         <input
           type="number"
+          min="1"
           onChange={event => {
             validateQuantity(event.target.value)
           }}
           value={quantity}
-          className="form-control"
+          className="form-control rounded-pill"
           style={{ width: '5rem' }}
         />
+        </>
       )}
       {sku && quantityInput === 'dropdown' && (
         <select

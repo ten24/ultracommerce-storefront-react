@@ -310,7 +310,7 @@ const getEntryBySlug = (payload = {}) => {
         hydrated[page.urlTitlePath] = { ...pageStruc, ...response[page.urlTitlePath] }
       })
 
-      return hydrated
+      return { response, hydrated }
     })
 }
 const processForPage = (page, content) => {

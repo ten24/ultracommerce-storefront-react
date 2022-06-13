@@ -1,6 +1,12 @@
 import { toast } from 'react-toastify'
 import { SlatwalApiService } from '../services'
 import { getErrorMessage } from '../utils'
+import { receiveCart, requestCart } from './'
+import { receiveSubscriptionCart, requestSubscriptionCart } from './subscriptionCartActions'
+import { receiveUser, requestUser } from './userActions'
+// import { receiveCart } from './cartActions'
+// import { receiveSubscriptionCart } from './subscriptionCartActions'
+// import { receiveUser } from './userActions'
 
 export const REQUEST_CONFIGURATION = 'REQUEST_CONFIGURATION'
 export const RECIVE_CONFIGURATION = 'RECIVE_CONFIGURATION'
@@ -25,27 +31,37 @@ export const requestConfiguration = () => {
   }
 }
 
-export const getConfiguration = () => {
+export const getConfiguration = (siteCode = localStorage.getItem('siteCode'), returnJSONObjects = 'cart,account,orderTemplateCart') => {
   return async (dispatch, getState) => {
     dispatch(requestConfiguration())
-    const localConfig = getState().configuration
-    // const localRoutes = localConfig.router
+    dispatch(requestSubscriptionCart())
+    dispatch(requestUser())
+    dispatch(requestCart())
 
-    const payload = {
-      siteCode: localConfig.site.siteCode,
-    }
-
-    await SlatwalApiService.content.getConfiguration(payload).then(response => {
-      if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-      if (response.isSuccess()) {
-        let serverConfig = response.success().config
-        // retail and local routes not found on the server
-        // const legacyRoutes = localRoutes.filter(localRoute => serverConfig.router.filter(route => route.URLKeyType === localRoute.URLKeyType).length === 0)
-        // serverConfig.router = [...serverConfig.router, ...legacyRoutes]
-        dispatch(reciveConfiguration(serverConfig))
-      } else {
-        dispatch(reciveConfiguration({}))
-      }
-    })
+    return await SlatwalApiService.content
+      .getConfiguration({
+        siteCode: siteCode,
+        returnJSONObjects,
+      })
+      .then(response => {
+        if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
+        if (response.isSuccess()) {
+          let serverConfig = response.success().config
+          // retail and local routes not found on the server
+          // const legacyRoutes = localRoutes.filter(localRoute => serverConfig.router.filter(route => route.URLKeyType === localRoute.URLKeyType).length === 0)
+          // serverConfig.router = [...serverConfig.router, ...legacyRoutes]
+          dispatch(reciveConfiguration(serverConfig))
+          dispatch(receiveUser(response.success().account))
+          dispatch(receiveCart(response.success().cart))
+          if (response.success()?.orderTemplateCart) {
+            dispatch(receiveSubscriptionCart(response.success()?.orderTemplateCart))
+          } else {
+            dispatch(receiveSubscriptionCart({}))
+          }
+        } else {
+          dispatch(reciveConfiguration({}))
+        }
+        return response
+      })
   }
 }

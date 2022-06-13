@@ -1,7 +1,24 @@
-import { PromptLayout, SWForm, SWInput } from '../../'
-import { useCreateAccount } from '../../../hooks/'
+import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
+import { OauthGoogleLogin } from '../../OauthLogin/OauthGoogleLogin'
+import { PromptLayout, SWForm, SWInput } from '../../'
+import { useCreateAccount } from '../../../hooks/'
+import { getSocialLogins } from '../../../selectors'
+
+//additional button added for oAuthLogins
+const OAuthSigninButtons = () => {
+  const { t } = useTranslation()
+  const socialLogins = useSelector(getSocialLogins)
+  return (
+    <div className="text-right pt-4">
+      {socialLogins.map(integration => {
+        if (integration.key === 'googlelogin') return <OauthGoogleLogin key={integration.key} buttonText={t('frontend.oauth.googlesignup')} />
+        return null
+      })}
+    </div>
+  )
+}
 
 const CreateAccount = () => {
   const { formik } = useCreateAccount()
@@ -12,13 +29,13 @@ const CreateAccount = () => {
       <h2>{t('frontend.account.createAccount')}</h2>
       <p>
         {t('frontend.account.old_account')}
-        <Link className="ms-1 link" to="my-account">
+        <Link className="ms-1 link" to="/my-account">
           {t('frontend.account.here')}
         </Link>
         .
       </p>
 
-      <SWForm formik={formik} primaryButtontext="Create Account & Continue" title="">
+      <SWForm formik={formik} primaryButtontext="Create Account & Continue" title="" AdditionalFormButtons={OAuthSigninButtons}>
         <div className="row">
           <div className="col-md-6">
             <SWInput formik={formik} token="firstName" label="First Name" wrapperClasses="" />

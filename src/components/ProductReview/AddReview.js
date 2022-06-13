@@ -1,24 +1,20 @@
 import { useFormik } from 'formik'
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { SimpleImage } from '../'
 import { toast } from 'react-toastify'
-import { sdkURL, axios } from '../../services'
+import { SlatwalApiService } from '../../services'
 import { useTranslation } from 'react-i18next'
 import { getProductRoute } from '../../selectors'
+import { getErrorMessage } from '../../utils'
 import { useSelector } from 'react-redux'
 
 const possibleRates = [1, 2, 3, 4, 5]
-const AddReview = ({ sku_product_productID, sku_product_productName, sku_product_urlTitle, sku_skuID, images ,showModal ,setModal}) => {
+const AddReview = ({ selectedRate , setSelectedRate, hoveredRate, setHoveredRate, sku_product_productID, sku_product_productName, sku_product_urlTitle, sku_skuID, images ,showModal ,setModal}) => {
   const productRouting = useSelector(getProductRoute)
   const user = useSelector(state => state.userReducer)
   const addProductReview = async values => {
-    axios({
-      method: 'POST',
-      withCredentials: true,
-      url: `${sdkURL}api/scope/addProductReview`,
-      data: {
-        "newProductReview": {
+    SlatwalApiService.products.addProductReview({
+      "newProductReview": {
           "product": {
             "productID": sku_product_productID
           },
@@ -27,24 +23,18 @@ const AddReview = ({ sku_product_productID, sku_product_productName, sku_product
           "rating": selectedRate,
           "review": formik.values.review
         },
-      },
-      headers: {
-        'Content-Type': 'application/json',
-      }
     }).then(response => {
-      if (response.status === 200) {
+      if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
+      if (response.isSuccess()) {
         setModal(false)
+        setSelectedRate(0)
+        setHoveredRate(0)
+        formik.resetForm()
         toast.success(t('frontend.product.review.success'))
-        return response.data
-      }else{
-        formik.setStatus({ showForm: true, message: 'Error' })
       }
-      return null
     })
   }
   const { t } = useTranslation()
-  const [selectedRate, setSelectedRate] = useState(null)
-  const [hoveredRate, setHoveredRate] = useState(null)
   const formik = useFormik({
     enableReinitialize: false,
     initialValues: {

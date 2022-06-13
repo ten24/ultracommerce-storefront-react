@@ -7,6 +7,7 @@ import { SlatwalApiService } from '../../../services'
 import { toast } from 'react-toastify'
 import { errorLogin, receiveLogin, receiveUser, receiveCart, getWishLists, requestLogin, requestUser, requestCart } from '../../../actions/'
 import { getErrorMessage } from '../../../utils'
+import { receiveSubscriptionCart, requestSubscriptionCart } from '../../../actions/subscriptionCartActions'
 
 const useLoginForm = () => {
   const dispatch = useDispatch()
@@ -26,10 +27,12 @@ const useLoginForm = () => {
       dispatch(requestLogin())
       dispatch(requestUser())
       dispatch(requestCart())
+      dispatch(requestSubscriptionCart())
+
       const payload = {
         emailAddress: values.loginEmail,
         password: values.loginPassword,
-        returnJSONObjects: 'account,cart',
+        returnJSONObjects: 'account,cart,orderTemplateCart',
       }
 
       SlatwalApiService.auth.login(payload).then(response => {
@@ -37,6 +40,7 @@ const useLoginForm = () => {
           dispatch(receiveLogin({ isAuthenticanted: true }))
           dispatch(receiveUser(response.success().account))
           dispatch(receiveCart(response.success().cart))
+          dispatch(receiveSubscriptionCart(response.success()?.orderTemplateCart))
           dispatch(getWishLists())
           toast.success(t('frontend.account.auth.success'))
         } else {

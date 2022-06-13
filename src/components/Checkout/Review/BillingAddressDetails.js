@@ -1,9 +1,12 @@
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { billingAddressNickname } from '../../../selectors'
 
-const BillingAddressDetails = ({ orderPayment, billingNickname }) => {
+const BillingAddressDetails = ({ orderPayment }) => {
   const { billingAddress = {} } = orderPayment
   const { name, streetAddress, city, stateCode, postalCode, emailAddress } = billingAddress
   const { t } = useTranslation()
+  let billingNickname = useSelector(billingAddressNickname)
 
   return (
     <>

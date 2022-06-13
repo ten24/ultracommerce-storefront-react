@@ -42,7 +42,9 @@ function Footer() {
 
           <div className={`${styles.bgFooter} p-4`}>
             <div className="container">
-              <div className="text-center text-secondary small">{`@${new Date().getFullYear()} ${t('frontend.copywrite')}`}</div>
+              <div className="row">
+                <div className="text-center text-secondary small">{`@${new Date().getFullYear()} ${t('frontend.copywrite')}`}</div>
+              </div>
             </div>
           </div>
         </div>
