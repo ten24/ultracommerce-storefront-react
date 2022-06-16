@@ -1,14 +1,19 @@
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { useRouteMatch, useLocation } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import { useLocation } from 'react-router-dom'
 import { useLoginForm } from '../../../hooks'
+import { OauthGoogleLogin } from '../../OauthLogin/OauthGoogleLogin'
+import { OauthFacebookLogin } from '../../OauthLogin/OauthFacebookLogin'
+import { getSocialLogins } from '../../../selectors'
 
-const LoginForm = () => {
-  let match = useRouteMatch()
+const LoginForm = ({ isCheckout = false }) => {
   const { t } = useTranslation()
   const { formik } = useLoginForm()
   const location = useLocation()
-
+  const allowGuestCheckout = useSelector(state => state.configuration.allowGuestCheckout)
+  const socialLogins = useSelector(getSocialLogins)
+  
   return (
     <>
       <div className="mb-5 bg-white col-md-7">
@@ -31,21 +36,35 @@ const LoginForm = () => {
                 <input value={formik.values.loginPassword} onBlur={formik.handleBlur} onChange={formik.handleChange} autoComplete="current-password" className="form-control" type="password" id="loginPassword" />
                 {formik.errors.loginPassword && formik.touched.loginPassword && <span className="form-error-msg">{formik.errors.loginPassword}</span>}
               </div>
-              <Link to={`${match.path}/forgotPassword`} className="nav-link-inline font-size-sm link">
+              <Link to={`/my-account/forgotPassword`} className="nav-link-inline font-size-sm link">
                 {t('frontend.account.forgot_password')}
               </Link>
             </div>
             <div className="row my-2">
               <p>
                 {t('frontend.account.no_account')}
-                <Link className="link mx-1" to={`${match.path}/createAccount${location.search}`}>
+                <Link className="link mx-1" to={`/my-account/createAccount${location.search}`}>
                   {t('frontend.account.here')}
                 </Link>
               </p>
             </div>
-            <button className="btn btn-primary btn-lg mt-3" type="submit">
-              {t('frontend.account.sign_in')}
-            </button>
+            <div className="row">
+              <div className="col-12">
+                <button className="btn btn-primary btn-lg" type="submit">
+                  {t('frontend.account.sign_in')}
+                </button>
+                {socialLogins?.map(integration => {
+                  if (integration.key === 'googlelogin') return <OauthGoogleLogin key={integration.key} />
+                  if (integration.key === 'facebooklogin') return <OauthFacebookLogin key={integration.key} buttonText={t('frontend.oauth.facebooksignin')} />
+                  return null
+                })}
+              </div>
+            </div>
+            {allowGuestCheckout && isCheckout && (
+              <Link className="btn btn-primary btn-lg mt-3 ms-3" to={`/checkout/createGuestAccount${location.search}`}>
+                {t('frontend.account.checkout.as.guest')}
+              </Link>
+            )}
           </form>
         </div>
       </div>
@@ -53,11 +72,11 @@ const LoginForm = () => {
   )
 }
 
-const AccountLogin = () => {
+const AccountLogin = ({ isCheckout = false }) => {
   return (
     <div className="container py-4 py-lg-5 my-4">
       <div className="row d-flex justify-content-center">
-        <LoginForm />
+        <LoginForm isCheckout={isCheckout} />
       </div>
     </div>
   )

@@ -33,7 +33,7 @@ const useCategory = () => {
       const urlTitle = location.pathname.split('/').reverse()[0]
       const hasData = !!categoryListRequest.data.filter(pt => pt.urlTitle === urlTitle).length
       if (!hasData && categoryListRequest.data.length > 0) {
-        setCategoryRequest({ ...categoryRequest, data: {}, isFetching: false, isLoaded: false, params: { urlTitle }, makeRequest: true })
+        setCategoryRequest({ ...categoryRequest, data: {}, isFetching: false, isLoaded: false, params: { urlTitle, includeSettings: true }, makeRequest: true })
       } else {
       }
     })
@@ -42,11 +42,11 @@ const useCategory = () => {
     }
   }, [history, setCategoryRequest, categoryRequest, setCategoryListRequest, categoryListRequest])
   useEffect(() => {
-    setCategoryRequest({ ...categoryRequest, isFetching: true, isLoaded: false, entity: 'category', params: { urlTitle: pathKey, 'f:allowProductAssignmentFlag': true }, makeRequest: true })
+    setCategoryRequest({ ...categoryRequest, isFetching: true, isLoaded: false, entity: 'category', params: { urlTitle: pathKey, 'f:allowProductAssignmentFlag': true, includeSettings: true }, makeRequest: true })
     setCategoryListRequest({ ...categoryListRequest, data: [], isFetching: true, isLoaded: false, entity: 'category', params: { 'f:allowProductAssignmentFlag': true, 'p:show': 250, includeSettingsInList: true }, makeRequest: true })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-  if (!categoryRequest?.isFetching && categoryRequest?.isLoaded && Object.keys(categoryRequest?.data)?.length === 0) {
+  if (!categoryListRequest?.isFetching && categoryListRequest?.isLoaded && Object.keys(categoryListRequest?.data)?.length === 0) {
     isError = true
     errorMessage = t('frontend.core.error.no_products')
   }

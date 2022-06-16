@@ -1,4 +1,4 @@
-import { CONFIRM_ORDER, REQUEST_CART, RECEIVE_CART, CLEAR_CART, SET_ERROR } from '../actions/cartActions'
+import { CONFIRM_ORDER, REQUEST_CART, RECEIVE_CART, CLEAR_CART, SET_ERROR } from '../actions'
 
 const initState = {
   orderID: null,

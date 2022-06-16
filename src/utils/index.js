@@ -1,5 +1,6 @@
 import jwt_decode from 'jwt-decode'
 import queryString from 'query-string'
+import { toast } from 'react-toastify'
 
 export const cleanHTML = data => data.replace('class=', 'className=')
 export const renameKeys = (obj, find, replace = '') => {
@@ -25,6 +26,16 @@ export const isAuthenticated = () => {
   }
   return false
 }
+export const getMyAccountUrl = () => {
+  let token = localStorage.getItem('token')
+  if (token) {
+    try {
+      token = jwt_decode(token)
+      return token.exp && token.exp * 1000 > Date.now() && token.accountID.length > 0
+    } catch (error) {}
+  }
+  return isAuthenticated() ? '/my-account/overview' : '/my-account/login'
+}
 export const isImpersonating = () => {
   let token = localStorage.getItem('token')
   if (token) {
@@ -33,6 +44,12 @@ export const isImpersonating = () => {
       return token?.isImpersonating || false
     } catch (error) {}
   }
+  return false
+}
+export const toBoolean = (val = false) => {
+  if (isBoolean(val)) return val
+  if (Number.isInteger(val)) return val > 0
+  if (isString(val)) return val?.toLowerCase()?.trim() === 'true' || val?.toLowerCase()?.trim() === 'yes' || val?.toLowerCase()?.trim() === '1'
   return false
 }
 export const containsHTML = str => /<[a-z][\s\S]*>/i.test(str)
@@ -64,6 +81,10 @@ export const parseErrorMessages = error => {
 }
 export const getErrorMessage = error => {
   return parseErrorMessages(error)?.join('. ')
+}
+
+export const getFailureMessageOnSuccess = (response, message) => {
+  if (response.isSuccess() && Object.keys(response.success()?.messages || {}).length) return toast.error(message)
 }
 
 export const organizeProductTypes = (parents, list) => {
@@ -161,3 +182,9 @@ export const deepMerge = (source, target) => {
   }
   return target // we're replacing in-situ, so this is more for chaining than anything else
 }
+
+export const unflattenObject = (obj, delimiter = '_') =>
+  Object.keys(obj).reduce((res, k) => {
+    k.split(delimiter).reduce((acc, e, i, keys) => acc[e] || (acc[e] = isNaN(Number(keys[i + 1])) ? (keys.length - 1 === i ? obj[k] : {}) : []), res)
+    return res
+  }, {})

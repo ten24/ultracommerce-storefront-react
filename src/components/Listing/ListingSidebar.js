@@ -22,7 +22,7 @@ const ListingSidebar = ({ isFetching, hide, filtering, updateAttribute, recordsC
   const { t } = useTranslation()
 
   const { option, brand, attribute, category, priceRange, productType } = useFilterFormater({ ...filtering })
-  if (recordsCount < 1) return null
+  if (recordsCount < 1 && !isFetching) return null
 
   return (
     <div className="col-lg-3">

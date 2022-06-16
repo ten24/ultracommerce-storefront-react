@@ -1,0 +1,41 @@
+.table-styled{
+    td {border: none;padding: 30px 10px;color: #484848;font-weight: 300;}
+    thead{
+         background: #217cba;
+         th {color: #fff;padding: 15px;}
+    }
+    tbody{
+        border:none !important;
+        tr{
+            
+            &:nth-child(odd){background: #fafafa;}
+            td{
+                &:nth-child(1) img {width: 80px;height: 80px;object-fit: cover;}
+                &:nth-child(2),  &:nth-child(3) {width: 20%;line-height: 1.4;}
+                &:nth-child(5) {width: 80px;}
+                &:nth-child(1) {padding: 10px 10px;}
+            }
+        }
+    }
+}
+
+.filter-block {background: #fcfcfc;border: none;
+    .col-2 {display: flex;flex-wrap: wrap;padding: 0;align-items: center;
+    &:last-child span {font-size: 0.76rem;display: block;width: 100%;
+        span {color: #4b4b4b !important;font-size: 1rem;}
+    }
+     
+        figure {position: absolute;right: 4%;top: 20%;color: #217cba;background: aliceblue;padding: 1px;border-radius: 50%;font-size: .8rem;}
+        span {font-size: 0.8rem;color: #217cba !important;
+            span {padding-left: 0;}
+            
+        }
+    }
+    .border-light {position: relative;}
+}
+
+.listingCart{
+     p {opacity: .8;
+         span:last-child {font-weight: 300;color: black;font-size: 0.85rem;}
+     }
+}

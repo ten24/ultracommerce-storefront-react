@@ -1,10 +1,12 @@
 import { useSelector } from 'react-redux'
+import { getSiteConfig, getCurrencies } from '../selectors/configurationSelectors'
 
 const useFormatCurrency = ({ minimumFractionDigits = 2 }) => {
-  const { currencies, currencyCode } = useSelector(state => state.configuration.site.hibachiConfig)
-  const currency = currencies[currencyCode]
+  const { currencyCode } = useSelector(getSiteConfig)
+  const currencies = useSelector(getCurrencies)
   const format = value => {
-    return value ? `${currency.currencySymbol}${value?.toFixed(minimumFractionDigits)}${currency.formatMask}` : ''
+    const currency = currencies[currencyCode]
+    return value ? `${currency?.currencySymbol}${value?.toFixed(minimumFractionDigits)}${currency?.formatMask}` : ''
   }
   return [format]
 }

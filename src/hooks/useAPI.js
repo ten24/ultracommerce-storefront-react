@@ -50,6 +50,7 @@ export const useGetProductsByEntityModified = () => {
         } else {
           setRequest({ data: [], attributeSets: [], isFetching: false, makeRequest: false, isLoaded: true, params: {}, error: 'Something was wrong' })
         }
+        return response
       })
     }
     return () => {
@@ -351,7 +352,35 @@ export const useAddWishlistItem = () => {
 
   return [request, setRequest]
 }
+const groupByKey = (list, key) => list?.reduce((hash, obj) => ({ ...hash, [obj[key]]: (hash[obj[key]] || []).concat(obj) }), {})
+let uniq = a => [...new Set(a)]
 
+const formatOrderDetails = (order = {}) => {
+  let orderFulfillmentGroups = []
+  if (Object.keys(order)?.length > 0) {
+    orderFulfillmentGroups = groupByKey(order.orderFulfillments, 'orderFulfillment_orderFulfillmentID')
+    orderFulfillmentGroups = Object.keys(orderFulfillmentGroups)?.map(orderFulfillmentID => {
+      return {
+        orderFulfillmentID,
+        orderFulfillmentMethodName: orderFulfillmentGroups[orderFulfillmentID].at(0).orderFulfillment_fulfillmentMethod_fulfillmentMethodName,
+        fulfillmentMethodType: orderFulfillmentGroups[orderFulfillmentID].at(0).orderFulfillment_fulfillmentMethod_fulfillmentMethodType,
+        orderFulfillmentItems: orderFulfillmentGroups[orderFulfillmentID],
+      }
+    })
+    orderFulfillmentGroups = orderFulfillmentGroups.map(group => {
+      group.orderFulfillmentItems = group.orderFulfillmentItems.map(item => {
+        return {
+          ...item,
+          ...order.orderItems.filter(orderItem => orderItem.orderItemID === item.orderItemID).at(0),
+        }
+      })
+      group.trackingNumbers = group.orderFulfillmentItems.map(item => item['orderDeliveryItems_orderDelivery_trackingNumber']).filter(item => item)
+      group.trackingNumbers = uniq(group.trackingNumbers)
+      return group
+    })
+  }
+  return orderFulfillmentGroups
+}
 export const useGetOrderDetails = () => {
   let [request, setRequest] = useState({ isFetching: false, isLoaded: false, makeRequest: false, data: {}, error: '', params: {} })
   useEffect(() => {
@@ -373,7 +402,7 @@ export const useGetOrderDetails = () => {
     }
   }, [request, setRequest])
 
-  return [request, setRequest]
+  return [request, setRequest, formatOrderDetails]
 }
 
 export const useGetAllOrders = () => {
@@ -382,7 +411,6 @@ export const useGetAllOrders = () => {
     let source = axios.CancelToken.source()
     if (request.makeRequest) {
       const payload = request.params
-
       SlatwalApiService.account.orders(payload, headers, source).then(response => {
         if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
         if (response.isSuccess()) {
@@ -572,4 +600,29 @@ export const useGetProductImageGallery = urlTitle => {
   }, [urlTitle])
 
   return { isFetching, imageGallery, error }
+}
+
+export const useGetAllOrderTemplates = () => {
+  let [request, setRequest] = useState({ isFetching: false, isLoaded: false, makeRequest: false, data: [], error: '', params: {} })
+  const { accountID } = useSelector(state => state.userReducer)
+  useEffect(() => {
+    let source = axios.CancelToken.source()
+    if (request.makeRequest && accountID) {
+      const payload = request.params
+      SlatwalApiService.orderTemplate.list(payload, headers, source).then(response => {
+        if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
+        if (response.isSuccess()) {
+          setRequest({ data: response.success().orderTemplates, isFetching: false, isLoaded: true, makeRequest: false, params: {} })
+        } else {
+          setRequest({ data: {}, isFetching: false, makeRequest: false, isLoaded: true, params: {}, error: 'Something was wrong' })
+        }
+      })
+    }
+    return () => {
+      source.cancel()
+    }
+    // eslint-disable-next-line
+  }, [request, setRequest])
+
+  return [request, setRequest]
 }

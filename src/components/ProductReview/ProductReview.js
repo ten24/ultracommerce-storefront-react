@@ -1,9 +1,7 @@
 import { ListingPagination, ProductReviewListing, ProductReviewRating } from '../../components'
-import { useReview } from '../../hooks'
 import { useTranslation } from 'react-i18next'
 
-const ProductReview = ({ productUrlTitle }) => {
-  const { records, isFetching, total, totalPages, setCurrentPage, currentPage, ratingCount, averageRating } = useReview(productUrlTitle)
+const ProductReview = ({ records, isFetching, total, totalPages, setCurrentPage, currentPage, ratingCount, averageRating }) => {
   const { t } = useTranslation()
   const average = isNaN(averageRating) ? '0' : Math.round(averageRating)
   return (
@@ -12,10 +10,12 @@ const ProductReview = ({ productUrlTitle }) => {
         <header className="section-title mb-5 pb-2">
           <h2 className="mb-5">{t('frontend.product.review.mainHeading')}</h2>
         </header>
+       
         <div className="mb-5">
           <div className="row">
             <div className="col-md-12">
               <div className="row">
+                 {records.length > 0 && (
                 <div className="bg-transparent col-sm-6 col-md-3 mb-4 mb-md-0">
                   <div className="d-flex align-items-baseline">
                     <div className="star-rating">
@@ -46,6 +46,7 @@ const ProductReview = ({ productUrlTitle }) => {
                     })}
                   </div>
                 </div>
+                )}
                 <ProductReviewListing isFetching={isFetching} pageRecords={records} />
                 <ListingPagination recordsCount={total} currentPage={currentPage} totalPages={totalPages} setPage={setCurrentPage} />
               </div>

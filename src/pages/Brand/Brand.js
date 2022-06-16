@@ -1,7 +1,6 @@
 import { Helmet } from 'react-helmet'
 import { Layout, BrandBanner, ListingToolBar, ListingSidebar, ListingGrid, ListingPagination } from '../../components'
 import { useBrand, useListing } from '../../hooks'
-import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
 import { useLocation } from 'react-router'
 import { useSelector } from 'react-redux'
@@ -10,7 +9,7 @@ const Brand = () => {
   const { brandResponse, slug, subHeading } = useBrand()
   return (
     <Layout>
-      {brandResponse.isLoaded && brandResponse.data.length > 0 && <Helmet title={brandResponse.data[0]?.settings?.brandHTMLTitleString} />}
+      {!!brandResponse.data[0]?.settings?.brandHTMLTitleString && <Helmet title={brandResponse.data[0]?.settings?.brandHTMLTitleString} />}
       <BrandBanner subHeading={subHeading} brandName={brandResponse?.data[0]?.brandName} images={brandResponse?.data[0]?.images} brandDescription={brandResponse?.data[0]?.brandDescription} />
 
       {brandResponse.isLoaded && brandResponse.data.length > 0 && <BrandSearchListing brandSlug={slug} />}
@@ -24,14 +23,11 @@ const BrandSearchListing = ({ brandSlug }) => {
     brand_slug: brandSlug,
   })
   const loc = useLocation()
-  const { t } = useTranslation()
-  const siteName = useSelector(state => state.configuration.site.siteName)
   const content = useSelector(state => state.content[loc.pathname.substring(1)])
   const { records, isFetching, potentialFilters, total, totalPages, setSort, updateAttribute, setPage, setKeyword, params } = useListing(preFilter)
 
   return (
-    <Layout>
-      <Helmet title={`${t('frontend.header.shop')} - ${siteName}`} />
+    <>
       <div className="bg-lightgray py-4">
         <div className="container d-lg-flex justify-content-between py-2 py-lg-3">
           <div className="order-lg-1 pr-lg-4 text-center">
@@ -47,7 +43,7 @@ const BrandSearchListing = ({ brandSlug }) => {
         </div>
         <ListingPagination recordsCount={total} currentPage={params['currentPage']} totalPages={totalPages} setPage={setPage} />
       </div>
-    </Layout>
+    </>
   )
 }
 export default Brand

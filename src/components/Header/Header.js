@@ -9,6 +9,8 @@ import { AccountBubble, MiniCart, AccountImpersonationBanner } from '../../compo
 import { useLocation } from 'react-use'
 import { useUtilities } from '../../hooks'
 import { SearchBar } from './SearchBar'
+import { MultiSitePicker } from '../MultiSitePicker/MultiSitePicker'
+import { getMyAccountUrl } from '../../utils'
 
 const MegaMenuPanel = ({ subMenu = [] }) => {
   const { eventHandlerForWSIWYG } = useUtilities()
@@ -155,10 +157,13 @@ const MainNavBar = () => {
               </Link>
             )
           })}
-        <Link to="/my-account" className="nav-item link-button">
+        <Link to={getMyAccountUrl()} className="nav-item link-button">
           <AccountBubble />
         </Link>
+
         <MiniCart />
+
+        <MultiSitePicker />
       </ul>
     </div>
   )

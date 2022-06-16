@@ -1,8 +1,8 @@
 import { toast } from 'react-toastify'
 import { SlatwalApiService } from '../services'
 import { getErrorMessage } from '../utils'
-import { getCart, receiveCart, requestCart } from './cartActions'
-import { requestUser, receiveUser, clearUser, getWishLists } from './userActions'
+import { getCart, receiveCart, requestCart } from './'
+import { requestUser, receiveUser, clearUser, getWishLists, evictAllPages, receiveSubscriptionCart, requestSubscriptionCart } from './'
 import { isAuthenticated } from '../utils'
 
 export const REQUEST_LOGIN = 'REQUEST_LOGIN'
@@ -36,7 +36,8 @@ export const requestLogOut = () => {
 }
 export const logout = (success = '', failure = '') => {
   return async dispatch => {
-    await SlatwalApiService.auth.revokeToken().then(response => {
+    dispatch(evictAllPages())
+    return await SlatwalApiService.auth.revokeToken().then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
       dispatch(softLogout())
       dispatch(getCart())
@@ -45,6 +46,7 @@ export const logout = (success = '', failure = '') => {
       } else {
         toast.error(failure)
       }
+      return response
     })
   }
 }
@@ -53,35 +55,40 @@ export const softLogout = () => {
   return async dispatch => {
     dispatch(requestLogOut())
     dispatch(clearUser())
+    return new Promise((resolve, reject) => resolve({}))
   }
 }
 
 export const login = (email, password, success, failure) => {
   return async (dispatch, getState) => {
     let { accountID } = getState().userReducer
-
     if (!isAuthenticated() || !accountID.length) {
       dispatch(requestLogin())
       dispatch(requestUser())
       dispatch(requestCart())
-      const payload = {
-        emailAddress: email,
-        password: password,
-        returnJSONObjects: 'account,cart',
-      }
-      await SlatwalApiService.auth.login(payload).then(response => {
-        if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-        if (response.isSuccess()) {
-          dispatch(receiveLogin({ isAuthenticanted: true }))
-          dispatch(receiveUser(response.success().account))
-          dispatch(receiveCart(response.success().cart))
-          dispatch(getWishLists())
-          toast.success(success)
-        } else {
-          toast.error(failure)
-          dispatch(errorLogin())
-        }
-      })
+      dispatch(requestSubscriptionCart())
+
+      return await SlatwalApiService.auth
+        .login({
+          emailAddress: email,
+          password: password,
+          returnJSONObjects: 'account,cart,orderTemplateCart',
+        })
+        .then(response => {
+          if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
+          if (response.isSuccess()) {
+            dispatch(receiveLogin({ isAuthenticanted: true }))
+            dispatch(receiveUser(response.success().account))
+            dispatch(receiveCart(response.success().cart))
+            dispatch(receiveSubscriptionCart(response.success().orderTemplateCart))
+            dispatch(getWishLists())
+            toast.success(success)
+          } else {
+            toast.error(failure)
+            dispatch(errorLogin())
+          }
+          return response
+        })
     }
   }
 }

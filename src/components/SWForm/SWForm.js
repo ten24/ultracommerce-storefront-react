@@ -1,6 +1,6 @@
 import { useHistory } from 'react-router'
 
-const SWForm = ({ formik, children, title = '', subTitle = '', primaryButtontext = '' }) => {
+const SWForm = ({ formik, children, title = '', subTitle = '', primaryButtontext = '', AdditionalFormButtons = () => null }) => {
   let history = useHistory()
 
   return (
@@ -26,6 +26,7 @@ const SWForm = ({ formik, children, title = '', subTitle = '', primaryButtontext
             {primaryButtontext}
           </button>
         </div>
+        <AdditionalFormButtons />
       </form>
     </>
   )

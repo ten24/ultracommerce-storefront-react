@@ -93,18 +93,12 @@ const useListing = (preFilter, type = 'productListing') => {
   let [error, setError] = useState({ isError: false, message: '' })
 
   const loc = useLocation()
-  let productSearch = useSelector(state => state.configuration.listings.productListing.params)
-  let initialData = useSelector(state => state.configuration.listings.productListing.filters)
-  let initialForcedFilterOptions = useSelector(state => state.configuration.listings.productListing.forcedFilterOptions)
-  let bulkOrder = useSelector(state => state.configuration.listings.bulkOrder.params)
-  let initialBulkOrderData = useSelector(state => state.configuration.listings.bulkOrder.filters)
-  let initialBulkForcedFilterOptions = useSelector(state => state.configuration.listings.bulkOrder.forcedFilterOptions)
-  if (type === 'bulkOrder') {
-    productSearch = bulkOrder
-    initialData = initialBulkOrderData
-    initialData = initialBulkOrderData
-    initialForcedFilterOptions = initialBulkForcedFilterOptions
-  }
+  let listings = useSelector(state => state.configuration.listings)
+  const listing = listings[type]
+  let productSearch = listing.params
+  let initialData = listing.filters
+  let initialForcedFilterOptions = listing.forcedFilterOptions
+
   let history = useHistory()
   let params = processQueryParameters(loc.search)
   params = { ...initialData, ...params, ...preFilter }
@@ -125,11 +119,15 @@ const useListing = (preFilter, type = 'productListing') => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) setError({ isError: true, message: getErrorMessage(response.success().errors) })
       if (response.isSuccess()) {
         const data = response.success().data
-        const products = data.products.map(sku => {
-          return { ...sku, salePrice: sku.skuPrice, productName: sku.product_productName, urlTitle: sku.product_urlTitle, productCode: sku.product_productCode, imageFile: sku.sku_imageFile, skuID: sku.sku_skuID, skuCode: sku.sku_skuCode }
-        })
+        if (!!data.products && Array.isArray(data.products)) {
+          const products = data.products.map(sku => {
+            return { ...sku, salePrice: sku.skuPrice, productName: sku.product_productName, urlTitle: sku.product_urlTitle, productCode: sku.product_productCode, imageFile: sku.sku_imageFile, skuID: sku.sku_skuID, skuCode: sku.sku_skuCode }
+          })
+          setRecords(products)
+        } else {
+          setRecords([])
+        }
 
-        setRecords(products)
         setPotentialFilters(data.potentialFilters)
         setTotal(data.total)
         setTotalPages(Math.ceil(data.total / data.pageSize))
@@ -203,7 +201,7 @@ const useListing = (preFilter, type = 'productListing') => {
     })
   }
 
-  return { records, pageSize, potentialFilters, isFetching, total, totalPages, error, setSort, updateAttribute, setPage, setKeyword, params }
+  return { records, pageSize, potentialFilters, isFetching, total, totalPages, error, setSort, updateAttribute, setPage, setKeyword, params, config: listing }
 }
 
 export { useListing }

@@ -9,10 +9,10 @@ import { Integrations } from '@sentry/tracing'
 import { Provider } from 'react-redux'
 import './i18n'
 import store from './createStore'
-import App from './App'
 import './assets/theme'
 import devData from './preload'
 import { AnalyticsManager } from './components'
+import { AppSwitcher } from './AppSwitcher'
 
 const release = process.env.REACT_APP_NAME + '@' + process.env.REACT_APP_VERSION
 const dsn = process.env.REACT_APP_SENTRY_DSN
@@ -45,7 +45,7 @@ ReactDOM.render(
 
   <Provider store={store}>
     <Router>
-      <App />
+      <AppSwitcher />
       <AnalyticsManager />
     </Router>
   </Provider>,

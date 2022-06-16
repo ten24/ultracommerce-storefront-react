@@ -1,15 +1,27 @@
 const data = {
+  global: {
+    globalVATCountries: 'GB,IE,AD',
+    globalTimeFormat: 'hh:mm tt',
+    globalDateFormat: 'mmm dd, yyyy',
+    globalURLKeyBrand: 'sb',
+    globalURLKeyProductType: 'spt',
+    globalURLKeyAccount: 'ac',
+    globalURLKeyAttribute: 'att',
+    globalURLKeyAddress: 'ad',
+    globalURLKeyCategory: 'caty',
+    globalURLKeyProduct: 'sp',
+  },
+  currencies: {
+    USD: {
+      currencySymbol: '$',
+      formatMask: ' ',
+    },
+  },
+  sites: [],
   site: {
-    hibachiInstanceApplicationScopeKey: '',
-    siteName: '',
-    siteID: '',
-    defaultCountry: 'US',
-    siteCode: process.env.REACT_APP_SITE_CODE,
-    hibachiConfig: {
-      currencies: { GBP: { currencySymbol: '£', formatMask: '' }, USD: { currencySymbol: '$', formatMask: '' } },
-      currencyCode: 'USD',
-      rbLocale: 'en_us',
-      vatCountries: 'GB',
+    currencyCode: 'USD',
+    settings: {
+      siteDefaultCountry: 'us',
     },
   },
   router: [
@@ -26,6 +38,7 @@ const data = {
   },
   cmsProvider: 'slatwallCMS',
   enforceVerifiedAccountFlag: false,
+  allowGuestCheckout: true,
   products: {
     fallbackImageCall: false,
     loginRequiredForPrice: false,
@@ -45,11 +58,11 @@ const data = {
         { heading: 'Product Name', value: 'product_productName' },
         { heading: 'Sku Code', value: 'sku_skuCode' },
       ],
+      buttonLabel: '',
       params: {
         propertyIdentifierList: '',
         includeSKUCount: true,
         includeResizedImages: false,
-        applySiteFilter: false,
         applyStockFilter: false,
         includePagination: true,
         includePotentialFilters: true,
@@ -74,11 +87,43 @@ const data = {
         { type: 'data', heading: 'Sku Code', value: 'sku_skuCode' },
         { type: 'button', buttonType: 'viewProduct', linkLabel: 'View' },
       ],
+      buttonLabel: 'frontend.bulkorder.add_to_list',
       params: {
         propertyIdentifierList: '',
         includeSKUCount: false,
         includeResizedImages: true,
-        applySiteFilter: false,
+        applyStockFilter: false,
+        productsListingFlag: false,
+        includeSkus: true,
+        includeOptions: true,
+        includePagination: true,
+        includePotentialFilters: true,
+      },
+      filters: {
+        brand_slug: '',
+        orderBy: '',
+        pageSize: '12',
+        currentPage: '1',
+        keyword: '',
+        productType_slug: '',
+        category_slug: '',
+      },
+    },
+    bulkOrderPruduct: {
+      isSales: true,
+      viewMode: 'grid',
+      forcedFilterOptions: [],
+      headings: [
+        { type: 'property', heading: '', value: 'product_productName' },
+        { type: 'data', heading: 'Product Name', value: 'product_productName' },
+        { type: 'data', heading: 'Sku Code', value: 'sku_skuCode' },
+        { type: 'button', buttonType: 'viewProduct', linkLabel: 'View' },
+      ],
+      buttonLabel: 'frontend.bulkorder.add_to_list',
+      params: {
+        propertyIdentifierList: '',
+        includeSKUCount: false,
+        includeResizedImages: true,
         applyStockFilter: false,
         productsListingFlag: true,
         includeSkus: true,
@@ -141,5 +186,20 @@ const data = {
   forms: {
     contact: '',
   },
+  integrations: [
+    // {
+    //   key: 'googlelogin',
+    //   name: 'Google Login',
+    //   types: 'authentication',
+    //   settings: {},
+    // },
+    // {
+    //   key: 'facebooklogin',
+    //   name: 'Facebook Login',
+    //   types: 'authentication',
+    //   settings: {},
+    // },
+  ],
+  enableMultiSite: true,
 }
 export default data

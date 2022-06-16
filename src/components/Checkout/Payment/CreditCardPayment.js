@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { CreditCardDetails, SwRadioSelect } from '../..'
-import { addPayment } from '../../../actions/'
-import { getSavedCreditCardMethods, orderPayment } from '../../../selectors/'
+import { addPaymentToOrder } from '../../../actions/'
+import { getSavedCreditCardMethods } from '../../../selectors/'
 import { useTranslation } from 'react-i18next'
 
-const CreditCardPayment = () => {
+const CreditCardPayment = ({ method, fulfillment, isQuote = false, orderID, updateQuote }) => {
   const paymentMethods = useSelector(getSavedCreditCardMethods)
   const [newOrderPayment, setNewOrderPayment] = useState(false)
-  const { accountPaymentMethod = { accountPaymentMethodID: '' } } = useSelector(orderPayment)
+  const { accountPaymentMethod = { accountPaymentMethodID: '' } } = method
   const dispatch = useDispatch()
   const { t } = useTranslation()
 
@@ -35,11 +35,14 @@ const CreditCardPayment = () => {
                   setNewOrderPayment('new')
                 } else {
                   setNewOrderPayment(false)
-                  dispatch(
-                    addPayment({
-                      accountPaymentMethodID: value,
-                    })
-                  )
+                  let params = {
+                    accountPaymentMethodID: value,
+                  }
+                  if (isQuote) params['orderID'] = orderID
+
+                  dispatch(addPaymentToOrder({ params, isQuote })).then(response => {
+                    if (response.isSuccess() && isQuote && response.success().quote) updateQuote(response.success().quote)
+                  })
                 }
               }}
               selectedValue={newOrderPayment ? newOrderPayment : accountPaymentMethod.accountPaymentMethodID}
@@ -61,6 +64,9 @@ const CreditCardPayment = () => {
       </div>
       {newOrderPayment === 'new' && (
         <CreditCardDetails
+          fulfillment={fulfillment}
+          isQuote={isQuote}
+          orderID={orderID}
           onSubmit={() => {
             setNewOrderPayment(false)
           }}

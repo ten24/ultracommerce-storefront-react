@@ -13,7 +13,7 @@ const AuthenticationStepUp = ({ messageKey = 'frontend.account.auth.price' }) =>
 
   return (
     <div className="alert alert-warning" role="alert">
-      {t(messageKey)} <Link to={`/my-account?redirect=${loc.pathname}`}>{t('frontend.account.login')}</Link>
+      {t(messageKey)} <Link to={`/my-account/login?redirect=${loc.pathname}`}>{t('frontend.account.login')}</Link>
     </div>
   )
 }

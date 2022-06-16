@@ -310,11 +310,12 @@ const getEntryBySlug = (payload = {}) => {
         hydrated[page.urlTitlePath] = { ...pageStruc, ...response[page.urlTitlePath] }
       })
 
-      return hydrated
+      return { response, hydrated }
     })
 }
 const processForPage = (page, content) => {
   let hydrated = {}
+  hydrated.permissions = { accessFlag: true, nonRestrictedFlag: true }
   const descendants = getDescendants(content, page.contentID)
   hydrated.tabs = getContentByType(descendants, 'cetTab')
   hydrated.slider = processForSlider(descendants)
@@ -333,7 +334,6 @@ const processForPage = (page, content) => {
   hydrated.menu = {}
 
   hydrated.contentPageType = 'BasicPage'
-
   return hydrated
 }
 const getParent = (content = [], parentContentID) => content.filter(item => item.contentID === parentContentID)

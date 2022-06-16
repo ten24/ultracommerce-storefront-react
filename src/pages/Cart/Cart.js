@@ -2,18 +2,20 @@ import { CartLineItem, CartPromoBox, Layout, OrderSummary } from '../../componen
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
-import { getCart, clearCartData } from '../../actions/cartActions'
+import { getCart, clearCartData, removePromoCode } from '../../actions/cartActions'
 import { useEffect, useState } from 'react'
 import { disableInteractionSelector } from '../../selectors'
+import { applyPromoCode } from '../../actions/'
+import { updateItemQuantity, removeItem } from '../../actions/'
 
 const Cart = () => {
   const { t } = useTranslation()
   const dispatch = useDispatch()
   const disableInteraction = useSelector(disableInteractionSelector)
-  const { orderItems, isFetching } = useSelector(state => state.cart)
   const [removeitem, setRemoveitem] = useState(false)
   let history = useHistory()
-
+  const cart = useSelector(state => state.cart)
+  const { orderItems, isFetching } = cart
   useEffect(() => {
     dispatch(getCart())
   }, [dispatch])
@@ -57,7 +59,14 @@ const Cart = () => {
                   <div className="card-body py-0">
                     {orderItems &&
                       orderItems.map(orderItem => {
-                        return <CartLineItem key={orderItem.orderItemID} orderItemID={orderItem.orderItemID} orderItem={orderItem} setRemoveitem={setRemoveitem} />
+                        return <CartLineItem key={orderItem.orderItemID} orderItem={orderItem} setRemoveitem={setRemoveitem} onUpdateQty={(itemCount) => {
+                          dispatch(updateItemQuantity(orderItem.orderItemID, itemCount))
+                        }}
+                        onRemoveItem={(event)=>{
+                          setRemoveitem(true)
+                          event.preventDefault()
+                          dispatch(removeItem(orderItem.orderItemID))
+                        }}/>
                       })}
                   </div>
                 </div>
@@ -73,9 +82,16 @@ const Cart = () => {
             <div className="col-lg-4 col-md-12">
               <div className="row">
                 <div className="col-sm-12">
-                  <OrderSummary />
+                  <OrderSummary cart={cart} disabled={disableInteraction} onRemovePromoCode={(event,promotionCode)=>{
+           event.preventDefault()
+           dispatch(removePromoCode(promotionCode, undefined, t('frontend.cart.promo_code_removed')))
+          }
+        }/>
                 </div>
-                <CartPromoBox />
+                <CartPromoBox disabledInteraction={disableInteraction} onApplyCode={(promoCode,setPromoCode)=>{
+                  dispatch(applyPromoCode(promoCode, t('frontend.cart.promo_code_applied')))
+                  setPromoCode('')
+                }}/>
                 <div className="ps-2 pe-2">
                   <button
                     className="col-md-12 btn btn-primary w-100 mt-2 "

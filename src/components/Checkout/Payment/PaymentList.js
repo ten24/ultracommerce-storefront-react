@@ -1,20 +1,11 @@
-import { useDispatch, useSelector } from 'react-redux'
 import { GiftCardDetails, CCDetails, TermPaymentDetails, ExternalPaymentDetails, CashPaymentDetails } from '../..'
-import { removePayment } from '../../../actions/'
-import { getAllOrderPayments, disableInteractionSelector } from '../../../selectors/'
 import { useTranslation } from 'react-i18next'
 import { useCheckoutUtilities } from '../../../hooks'
 
-const PaymentList = ({ resetSelection }) => {
-  const payments = useSelector(getAllOrderPayments)
-  const disableInteraction = useSelector(disableInteractionSelector)
+const PaymentList = ({ resetSelection, payments, onRemovePayment = () => {}, disableInteraction = false }) => {
   const { CREDIT_CARD_CODE, GIFT_CARD_CODE, TERM_PAYMENT_CODE, CASH_PAYMENT_CODE, EXTERNAL_PAYMENT_CODE } = useCheckoutUtilities()
-
   const { t } = useTranslation()
-  const dispatch = useDispatch()
-  if (payments.length === 0) {
-    return null
-  }
+  if (payments.length === 0) return null
 
   return (
     <>
@@ -35,7 +26,7 @@ const PaymentList = ({ resetSelection }) => {
                 disabled={disableInteraction}
                 onClick={event => {
                   resetSelection()
-                  dispatch(removePayment({ orderPaymentID: payment.orderPaymentID }))
+                  onRemovePayment({ orderPaymentID: payment.orderPaymentID })
                 }}
               >
                 <i className="fal fa-times-circle"></i>

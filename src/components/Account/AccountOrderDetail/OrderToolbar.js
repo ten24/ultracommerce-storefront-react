@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-
+import { Link } from 'react-router-dom'
 const OrderToolbar = ({ delivered, orderPayments }) => {
   const { t } = useTranslation()
 
@@ -13,7 +13,7 @@ const OrderToolbar = ({ delivered, orderPayments }) => {
             </h6>
           </div>
           <div className="text-muted">
-            Status <span className="badge bg-success m-0 p-2 ml-2">{delivered}</span>
+            {t('frontend.order.statusText')} <span className="badge bg-success m-0 p-2 ml-2">{delivered.orderStatusType_typeName}</span>
           </div>
         </div>
         <div className="col-sm-6">
@@ -23,10 +23,19 @@ const OrderToolbar = ({ delivered, orderPayments }) => {
                 <i className="bi bi-box-full mr-2"></i> Request RMA
               </a>
             </div> */}
-            <button className="btn btn-outline-secondary w-25 no-print" onClick={() => window.print()}>
-              <i className="bi bi-print mr-2"></i> Print
+           
+            <button className="btn btn-outline-secondary w-25 no-print p-2" onClick={() => window.print()}>
+              <i className="bi bi-print mr-2"></i> {t('frontend.order.print')}
             </button>
+            
           </div>
+          {delivered.orderTemplate_orderTemplateID && (
+           <div className="text-align-right mt-4 justify-content-end">
+              <span>{t('frontend.account.order.history.orderFromTemplate') }</span>
+            <Link to={`/my-account/subscription-orders/${delivered.orderTemplate_orderTemplateID}`}>
+               {t('frontend.account.order.history.orderFromTemplateClickHere')}
+            </Link>
+            </div> ) }
         </div>
       </div>
     </div>

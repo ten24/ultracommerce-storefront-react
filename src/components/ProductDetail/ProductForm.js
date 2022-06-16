@@ -5,6 +5,7 @@ import { addToCart } from '../../actions'
 import { useProductPrice } from '../../hooks'
 import { Button, ProductQuantityInput } from '../'
 import { checkInvetory } from '../../selectors'
+import { toBoolean } from '../../utils'
 
 const ProductQuantityMessage = () => {
   const { t } = useTranslation()
@@ -22,6 +23,7 @@ const ProductForm = ({ sku, isDisabled, isLoading }) => {
   const { showAddToCart } = useProductPrice({ salePrice: sku?.salePrice, listPrice: sku?.listPrice })
   const [quantity, setQuantity] = useState(1)
   if (checkInvetoryFlag && (!sku || sku?.calculatedQATS < 1 || sku?.stocks_calculatedQATS < 1)) return <ProductQuantityMessage />
+if(toBoolean(sku?.settings?.skuAllowOrderTemplateFlag)) return null
   return (
     <div className="d-flex d-flex align-items-end ">
       <form
@@ -35,7 +37,7 @@ const ProductForm = ({ sku, isDisabled, isLoading }) => {
             <ProductQuantityInput setQuantity={setQuantity} quantity={quantity} sku={sku} stock={sku.calculatedQATS || sku.stocks_calculatedQATS} />
 
             <Button
-              disabled={isDisabled}
+              disabled={isDisabled || quantity < 1 }
               isLoading={isLoading}
               className="btn btn-primary btn-block my-3"
               label={t('frontend.product.add_to_cart')}

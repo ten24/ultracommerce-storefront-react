@@ -4,10 +4,12 @@ import { useGetEntityByUrlTitleAdvanced, useProductDetail } from '../../hooks'
 import { ProductDetailGallery, ProductDetailHeading, ProductPrice, ProductAttributes, SkuOptions, ProductForm } from '../../components'
 import { disableInteractionSelector } from '../../selectors'
 import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 
 const modalSizes = {
   default: '',
   small: 'modal-sm',
+  medium : 'modal-md',
   large: 'modal-lg',
   xLarge: 'modal-xl',
 }
@@ -39,10 +41,11 @@ const Modal = ({ show = true, setShow, title = 'Modal Title', children, size = '
 }
 
 const ProductModalHeading = ({ title, skuCode = '', setShow }) => {
+  const { t } = useTranslation()
   return (
     <div>
       <div className="modal-header">
-        <h3 className="modal-title">Configuring: {title}</h3>
+        <h3 className="modal-title">{t('frontend.bulkorder.listview.modal.configuring')}: {title}</h3>
         <button
           type="button"
           className="btn-close"
@@ -54,7 +57,7 @@ const ProductModalHeading = ({ title, skuCode = '', setShow }) => {
         ></button>
       </div>
       <div className="modal-header">
-        <h5 className="modal-title">SKU: {skuCode}</h5>
+        <h5 className="modal-title">{t('frontend.bulkorder.listview.modal.sku')}: {skuCode}</h5>
       </div>
     </div>
   )
@@ -110,9 +113,9 @@ const updateSkusForBetterOptions = product => {
   })
   return product
 }
-const ProductModal = ({ show = true, setShow, product = {}, size = 'xLarge', footer = false, addToCart = () => {} }) => {
+const ProductModal = ({ show = true, setShow, product = {}, size = 'xLarge', footer = false, addToCart = () => { } }) => {
   let { eventHandlerForWSIWYG } = useUtilities()
-  let { attributeSets, product: productWithAttributes } = useGetEntityByUrlTitleAdvanced(product.urlTitle, { includeAttributesMetadata: true, includeCategories: false, includeOptions: false, includeSkus: false, includeSettings: false })
+  let { attributeSets, product: productWithAttributes } = useGetEntityByUrlTitleAdvanced(product.urlTitle, { includeAttributesMetadata: true, includeCategories: true, includeOptions: false, includeSkus: false, includeSettings: false })
   const { filterSkusBySelectedOptions, calculateAvaliableOptions, calculateAdditionalParamters, selectionToSku } = useProductDetail()
   // const [selectedOptions, setSelectedOptions] = useState([])
   const [optionSelection, setOptionSelection] = useState([])
@@ -166,7 +169,7 @@ const ProductModal = ({ show = true, setShow, product = {}, size = 'xLarge', foo
               <div className="row">
                 <div className="col-md-3">{product?.productID && <ProductDetailGallery productUrlTitle={product?.urlTitle} />}</div>
                 <div className="col-md-5">
-                  <ProductDetailHeading product={product} />
+                  <ProductDetailHeading product={productWithAttributes} />
                   <div
                     className="pt-4"
                     onClick={eventHandlerForWSIWYG}
@@ -179,7 +182,7 @@ const ProductModal = ({ show = true, setShow, product = {}, size = 'xLarge', foo
                   <div className="my-4">{selectedSKu && <ProductPrice salePrice={selectedSKu.salePrice} listPrice={selectedSKu.listPrice} className="d-flex" showloginRequired={false} />}</div>
                   {!cart.isFetching && product?.skus?.length && <SkuOptions sku={selectedSKu} selection={optionSelection} productOptions={updatedProductOptions} skus={product?.skus} selectedOptionInModel={triggerSelectedOption} />}
 
-                  {product?.productID && <ProductForm sku={selectedSKu} isDisabled={isDisabled} isLoading={cart.isFetching} />}
+                  <ProductForm product={product} sku={selectedSKu} isDisabled={isDisabled} isLoading={cart.isFetching} />
                 </div>
               </div>
               <div className="row">
