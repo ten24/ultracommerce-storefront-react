@@ -99,4 +99,40 @@ const SkuOptions = ({ productOptions, selection, skus = [], selectedOptionInMode
   )
 }
 
-export { SkuOptions }
+const SkuSelector = ({ sku, skus = [], selectedOptionInModel }) => {
+  let loc = useLocation()
+  let history = useHistory()
+  return (
+    <div className="d-flex flex-row">
+      <div className="form-group pe-4 mb-4">
+        <select
+          className="custom-select rounded-pill"
+          required
+          value={sku?.skuID}
+          id="skuSelector"
+          onChange={e => {
+            if (selectedOptionInModel) {
+              selectedOptionInModel('', e.target.value)
+            } else {
+              history.replace({
+                pathname: loc.pathname,
+                search: `skuid=${e.target.value}`,
+              })
+            }
+          }}
+        >
+          {skus &&
+            skus.map(skuOption => {
+              return (
+                <option className="" key={skuOption.skuID} value={skuOption.skuID}>
+                  {skuOption.calculatedSkuDefinition}
+                </option>
+              )
+            })}
+        </select>
+      </div>
+    </div>
+  )
+}
+
+export { SkuOptions, SkuSelector }

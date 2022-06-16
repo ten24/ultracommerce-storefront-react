@@ -27,7 +27,8 @@ const useAccountProfile = () => {
           firstName: values.accountFirstName,
           lastName: values.accountLastName,
           primaryEmailAddress: {
-            emailAddress: values.accountEmailAddress
+            emailAddress: values.accountEmailAddress,
+            accountEmailAddressID : user.primaryEmailAddress.accountEmailAddressID,
           },
           company: values.accountCompany,
           returnJSONObjects: 'account',

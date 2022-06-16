@@ -1,86 +1,73 @@
 import { toast } from 'react-toastify'
 import { axios, sdkURL, SlatwalApiService } from '../services'
-import { receiveUser, requestUser } from './userActions'
 import { getErrorMessage } from '../utils'
+import {
+  requestCart,
+  receiveCart,
+  addToOrder,
+  addMultipleItemsToOrder,
+  removeOrderItem,
+  getOrder,
+  clearOrderData,
+  getEligibleOrderFulfillmentMethods,
+  getAllPickupLocations,
+  clearFulfillmentOnOrder,
+  addPickupLocationToOrderFulfillment,
+  setPickupDateToOrderFulfillment,
+  updateNotesOnOrder,
+  updateOrderItemQuantity,
+  addShippingAddressToOrderFulfillment,
+  addShippingAddressUsingAccountAddressToOrderFulfillment,
+  addShippingMethodToOrderFulfillment,
+  updateOrderFulfillment,
+  applyPromoCodeToOrder,
+  removePromoCodeFromOrder,
+  addBillingAddressToOrderFulfillment,
+  addPaymentToOrder,
+  removeOrderPayment,
+  placeMyOrder,
+  addNewAddressAndAttachAsShippingOnOrderFulfillment,
+  changeFulfillmentOnOrder,
+  addBillingAddressUsingAccountAddressOnOrderFulfillment,
+  addNewAccountAndSetAsBillingOnOrderFulfillment,
+  addAddressAndAttachAsBillingOnOrderFulfillment,
+  addAddressAndPaymentAndThenAddToOrder,
+} from './orderActions'
 
-export const REQUEST_CART = 'REQUEST_CART'
-export const RECEIVE_CART = 'RECEIVE_CART'
-export const CONFIRM_ORDER = 'CONFIRM_ORDER'
-export const CLEAR_CART = 'CLEAR_CART'
-export const ADD_TO_CART = 'ADD_TO_CART'
-export const REMOVE_FROM_CART = 'REMOVE_FROM_CART'
-export const SET_ERROR = 'SET_ERROR'
-
-export const requestCart = () => {
-  return {
-    type: REQUEST_CART,
-  }
-}
-
-export const receiveCart = cart => {
-  return {
-    type: RECEIVE_CART,
-    cart,
-  }
-}
-export const confirmOrder = (isPlaced = true) => {
-  return {
-    type: CONFIRM_ORDER,
-    isPlaced,
-  }
-}
-export const setError = (error = null) => {
-  return {
-    type: SET_ERROR,
-    error,
-  }
-}
-
-export const clearCart = () => {
-  return {
-    type: CLEAR_CART,
-  }
-}
-export const setOrderOnCart = (orderID, successMsg = '') => {
+const setOrderOnCart = (orderID, successMsg = '') => {
   return async dispatch => {
     dispatch(requestCart())
 
-    const payload = {
-      orderID,
-      returnJSONObjects: 'cart',
-    }
-
-    await SlatwalApiService.cart.addCartToSession(payload).then(response => {
-      if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-      if (response.isSuccess()) {
-        dispatch(receiveCart(response.success().cart))
-        if (successMsg !== '' && !Object.keys(response.success()?.errors || {}).length) {
-          toast.success(successMsg)
+    return await SlatwalApiService.cart
+      .addCartToSession({
+        orderID,
+        returnJSONObjects: 'cart',
+      })
+      .then(response => {
+        if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
+        if (response.isSuccess()) {
+          dispatch(receiveCart(response.success().cart))
+          if (successMsg !== '' && !Object.keys(response.success()?.errors || {}).length) {
+            toast.success(successMsg)
+          }
         }
-      } else {
-      }
+        return response
+      })
+  }
+}
+const getCart = () => {
+  return async dispatch => {
+    return dispatch(getOrder({})).then(response => {
+      if (response.isSuccess() && response.success().errors) toast.error(getErrorMessage(response.success().errors))
+      return response
     })
   }
 }
-export const getCart = () => {
+const clearCartData = () => {
   return async dispatch => {
-    dispatch(requestCart())
-    await SlatwalApiService.cart.get().then(response => {
-      if (response.isSuccess()) {
-        if (response.success().errors) toast.error(getErrorMessage(response.success().errors))
-        dispatch(receiveCart(response.success().cart))
-      }
-    })
-  }
-}
-export const clearCartData = () => {
-  return async dispatch => {
-    dispatch(requestCart())
-    await SlatwalApiService.cart.clear({ returnJSONObjects: 'cart' }).then(response => {
+    return dispatch(clearOrderData({})).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-      if (response.isSuccess()) {
-        dispatch(receiveCart(response.success().cart))
-      }
+      return response
     })
   }
 }
@@ -100,10 +87,8 @@ const getCookie = cname => {
   }
   return ''
 }
-export const addToCart = (skuID, quantity = 1) => {
+const addToCart = (skuID, quantity = 1) => {
   return async (dispatch, getState) => {
-    dispatch(requestCart())
-
     const accountCode = getState().cartReducer?.affiliateAccount?.accountCode
     const affiliateAccountCookie = getCookie('affiliateCode')
 
@@ -112,28 +97,49 @@ export const addToCart = (skuID, quantity = 1) => {
       dispatch(addAffiliate(codePair[1], '', false))
     }
 
-    return await SlatwalApiService.cart
-      .addItem({
-        skuID,
-        quantity,
-        returnJSONObjects: 'cart',
+    return dispatch(
+      addToOrder({
+        params: {
+          skuID,
+          quantity,
+        },
       })
-      .then(response => {
-        if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-        if (response.isSuccess()) {
-          toast.success('Added to Cart')
-          dispatch(receiveCart(response.success().cart))
-        } else {
-          dispatch(receiveCart())
+    ).then(response => {
+      if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
+      if (response.isSuccess()) toast.success('Added to Cart')
+      if (!response.isSuccess()) toast.error('Error')
 
-          toast.error('Error')
-        }
-        return response
-      })
+      return response
+    })
   }
 }
 
-export const addAffiliate = (affiliateCode, skuCode, requestCartRefresh = true) => {
+const addMultipleItemsToCart = (skuIDs, quantities) => {
+  return async (dispatch, getState) => {
+    const accountCode = getState().cartReducer?.affiliateAccount?.accountCode
+    const affiliateAccountCookie = getCookie('affiliateCode')
+
+    if (!accountCode?.length && affiliateAccountCookie.length) {
+      const codePair = affiliateAccountCookie.split('=')
+      dispatch(addAffiliate(codePair[1], '', false))
+    }
+    dispatch(
+      addMultipleItemsToOrder({
+        params: {
+          skuIDs,
+          quantities,
+        },
+      })
+    ).then(response => {
+      if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
+      if (response.isSuccess()) toast.success('Added to Cart')
+      if (!response.isSuccess()) toast.error('Error')
+      return response
+    })
+  }
+}
+
+const addAffiliate = (affiliateCode, skuCode, requestCartRefresh = true) => {
   return async dispatch => {
     if (requestCartRefresh) dispatch(requestCart())
     return await axios({
@@ -157,428 +163,256 @@ export const addAffiliate = (affiliateCode, skuCode, requestCartRefresh = true) 
   }
 }
 
-export const getEligibleFulfillmentMethods = () => {
+const getEligibleFulfillmentMethods = () => {
   return async dispatch => {
-    dispatch(requestCart())
-
-    const payload = {}
-
-    await SlatwalApiService.cart.eligibleFulfillmentMethods(payload).then(response => {
+    return dispatch(getEligibleOrderFulfillmentMethods({})).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-      if (response.isSuccess()) {
-        dispatch(receiveCart({ eligibleFulfillmentMethods: response.success().eligibleFulfillmentMethods }))
-      } else {
-        dispatch(receiveCart())
-      }
+      return response
     })
   }
 }
 
-export const getPickupLocations = () => {
+const getPickupLocations = () => {
   return async dispatch => {
-    dispatch(requestCart())
-
-    await SlatwalApiService.location.getPickupLocations().then(response => {
+    return dispatch(getAllPickupLocations({})).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-      if (response.isSuccess()) {
-        dispatch(receiveCart({ pickupLocations: response.success().locations }))
-      } else {
-        dispatch(receiveCart())
-      }
+      return response
     })
   }
 }
 
-export const clearOrderFulfillment = orderFulfillmentID => {
+const clearOrderFulfillment = orderFulfillmentID => {
   return async dispatch => {
-    dispatch(requestCart())
-
-    const payload = { orderFulfillmentID, returnJSONObjects: 'cart' }
-
-    await SlatwalApiService.cart.clearOrderFulfillment(payload).then(response => {
+    return dispatch(clearFulfillmentOnOrder({ params: { orderFulfillmentID } })).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-      if (response.isSuccess()) {
-        dispatch(receiveCart(response.success().cart))
-      } else {
-        dispatch(receiveCart())
-      }
+      return response
     })
   }
 }
 
-export const addPickupLocation = params => {
+const addPickupLocation = params => {
   return async dispatch => {
-    dispatch(requestCart())
-
-    const payload = {
-      ...params,
-      returnJSONObjects: 'cart',
-    }
-
-    await SlatwalApiService.cart.addPickupLocation(payload).then(response => {
+    return dispatch(addPickupLocationToOrderFulfillment({ params })).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-      if (response.isSuccess()) {
-        dispatch(receiveCart(response.success().cart))
-      } else {
-        dispatch(receiveCart())
-      }
+      return response
     })
   }
 }
-export const setPickupDate = params => {
+const setPickupDate = params => {
   return async dispatch => {
-    dispatch(requestCart())
-
-    const payload = {
-      ...params,
-      returnJSONObjects: 'cart',
-    }
-
-    await SlatwalApiService.cart.setPickupDate(payload).then(response => {
+    return dispatch(setPickupDateToOrderFulfillment({ params })).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-      if (response.isSuccess()) {
-        dispatch(receiveCart(response.success().cart))
-      } else {
-        dispatch(receiveCart())
-      }
+      return response
     })
   }
 }
-export const updateOrderNotes = params => {
+const updateOrderNotes = params => {
   return async dispatch => {
-    dispatch(requestCart())
-
-    const payload = {
-      ...params,
-      returnJSONObjects: 'cart',
-    }
-
-    await SlatwalApiService.cart.updateNotes(payload).then(response => {
+    return dispatch(updateNotesOnOrder({ params })).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-      if (response.isSuccess()) {
-        dispatch(receiveCart(response.success().cart))
-      } else {
-        dispatch(receiveCart())
-      }
+      return response
     })
   }
 }
-export const updateItemQuantity = (skuID, quantity = 1) => {
+const updateItemQuantity = (skuID, quantity = 1) => {
   return async dispatch => {
-    dispatch(requestCart())
-    const payload = {
-      orderItem: {
-        sku: {
-          skuID,
+    dispatch(
+      updateOrderItemQuantity({
+        orderItem: {
+          sku: {
+            skuID,
+          },
+          qty: quantity,
         },
-        qty: quantity,
-      },
-      returnJSONObjects: 'cart',
-    }
-
-    await SlatwalApiService.cart.updateItemQuantity(payload).then(response => {
+      })
+    ).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-      if (response.isSuccess()) {
-        toast.success('Quantity Update')
-        dispatch(receiveCart(response.success().cart))
-      } else {
-        dispatch(receiveCart())
-      }
+      if (response.isSuccess()) toast.success('Quantity Update')
+      return response
     })
   }
 }
 
-export const removeItem = orderItemID => {
+const removeItem = orderItemID => {
   return async dispatch => {
-    dispatch(requestCart())
-    const payload = {
-      orderItemID,
-      returnJSONObjects: 'cart',
-    }
-    return await SlatwalApiService.cart.removeItem(payload).then(response => {
+    return dispatch(removeOrderItem({ params: { orderItemID } })).then(response => {
+      if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
+      return response
+    })
+  }
+}
+
+const addShippingAddress = (params = {}) => {
+  return async dispatch => {
+    return dispatch(addShippingAddressToOrderFulfillment({ params })).then(response => {
+      if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
+      return response
+    })
+  }
+}
+const addShippingAddressUsingAccountAddress = (params = {}) => {
+  return async dispatch => {
+    return dispatch(addShippingAddressUsingAccountAddressToOrderFulfillment({ params })).then(response => {
+      if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
+      return response
+    })
+  }
+}
+
+const addShippingMethod = (params = {}) => {
+  return async dispatch => {
+    return dispatch(addShippingMethodToOrderFulfillment({ params })).then(response => {
+      if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
+      return response
+    })
+  }
+}
+
+const updateFulfillment = (params = {}) => {
+  return async dispatch => {
+    return dispatch(updateOrderFulfillment({ params })).then(response => {
+      if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
+      return response
+    })
+  }
+}
+
+const applyPromoCode = (promotionCode, successMsg = '') => {
+  return async dispatch => {
+    dispatch(
+      applyPromoCodeToOrder({
+        params: {
+          promotionCode,
+          returnJSONObjects: 'cart',
+        },
+      })
+    ).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
       if (response.isSuccess()) {
-        dispatch(receiveCart(response.success().cart))
+        if (successMsg !== '' && !Object.keys(response.success()?.errors || {}).length) {
+          toast.success(successMsg)
+        }
       }
       return response
     })
   }
 }
 
-export const addShippingAddress = (params = {}) => {
+const removePromoCode = (promotionCode, promotionCodeID, successMsg = '') => {
   return async dispatch => {
-    dispatch(requestCart())
-
-    await SlatwalApiService.cart.addShippingAddress(params).then(response => {
+    return dispatch(
+      removePromoCodeFromOrder({
+        params: {
+          promotionCode,
+          promotionCodeID,
+        },
+      })
+    ).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
       if (response.isSuccess()) {
-        dispatch(receiveCart(response.success().cart))
-      }
-    })
-  }
-}
-export const addShippingAddressUsingAccountAddress = (params = {}) => {
-  return async dispatch => {
-    dispatch(requestCart())
-
-    await SlatwalApiService.cart
-      .addShippingAddressUsingAccountAddress({
-        ...params,
-        returnJSONObjects: 'cart',
-      })
-      .then(response => {
-        if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-        if (response.isSuccess()) {
-          dispatch(receiveCart(response.success().cart))
+        if (successMsg !== '' && !Object.keys(response.success()?.errors || {}).length) {
+          toast.success(successMsg)
         }
-      })
-  }
-}
-export const addShippingMethod = (params = {}) => {
-  return async dispatch => {
-    dispatch(requestCart())
-
-    await SlatwalApiService.cart
-      .addShippingMethod({
-        ...params,
-        returnJSONObjects: 'cart',
-      })
-      .then(response => {
-        if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-        if (response.isSuccess()) {
-          dispatch(receiveCart(response.success().cart))
-        }
-      })
-  }
-}
-
-export const updateFulfillment = (params = {}) => {
-  return async dispatch => {
-    dispatch(requestCart())
-
-    await SlatwalApiService.cart.updateFulfillment(params).then(response => {
-      if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-      if (response.isSuccess()) {
-        dispatch(receiveCart(response.success().cart))
       }
+      return response
     })
   }
 }
 
-export const applyPromoCode = (promotionCode, successMsg = '') => {
+const addBillingAddress = (params = {}) => {
   return async dispatch => {
-    dispatch(requestCart())
-    await SlatwalApiService.cart
-      .applyPromoCode({
-        promotionCode,
-        returnJSONObjects: 'cart',
-      })
-      .then(response => {
-        if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-        if (response.isSuccess()) {
-          dispatch(receiveCart(response.success().cart))
-          if (successMsg !== '' && !Object.keys(response.success()?.errors || {}).length) {
-            toast.success(successMsg)
-          }
-        } else {
-        }
-      })
-  }
-}
-export const removePromoCode = (promotionCode, promotionCodeID, successMsg = '') => {
-  return async dispatch => {
-    dispatch(requestCart())
-    await SlatwalApiService.cart
-      .removePromoCode({
-        promotionCode,
-        promotionCodeID,
-        returnJSONObjects: 'cart',
-      })
-      .then(response => {
-        if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-        if (response.isSuccess()) {
-          dispatch(receiveCart(response.success().cart))
-          if (successMsg !== '' && !Object.keys(response.success()?.errors || {}).length) {
-            toast.success(successMsg)
-          }
-        } else {
-        }
-      })
-  }
-}
-
-export const addBillingAddress = (params = {}) => {
-  return async dispatch => {
-    dispatch(requestCart())
-
-    await SlatwalApiService.cart.addBillingAddress(params).then(response => {
+    return dispatch(addBillingAddressToOrderFulfillment({ params })).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-      if (response.isSuccess()) {
-        dispatch(receiveCart(response.success().cart))
-      }
+
+      return response
     })
   }
 }
 
-export const addPayment = (params = {}) => {
+const addPayment = (params = {}) => {
   return async dispatch => {
-    dispatch(requestCart())
-    await SlatwalApiService.cart
-      .addPayment({
-        ...params,
-        returnJSONObjects: 'cart,account',
-      })
-      .then(response => {
-        if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-        if (response.isSuccess()) {
-          dispatch(receiveCart(response.success().cart))
-          dispatch(receiveUser(response.success().account))
-        } else {
-          dispatch(receiveCart({}))
-          toast.error('An Error Occured')
-        }
-      })
-  }
-}
-
-export const removePayment = (params = {}) => {
-  return async dispatch => {
-    dispatch(requestCart())
-
-    await SlatwalApiService.cart.removePayment({ ...params, returnJSONObjects: 'cart' }).then(response => {
+    return dispatch(addPaymentToOrder({ params })).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-      if (response.isSuccess()) {
-        dispatch(receiveCart({ ...response.success().cart }))
-      } else {
-      }
+      if (!response.isSuccess()) toast.error('An Error Occured')
+
+      return response
     })
   }
 }
 
-export const placeOrder = () => {
+const removePayment = (params = {}) => {
   return async dispatch => {
-    dispatch(requestCart())
-
-    await SlatwalApiService.cart.placeOrder({ returnJSONObjects: 'cart' }).then(response => {
+    return dispatch(removeOrderPayment({ params })).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-      if (response.isSuccess()) {
-        dispatch(receiveCart(response.success().cart))
-        dispatch(confirmOrder())
-      } else {
-      }
+
+      return response
     })
   }
 }
 
-export const addNewAddressAndAttachAsShipping = (params = {}) => {
+const placeOrder = () => {
   return async dispatch => {
-    dispatch(requestCart())
-    dispatch(requestUser())
-
-    const payload = { returnJsonObjects: 'cart,account', ...params }
-
-    await SlatwalApiService.cart.addNewAddressAndAttachAsShipping(payload).then(response => {
+    return dispatch(placeMyOrder({})).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-      if (response.isSuccess()) {
-        dispatch(receiveUser(response.success().account))
-        dispatch(receiveCart(response.success().cart))
-      } else {
-        dispatch(receiveCart())
-        dispatch(receiveUser())
-      }
+      return response
     })
   }
 }
 
-export const changeOrderFulfillment = (params = {}) => {
+const addNewAddressAndAttachAsShipping = (params = {}) => {
   return async dispatch => {
-    dispatch(requestCart())
-
-    await SlatwalApiService.cart.updateFulfillment({ returnJsonObjects: 'cart', ...params }).then(response => {
+    return dispatch(addNewAddressAndAttachAsShippingOnOrderFulfillment({ params })).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-      if (response.isSuccess()) {
-        dispatch(receiveCart(response.success().cart))
-      } else {
-        dispatch(receiveCart())
-      }
+      return response
     })
   }
 }
 
-export const addBillingAddressUsingAccountAddress = (params = {}) => {
+const changeOrderFulfillment = (params = {}) => {
   return async dispatch => {
-    dispatch(requestCart())
-    dispatch(requestUser())
-
-    const payload = { returnJsonObjects: 'cart', ...params }
-
-    await SlatwalApiService.cart.addBillingAddressUsingAccountAddress(payload).then(response => {
+    return dispatch(changeFulfillmentOnOrder({ params })).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-      if (response.isSuccess()) {
-        dispatch(receiveUser(response.success().account))
-        dispatch(receiveCart(response.success().cart))
-      } else {
-        dispatch(receiveUser())
-        dispatch(receiveCart())
-      }
+
+      return response
     })
   }
 }
 
-export const addNewAccountAndSetAsBilling = (params = {}) => {
+const addBillingAddressUsingAccountAddress = (params = {}) => {
   return async dispatch => {
-    dispatch(requestCart())
-    dispatch(requestUser())
-
-    const payload = { returnJsonObjects: 'cart,account', ...params }
-
-    await SlatwalApiService.cart.addNewAccountAndSetAsBillingAddress(payload).then(response => {
+    return dispatch(addBillingAddressUsingAccountAddressOnOrderFulfillment({ params })).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-      if (response.isSuccess()) {
-        dispatch(receiveUser(response.success().account))
-        dispatch(receiveCart(response.success().cart))
-      } else {
-        dispatch(receiveCart())
-        dispatch(receiveUser())
-      }
+
+      return response
     })
   }
 }
 
-export const addAddressAndAttachAsBilling = (params = {}) => {
+const addNewAccountAndSetAsBilling = (params = {}) => {
   return async dispatch => {
-    dispatch(requestCart())
-    dispatch(requestUser())
-
-    const payload = { returnJsonObjects: 'cart,account', ...params }
-
-    await SlatwalApiService.cart.addEditAccountAndSetAsBillingAddress(payload).then(response => {
+    return dispatch(addNewAccountAndSetAsBillingOnOrderFulfillment({ params })).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-      if (response.isSuccess()) {
-        dispatch(receiveUser(response.success().account))
-        dispatch(receiveCart(response.success().cart))
-      } else {
-        dispatch(receiveCart())
-        dispatch(receiveUser())
-      }
+      return response
     })
   }
 }
 
-export const addAddressAndPaymentAndAddToOrder = (params = {}) => {
+const addAddressAndAttachAsBilling = (params = {}) => {
   return async dispatch => {
-    dispatch(requestCart())
-    dispatch(requestUser())
-
-    await SlatwalApiService.cart.addAccountPaymentMethod({ returnJsonObjects: 'cart,account', ...params }).then(response => {
+    return dispatch(addAddressAndAttachAsBillingOnOrderFulfillment({ params })).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-      if (response.isSuccess()) {
-        dispatch(receiveUser(response.success().account))
-        dispatch(receiveCart(response.success().cart))
-      } else {
-        dispatch(receiveCart())
-        dispatch(receiveUser())
-      }
+      return response
     })
   }
 }
+
+const addAddressAndPaymentAndAddToOrder = (params = {}) => {
+  return async dispatch => {
+    dispatch(addAddressAndPaymentAndThenAddToOrder({ params })).then(response => {
+      if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
+
+      return response
+    })
+  }
+}
+export { getCart, setOrderOnCart, clearCartData, addMultipleItemsToCart, addToCart, addAffiliate, getEligibleFulfillmentMethods, getPickupLocations, addPickupLocation, setPickupDate, updateOrderNotes, updateItemQuantity, removeItem, addShippingAddress, addShippingAddressUsingAccountAddress, addShippingMethod, updateFulfillment, applyPromoCode, removePromoCode, addBillingAddress, addPayment, removePayment, placeOrder, addNewAddressAndAttachAsShipping, changeOrderFulfillment, addBillingAddressUsingAccountAddress, addNewAccountAndSetAsBilling, addAddressAndPaymentAndAddToOrder, clearOrderFulfillment, addAddressAndAttachAsBilling }

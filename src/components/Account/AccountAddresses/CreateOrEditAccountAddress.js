@@ -166,7 +166,7 @@ const CreateOrEditAccountAddress = ({ path, heading, action = 'Account Address' 
                 options={countryCodeOptions}
                 onBlur={value => requiredValidation({ value, name: 'countryCode', msg: t('frontend.core.required') })}
               />
-              {!!billingAddressErrors.countryCode && <span className="form-error-msg">{billingAddressErrors.countryCode}</span>}
+              {!!billingAddressErrors.countryCode && <span className="form-error-msg">{billingAddressErrors?.countryCode?.message}</span>}
             </div>
           </div>
 
@@ -234,7 +234,7 @@ const CreateOrEditAccountAddress = ({ path, heading, action = 'Account Address' 
                   onBlur={value => requiredValidation({ value, name: 'stateCode', msg: t('frontend.core.required') })}
                   options={stateCodeOptions[billingAddress.countryCode]}
                 />
-                {!!billingAddressErrors.stateCode && <span className="form-error-msg">{billingAddressErrors.stateCode}</span>}
+                {!!billingAddressErrors.stateCode && <span className="form-error-msg">{billingAddressErrors?.stateCode?.message}</span>}
               </div>
             )}
 

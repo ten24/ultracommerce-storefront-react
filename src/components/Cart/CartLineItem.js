@@ -1,16 +1,16 @@
 import { ProductPrice, SimpleImage } from '../../components'
-import { useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { updateItemQuantity, removeItem } from '../../actions/'
-import { useCartLineItem, useFormatCurrency } from '../../hooks/'
+import { useFormatCurrency } from '../../hooks/'
 import { useState } from 'react'
+import { getProductRoute } from '../../selectors'
 
-const CartLineItem = ({ orderItemID, isDisabled = false, setRemoveitem = () => {} }) => {
+const CartLineItem = ({ orderItem, isDisabled = false, isFetching= false, setRemoveitem = () => {} , onUpdateQty, onRemoveItem }) => {
   const [formatCurrency] = useFormatCurrency({})
   const { t } = useTranslation()
-  const dispatch = useDispatch()
-  const { orderItem, listPrice, productRouting, isFetching, isBackordered } = useCartLineItem(orderItemID)
+  const productRouting = useSelector(getProductRoute)
+  const isBackordered = false
   const [itemCount, setItemCount] = useState(orderItem.quantity)
   return (
     <div className="row border-bottom py-3">
@@ -41,7 +41,7 @@ const CartLineItem = ({ orderItemID, isDisabled = false, setRemoveitem = () => {
       <div className="col-sm-12 col-md-6 d-none d-sm-block">
         <div className="row">
           <div className="col-sm-3">
-            <ProductPrice type="cart" salePrice={orderItem.price} listPrice={listPrice} salePriceSuffixKey="frontend.core.each" accentSalePrice={false} />
+            <ProductPrice type="cart" salePrice={orderItem.extendedUnitPriceAfterDiscount} listPrice={orderItem.sku.listPrice} salePriceSuffixKey="frontend.core.each" accentSalePrice={false} />
           </div>
           {isBackordered && (
             <div className="col-sm-3">
@@ -63,11 +63,9 @@ const CartLineItem = ({ orderItemID, isDisabled = false, setRemoveitem = () => {
                 />
                 <button
                   className="btn text-muted btn-link p-1 text-end"
-                  onClick={() => {
-                    dispatch(updateItemQuantity(orderItem.sku.skuID, itemCount))
-                  }}
+                  onClick={()=>onUpdateQty(itemCount)}
                 >
-                  Update
+                  {t('frontend.account.cart.item.updateQuantity')}
                 </button>
               </div>
               <div className="col-sm-4">
@@ -81,11 +79,7 @@ const CartLineItem = ({ orderItemID, isDisabled = false, setRemoveitem = () => {
                 <span
                   className="bi bi-trash clickable"
                   disabled={isFetching}
-                  onClick={event => {
-                    setRemoveitem(true)
-                    event.preventDefault()
-                    dispatch(removeItem(orderItemID))
-                  }}
+                  onClick= {(event)=>onRemoveItem(event)}
                 ></span>
               </div>
             </>

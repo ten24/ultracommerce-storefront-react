@@ -7,11 +7,11 @@ import { useGetAllOrders } from '../../hooks'
 import { useEffect } from 'react'
 import { confirmOrder } from '../../actions'
 import { isAuthenticated } from '../../utils'
-import { useCookies } from 'react-cookie';
+import { useCookies } from 'react-cookie'
 
 const OrderConfirmation = () => {
   let [orders, setRequest] = useGetAllOrders()
-  const [, , removeCookie] = useCookies();
+  const [, , removeCookie] = useCookies()
   const { t } = useTranslation()
   let dispatch = useDispatch()
   let loc = useLocation()
@@ -24,8 +24,8 @@ const OrderConfirmation = () => {
     if (!orders.isFetching && !orders.isLoaded && !didCancel) {
       setRequest({ ...orders, isFetching: true, isLoaded: false, params: { pageRecordsShow: 1, currentPage: 1 }, makeRequest: true })
     }
-    if(!orders.isFetching && orders.isLoaded && !didCancel){
-      removeCookie('affiliateCode', {path:'/'})
+    if (!orders.isFetching && orders.isLoaded && !didCancel) {
+      removeCookie('affiliateCode', { path: '/' })
     }
     dispatch(confirmOrder(false))
     return () => {
@@ -34,7 +34,7 @@ const OrderConfirmation = () => {
   }, [orders, setRequest, removeCookie, dispatch])
 
   if (!isAuthenticated()) {
-    return <Redirect to={'/my-account'} />
+    return <Redirect to={'/my-account/login'} />
   }
 
   return (
@@ -76,7 +76,7 @@ const OrderConfirmation = () => {
                     className="btn btn-link w-100 mb-3 align-center link-btn"
                     onClick={e => {
                       e.preventDefault()
-                      history.push('/my-account')
+                      history.push('/my-account/overview')
                     }}
                   >
                     {t('frontend.header.myAccount')}

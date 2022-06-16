@@ -4,7 +4,7 @@ import { ProductReviewRating } from '../../components'
 const ProductReviewListing = ({ isFetching, pageRecords }) => {
 	const { t } = useTranslation()
 	return (
-<div className="col-sm-6 col-md-9">
+<div className={`col-sm-6 ${pageRecords.length > 0 ? 'col-md-9' : 'col-md-12 text-center'}`}>
 	{pageRecords.length > 0 ? pageRecords.map((productReview,index) => {
 	return (
 			<div className="repeater" key={index}>

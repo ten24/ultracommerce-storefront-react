@@ -1,5 +1,4 @@
 import { Layout, ListingToolBar, ListingSidebar, ListingPagination, ListingGrid, PageHeader, CategoryList } from '../../components'
-import { useTranslation } from 'react-i18next'
 import { useHistory, useLocation, useParams } from 'react-router'
 import { Helmet } from 'react-helmet'
 import { useSelector } from 'react-redux'
@@ -12,7 +11,7 @@ const Category = () => {
   const { categoryRequest, categoryData, categoryListRequest, crumbCalculator, categoryRoute, isError, errorMessage } = useCategory()
   return (
     <Layout>
-      {categoryRequest.isLoaded && <Helmet title={categoryRequest?.data?.settings?.productHTMLTitleString} />}
+      {!!categoryRequest?.data?.settings?.categoryHTMLTitleString && <Helmet title={categoryRequest?.data?.settings?.categoryHTMLTitleString} />}
       <PageHeader title={categoryRequest?.data?.categoryName} crumbs={crumbCalculator()} />
       {isError && (
         <div className="container bg-light box-shadow-lg rounded-lg p-5">
@@ -43,14 +42,11 @@ const CategorySearchListing = ({ category }) => {
   const [preFilter] = useState({
     category_slug: path[0],
   })
-  const { t } = useTranslation()
-  const siteName = useSelector(state => state.configuration.site.siteName)
   const content = useSelector(state => state.content[loc.pathname.substring(1)])
   const { records, isFetching, potentialFilters, total, totalPages, setSort, updateAttribute, setPage, setKeyword, params } = useListing(preFilter)
 
   return (
-    <Layout>
-      <Helmet title={`${t('frontend.header.shop')} - ${siteName}`} />
+    <>
       <div className="bg-lightgray py-4">
         <div className="container d-lg-flex justify-content-between py-2 py-lg-3">
           <div className="order-lg-1 pr-lg-4 text-center">
@@ -66,7 +62,7 @@ const CategorySearchListing = ({ category }) => {
         </div>
         <ListingPagination recordsCount={total} currentPage={params['currentPage']} totalPages={totalPages} setPage={setPage} />
       </div>
-    </Layout>
+    </>
   )
 }
 

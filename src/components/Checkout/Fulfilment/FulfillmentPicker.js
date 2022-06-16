@@ -1,13 +1,7 @@
-import { useDispatch, useSelector } from 'react-redux'
-import { changeOrderFulfillment } from '../../../actions/'
 import { SwRadioSelect } from '../../'
-import { fulfillmentMethodSelector } from '../../../selectors/'
 import { useTranslation } from 'react-i18next'
 
-const FulfillmentPicker = () => {
-  const dispatch = useDispatch()
-  const { eligibleFulfillmentMethods, orderItems } = useSelector(state => state.cart)
-  let selectedFulfillmentMethod = useSelector(fulfillmentMethodSelector)
+const FulfillmentPicker = ({ orderItems, eligibleFulfillmentMethods, onSelect, onChangeOrderFullfillment, selectedFulfillmentMethod }) => {
   const { t } = useTranslation()
   const orderItemIDList = orderItems
     .map(orderItem => {
@@ -22,7 +16,8 @@ const FulfillmentPicker = () => {
             label={t('frontend.checkout.receive_option')}
             options={eligibleFulfillmentMethods}
             onChange={fulfillmentMethodID => {
-              dispatch(changeOrderFulfillment({ fulfillmentMethodID, orderItemIDList }))
+              onChangeOrderFullfillment(fulfillmentMethodID, orderItemIDList)
+              onSelect()
             }}
             selectedValue={selectedFulfillmentMethod.fulfillmentMethodID}
           />

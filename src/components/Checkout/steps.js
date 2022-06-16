@@ -4,9 +4,8 @@ const PAYMENT = 'payment'
 const REVIEW = 'review'
 
 const getCurrentStep = path => {
-  return (checkOutSteps.filter(step => {
-    return step.key === path
-  }) || [checkOutSteps[1]])[0]
+  const currentList = checkOutSteps.filter(step => step.key === path)
+  return currentList.length ? currentList[0] : checkOutSteps[1]
 }
 
 const checkOutSteps = [

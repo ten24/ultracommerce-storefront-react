@@ -56,19 +56,26 @@ const CreateOrEditAccountPaymentMethod = () => {
     if (billingAccountAddressID.length) payload.billingAccountAddress.accountAddressID = billingAccountAddressID
     if (!billingAccountAddressID.length) payload.billingAddress = billingAddress
     SlatwalApiService.account.addPaymentMethod(payload).then(response => {
-      if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
+      
+      if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length){
+            toast.error(getErrorMessage(response.success().errors))
+      }
+      else{
       if (response.isSuccess()) {
         if (response.success()?.redirectUrl?.length) {
           setRedirectUrl(response.success().redirectUrl)
           setRedirectPayload(response.success().redirectPayload)
           setRedirectMethod(response.success().redirectMethod)
         } else {
+         
           toast.success(t('frontend.account.card.success'))
           setTimeout(() => {
             dispatch(receiveUser(response.success().account))
             history.push('/my-account/cards')
           }, 2000)
         }
+        
+      }
       }
       setFetching(false)
     })

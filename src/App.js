@@ -3,7 +3,7 @@ import { Switch, Route, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { Loading, Header, Footer } from './components'
 import { getConfiguration } from './actions'
-import { Blog, NotFound, Home, Cart, MyAccount, Search, Checkout, ThreeDSHandover, ProductDetail, Brand, ContentPage, Product, ProductType, Category, Account, OrderConfirmation, BlogPost, Manufacturer, ErrorFallback, Contact, BulkOrder } from './pages'
+import { AffiliateUser, Blog, NotFound, Home, Cart, MyAccount, Search, Checkout, ThreeDSHandover, ProductDetail, Brand, ContentPage, Product, ProductType, Category, Account, OrderConfirmation, GuestOrderConfirmation, BlogPost, Manufacturer, ErrorFallback, Contact, BulkOrder, OrderTemplateCart, OrderTemplateCheckout } from './pages'
 import logo from './assets/images/logo.svg'
 import mobileLogo from './assets/images/logo-mobile.svg'
 import { ErrorBoundary } from 'react-error-boundary'
@@ -29,6 +29,7 @@ const pageComponents = {
   Brand,
   Account,
   OrderConfirmation,
+  GuestOrderConfirmation,
   BlogPost,
   ErrorFallback,
 }
@@ -73,16 +74,20 @@ export default function App() {
               return <Route key={index} path={`/${URLKey}/:id`} component={pageComponents[URLKeyType]} />
             })}
           <Route path="/order-confirmation" component={OrderConfirmation} />
+          <Route path="/guest-order-confirmation" component={GuestOrderConfirmation} />
           <Route path={shopByManufacturer.slug} component={Manufacturer} />
           <Route path="/shop" component={Search} />
           <Route path="/product-type/:id" component={ProductType} />
-          <Route path="/my-account" component={MyAccount} />
+          <Route path="/my-account/:id" component={MyAccount} />
+          <Route exact path="/my-account" component={MyAccount} />
           <Route path="/checkout" component={Checkout} />
           <Route path="/checkout/:id" component={Checkout} />
           <Route path="/threeDSHandover" component={ThreeDSHandover} />
-          <Route path="/MyAccount" component={MyAccount} />
           <Route path="/shopping-cart" component={Cart} />
+          <Route path="/scheduled-delivery-cart" component={OrderTemplateCart} />
+          <Route path="/scheduled-delivery-checkout" component={OrderTemplateCheckout} />
           <Route path="/bulkorder" component={BulkOrder} />
+          <Route path="/affiliate" component={AffiliateUser} />
           <Route exact path="/" component={Home} />
           <Route path="" component={ContentPage} />
         </Switch>

@@ -15,9 +15,9 @@ const useProductPrice = ({ salePrice = 0, listPrice = 0, type = 'product' }) => 
   if (isString(listPrice)) {
     listPriceDisplay = listPrice.trim().length > 0 ? parseInt(listPrice) : 0
   }
+
   /* showSalePrice
-    Show if the pricing i
-    s valid
+    --Show if the pricing is valid
   */
   const showSalePrice = isValidSalePrice && !loginRequiredForPrice
 
@@ -27,6 +27,7 @@ const useProductPrice = ({ salePrice = 0, listPrice = 0, type = 'product' }) => 
     -- show if we dont have a showSalePrice
   */
   const showMissingPrice = !showSalePrice && type === 'product' && !loginRequiredForPrice
+
   /*
   showListPrice
     Never show list price if it is invalid or we are showing showMissingPrice CTA

@@ -1,13 +1,26 @@
 import { createSelector } from 'reselect'
+import { AUTO_CODE } from '../hooks/components/Checkout/useCheckoutUtilities'
 
-export const getAllOrderFulfillments = state => state.cart.orderFulfillments
+export const getAllOrderFulfillments = state => {
+  if (state.cart.orderFulfillments?.length > 1) {
+    return state.cart.orderFulfillments.filter(fulfillment => fulfillment.fulfillmentMethod.fulfillmentMethodType !== AUTO_CODE)
+  }
+  return state.cart.orderFulfillments
+}
 export const getAllAccountAddresses = state => state.userReducer.accountAddresses
 export const getAllAccountPaymentMethods = state => state.userReducer.accountPaymentMethods
 export const getAllPickupLocations = state => state.cart.pickupLocations
 export const getAllOrderPayments = state => state.cart.orderPayments?.filter(({ creditCardType, orderPaymentStatusType }) => creditCardType !== 'Invalid' && orderPaymentStatusType.systemCode !== 'opstRemoved')
 export const getAllEligiblePaymentMethodDetails = state => state.cart.eligiblePaymentMethodDetails
+export const getAllEligibleFulfillmentMethods = state => state.cart.eligibleFulfillmentMethods
 export const getAllOrderItems = state => state.cart.orderItems
 export const isFetching = state => state.cart.isFetching
+export const getAllOrderTemplateItems = state => state.subscriptionCart.orderTemplateItems
+export const isOrderTemplateFetching = state => state.subscriptionCart.isFetching
+
+export const isAllowedToSwitchFulfillmentMethod = createSelector([getAllOrderFulfillments, getAllEligibleFulfillmentMethods], (orderFulfillments, eligibleFulfillmentMethods) => {
+  return orderFulfillments?.length === 1 && orderFulfillments.filter(fulfillment => fulfillment.fulfillmentMethod.fulfillmentMethodType !== AUTO_CODE)?.length === 1 && eligibleFulfillmentMethods?.length > 1
+})
 
 export const hasOrderItems = createSelector(getAllOrderItems, orderItems => {
   return orderItems.length ? true : false
@@ -16,7 +29,16 @@ export const hasOrderItems = createSelector(getAllOrderItems, orderItems => {
 export const orderItemsCountSelector = createSelector(getAllOrderItems, orderItems => {
   return orderItems.length
 })
+
 export const disableInteractionSelector = createSelector([hasOrderItems, isFetching], (validOI, fetching) => {
+  return !(validOI && !fetching)
+})
+
+export const hasOrderTemplateItems = createSelector(getAllOrderTemplateItems, orderTemplateItems => {
+  return orderTemplateItems.length ? true : false
+})
+
+export const disableInteractionForOrderTemplateCheckoutSelector = createSelector([hasOrderTemplateItems, isOrderTemplateFetching], (validOI, fetching) => {
   return !(validOI && !fetching)
 })
 

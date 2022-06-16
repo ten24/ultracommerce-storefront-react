@@ -1,19 +1,18 @@
 import { useSelector } from 'react-redux'
-import { ProductPrice } from '..'
+import { ProductPrice, ProductReviewRating } from '..'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { getBrandRoute, getProductTypeRoute, getCategoryRoute } from '../../selectors'
-import { useUtilities, useReview } from '../../hooks'
-import { ProductReviewRating } from '..'
+import { useReview, useUtilities } from '../../hooks'
 
-const ProductDetailHeading = ({ product }) => {
+const ProductDetailHeading = ({ sku, product, total, averageRating }) => {
   const brand = useSelector(getBrandRoute)
   const productType = useSelector(getProductTypeRoute)
   const categoryRoute = useSelector(getCategoryRoute)
   const { t } = useTranslation()
   return (
     <>
-      {product.brand_brandID && (
+      {!!product.brand_brandName?.trim()?.length && (
         <div className="row">
           <div className="col">
             <strong className="mb-2 text-muted text-uppercase small">{t('frontend.product.brand')}: </strong>
@@ -25,7 +24,7 @@ const ProductDetailHeading = ({ product }) => {
         </div>
       )}
 
-      {product.productType_productTypeID && (
+      {!!product.productType_productTypeID?.trim()?.length && (
         <div className="row">
           <div className="col">
             <strong className="mb-2 text-muted text-uppercase small">{t('frontend.product.productType')}: </strong>
@@ -37,7 +36,7 @@ const ProductDetailHeading = ({ product }) => {
         </div>
       )}
 
-      {product.categories.length > 0 && (
+      {!!product.categories?.length && (
         <div className="row">
           <div className="col category-links">
             <strong className="mb-2 text-muted text-uppercase small">{t('frontend.product.category')}: </strong>

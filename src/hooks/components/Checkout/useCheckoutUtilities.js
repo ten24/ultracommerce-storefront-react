@@ -12,6 +12,22 @@ export const EXTERNAL_PAYMENT_CODE = 'external'
 
 export const SHIPPING_CODE = 'shipping'
 export const PICKUP_CODE = 'pickup'
+export const AUTO_CODE = 'auto'
+
+const getBillingAccountAddressIDFromPaymentMethod = (accountAddresses, payment) => {
+  const selectAccount = getBillingAccountAddressFromPaymentMethod(accountAddresses, payment)
+  return !!selectAccount ? selectAccount.selectedAccountID : ''
+}
+const getBillingAccountAddressFromPaymentMethod = (accountAddresses, payment) => {
+  return accountAddresses
+    ?.filter(({ accountAddressID }) => {
+      return accountAddressID === payment.billingAccountAddress.accountAddressID
+    })
+    ?.map(({ accountAddressID }) => {
+      return accountAddressID
+    })
+    ?.at(0)
+}
 
 const useCheckoutUtilities = () => {
   const months = Array.from({ length: 12 }, (_, i) => {
@@ -31,7 +47,7 @@ const useCheckoutUtilities = () => {
       return { key: year + index, value: year + index }
     })
 
-  return { SHIPPING_CODE, PICKUP_CODE, CREDIT_CARD, CREDIT_CARD_CODE, GIFT_CARD, GIFT_CARD_CODE, TERM_PAYMENT, TERM_PAYMENT_CODE, CASH_PAYMENT, CASH_PAYMENT_CODE, PAYPAL_PAYMENT, EXTERNAL_PAYMENT_CODE, months, years }
+  return { SHIPPING_CODE, PICKUP_CODE, AUTO_CODE, CREDIT_CARD, CREDIT_CARD_CODE, GIFT_CARD, GIFT_CARD_CODE, TERM_PAYMENT, TERM_PAYMENT_CODE, CASH_PAYMENT, CASH_PAYMENT_CODE, PAYPAL_PAYMENT, EXTERNAL_PAYMENT_CODE, months, years, getBillingAccountAddressIDFromPaymentMethod, getBillingAccountAddressFromPaymentMethod }
 }
 
 export { useCheckoutUtilities }

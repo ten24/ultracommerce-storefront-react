@@ -1,12 +1,17 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { SlideNavigation, SwRadioSelect, Overlay, PaymentList, CreditCardPayment, TermPayment, GiftCardPayment, PayPalPayment } from '../..'
-import { eligiblePaymentMethodDetailSelector, orderPayment, getAllOrderPayments } from '../../../selectors/'
+import { eligiblePaymentMethodDetailSelector, orderPayment, getAllOrderPayments, disableInteractionSelector, fulfillmentSelector } from '../../../selectors/'
 import { useTranslation } from 'react-i18next'
 import { useCheckoutUtilities } from '../../../hooks'
-import { addPayment } from '../../../actions'
+import { addPayment, removeOrderPayment } from '../../../actions'
+import { toast } from 'react-toastify'
+import { getErrorMessage } from '../../../utils'
 
 const PaymentSlide = ({ currentStep }) => {
+  const disableInteraction = useSelector(disableInteractionSelector)
+  const fulfillment = useSelector(fulfillmentSelector)
+
   const orderRequirementsList = useSelector(state => state.cart.orderRequirementsList)
   const eligiblePaymentMethodDetails = useSelector(eligiblePaymentMethodDetailSelector)
   const { paymentMethod } = useSelector(orderPayment)
@@ -42,6 +47,13 @@ const PaymentSlide = ({ currentStep }) => {
     <Overlay active={isFetching} spinner>
       {/* <!-- Payment Method --> */}
       <PaymentList
+        payments={allPayments}
+        disableInteraction={disableInteraction}
+        onRemovePayment={paymentSelection => {
+          dispatch(removeOrderPayment({ params: paymentSelection })).then(response => {
+            if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
+          })
+        }}
         resetSelection={() => {
           setPaymentMethodOnOrder('')
           setSelectedPaymentMethod('')
@@ -71,10 +83,10 @@ const PaymentSlide = ({ currentStep }) => {
               )}
             </div>
           </div>
-          {selectedPaymentMethod === CREDIT_CARD && <CreditCardPayment />}
+          {selectedPaymentMethod === CREDIT_CARD && <CreditCardPayment method={selectedPaymentMethod} fulfillment={fulfillment} />}
           {selectedPaymentMethod === GIFT_CARD && <GiftCardPayment method={selectedPaymentMethod} />}
           {selectedPaymentMethod === PAYPAL_PAYMENT && <PayPalPayment />}
-          {selectedPaymentMethod === TERM_PAYMENT && <TermPayment method={selectedPaymentMethod} />}
+          {selectedPaymentMethod === TERM_PAYMENT && <TermPayment method={selectedPaymentMethod} fulfillment={fulfillment} />}
         </>
       )}
 

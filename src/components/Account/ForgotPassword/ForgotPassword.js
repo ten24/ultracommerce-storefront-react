@@ -16,13 +16,13 @@ const ForgotPassword = () => {
     },
     onSubmit: values => {
       SlatwalApiService.account.forgotPassword(values).then(response => {
-      if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-      if (response.isSuccess()) {
-        history.push(`/my-account`)
-        toast.success('Success')
-      } else {
-        toast.error('Failure')
-      }
+        if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
+        if (response.isSuccess()) {
+          history.push(`/my-account/login`)
+          toast.success('Success')
+        } else {
+          toast.error('Failure')
+        }
       })
     },
   })
@@ -30,7 +30,7 @@ const ForgotPassword = () => {
     <PromptLayout>
       <SWForm formik={formik} title="Forgot Password" primaryButtontext="Send Me Reset Email">
         <SWInput required={true} formik={formik} token="emailAddress" label="Email Address" type="email" />
-        <Link className="link" to="/my-account">
+        <Link className="link" to="/my-account/login">
           {t('frontend.account.back_to_login')}
         </Link>
       </SWForm>

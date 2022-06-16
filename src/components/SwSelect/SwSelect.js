@@ -1,4 +1,4 @@
-const SwSelect = ({ id, value, onChange, options, disabled, onBlur }) => {
+const SwSelect = ({ id, value, onChange, options, disabled, onBlur, required = false }) => {
   return (
     <select
       disabled={disabled}
@@ -6,6 +6,8 @@ const SwSelect = ({ id, value, onChange, options, disabled, onBlur }) => {
       id={id}
       name={`['${id}']`}
       value={value}
+      required={required}
+      placeholder="Enter a valid email address"
       onChange={onChange}
       onBlur={e => {
         e.preventDefault()

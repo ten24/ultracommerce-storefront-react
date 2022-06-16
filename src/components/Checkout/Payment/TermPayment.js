@@ -1,15 +1,13 @@
 import { useState } from 'react'
-import { useSelector } from 'react-redux'
 import { PaymentAddressSelector, Button } from '../../'
-import { billingAccountAddressSelector } from '../../../selectors'
 import { useTranslation } from 'react-i18next'
 import { useTermPayment } from '../../../hooks'
 
-const TermPayment = ({ method }) => {
+const TermPayment = ({ method, fulfillment, isQuote = false, orderID, updateQuote }) => {
   const { t } = useTranslation()
-  const selectedAccountID = useSelector(billingAccountAddressSelector)
+  const selectedAccountID = ''
   const [saveShippingAsBilling, setSaveShippingAsBilling] = useState('')
-  const { onPaymentAddressSelect, onPaymentAddressSave, onSaveShippingAsBilling, fulfillmentMethodType, accountAddressID, setTermOrderNumber, termOrderNumber } = useTermPayment({ method })
+  const { onPaymentAddressSelect, onPaymentAddressSave, onSaveShippingAsBilling, fulfillmentMethodType, accountAddressID, setTermOrderNumber, termOrderNumber } = useTermPayment({ method, fulfillment, isQuote, orderID })
 
   return (
     <>
@@ -50,8 +48,32 @@ const TermPayment = ({ method }) => {
           </div>
         )}
       </div>
-      {saveShippingAsBilling && termOrderNumber && termOrderNumber.length > 0 && <Button label="Submit" onClick={onSaveShippingAsBilling} />}
-      {!saveShippingAsBilling && termOrderNumber && termOrderNumber.length > 0 && <PaymentAddressSelector addressTitle={'Billing Address'} selectedAccountID={selectedAccountID || accountAddressID} onSelect={onPaymentAddressSelect} onSave={onPaymentAddressSave} />}
+      {saveShippingAsBilling && termOrderNumber && termOrderNumber.length > 0 && (
+        <Button
+          label="Submit"
+          onClick={e => {
+            onSaveShippingAsBilling(e).then(response => {
+              if (response.isSuccess() && isQuote && response.success().quote) updateQuote(response.success().quote)
+            })
+          }}
+        />
+      )}
+      {!saveShippingAsBilling && termOrderNumber && termOrderNumber.length > 0 && (
+        <PaymentAddressSelector
+          addressTitle={'Billing Address'}
+          selectedAccountID={selectedAccountID || accountAddressID}
+          onSelect={e => {
+            onPaymentAddressSelect(e).then(response => {
+              if (response.isSuccess() && isQuote && response.success().quote) updateQuote(response.success().quote)
+            })
+          }}
+          onSave={e => {
+            onPaymentAddressSave(e).then(response => {
+              if (response.isSuccess() && isQuote && response.success().quote) updateQuote(response.success().quote)
+            })
+          }}
+        />
+      )}
     </>
   )
 }

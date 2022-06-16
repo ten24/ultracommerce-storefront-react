@@ -1,51 +1,70 @@
 import { useDispatch, useSelector } from 'react-redux'
-import { addNewAddressAndAttachAsShipping, addShippingAddressUsingAccountAddress, addShippingAddress, getEligibleFulfillmentMethods, getPickupLocations } from '../../../actions'
-import { FulfilmentAddressSelector, SlideNavigation, Overlay, FulfillmentPicker, PickupLocationPicker, ShippingMethodPicker } from '../../'
+import { getEligibleFulfillmentMethods, getPickupLocations, changeOrderFulfillment, addShippingAddressUsingAccountAddress, addNewAddressAndAttachAsShipping, addShippingAddress, addShippingMethod } from '../../../actions'
+import { SlideNavigation, Overlay } from '../../'
 import { useEffect } from 'react'
-import { accountAddressSelector, fulfillmentSelector } from '../../../selectors/'
+import { getAllOrderItems, getAllOrderFulfillments, isAllowedToSwitchFulfillmentMethod, getAllEligibleFulfillmentMethods, fulfillmentMethodSelector, pickupLocationOptions } from '../../../selectors/'
 import { Redirect } from 'react-router'
+import { FulfillmentList } from './FulfillmentList'
+import { usePickupLocation } from '../../../hooks'
+
 const ShippingSlide = ({ currentStep }) => {
   const dispatch = useDispatch()
   const { orderRequirementsList } = useSelector(state => state.cart)
-  let selectedFulfillmentMethod = useSelector(fulfillmentSelector)
-  let selectedAccountID = useSelector(accountAddressSelector)
-  const orderFulfillment = useSelector(fulfillmentSelector)
+  const allOrderFulfillments = useSelector(getAllOrderFulfillments)
   const { isFetching } = useSelector(state => state.cart)
-
+  let orderFulfillments = useSelector(getAllOrderFulfillments)
+  let orderItems = useSelector(getAllOrderItems)
+  const canSwitchFulfillmentMethod = useSelector(isAllowedToSwitchFulfillmentMethod)
+  let eligibleFulfillmentMethods = useSelector(getAllEligibleFulfillmentMethods)
+  let selectedFulfillmentMethod = useSelector(fulfillmentMethodSelector)
+  const { onChangeDate, onChangeLocation } = usePickupLocation()
   useEffect(() => {
     dispatch(getEligibleFulfillmentMethods())
     dispatch(getPickupLocations())
   }, [dispatch])
-
-  if (selectedFulfillmentMethod.fulfillmentMethod.fulfillmentMethodType === 'auto') {
+  const pickupLocations = useSelector(pickupLocationOptions)
+  if (allOrderFulfillments?.length === 1 && allOrderFulfillments?.at(0)?.fulfillmentMethod?.fulfillmentMethodType === 'auto') {
     return <Redirect to={currentStep.next} />
   }
   return (
     <>
       <Overlay active={isFetching} spinner>
-        <FulfillmentPicker />
-        {selectedFulfillmentMethod.fulfillmentMethod.fulfillmentMethodType === 'pickup' && <PickupLocationPicker />}
-        {selectedFulfillmentMethod.fulfillmentMethod.fulfillmentMethodType === 'shipping' && (
-          <FulfilmentAddressSelector
-            selectedAccountID={selectedAccountID}
-            onSelect={value => {
-              dispatch(
-                addShippingAddressUsingAccountAddress({
-                  accountAddressID: value,
-                  fulfillmentID: orderFulfillment.orderFulfillmentID,
-                })
-              )
-            }}
-            onSave={values => {
-              if (values.saveAddress) {
-                dispatch(addNewAddressAndAttachAsShipping({ ...values }))
-              } else {
-                dispatch(addShippingAddress({ ...values, fulfillmentID: orderFulfillment.orderFulfillmentID, returnJSONObjects: 'cart' }))
-              }
-            }}
-          />
-        )}
-        {selectedFulfillmentMethod.fulfillmentMethod.fulfillmentMethodType === 'shipping' && <ShippingMethodPicker />}
+        <FulfillmentList
+          orderFulfillments={orderFulfillments}
+          orderItems={orderItems}
+          canSwitchFulfillmentMethod={canSwitchFulfillmentMethod}
+          selectedFulfillmentMethod={selectedFulfillmentMethod}
+          eligibleFulfillmentMethods={eligibleFulfillmentMethods}
+          pickupLocations={pickupLocations}
+          onChangeOrderFullfillment={(fulfillmentMethodID, orderItemIDList) => {
+            dispatch(changeOrderFulfillment({ fulfillmentMethodID, orderItemIDList }))
+          }}
+          onShipmentSelect={(value, orderFulfillmentID) => {
+            return dispatch(
+              addShippingAddressUsingAccountAddress({
+                accountAddressID: value,
+                fulfillmentID: orderFulfillmentID,
+              })
+            )
+          }}
+          onShipmentSave={(values, orderFulfillmentID) => {
+            if (values.saveAddress) {
+              return dispatch(addNewAddressAndAttachAsShipping({ ...values }))
+            } else {
+              return dispatch(addShippingAddress({ ...values, fulfillmentID: orderFulfillmentID, returnJSONObjects: 'cart' }))
+            }
+          }}
+          onSelectShippingMethod={(value, orderFulfillmentID) => {
+            dispatch(
+              addShippingMethod({
+                shippingMethodID: value,
+                fulfillmentID: orderFulfillmentID,
+              })
+            )
+          }}
+          onChangeDate={onChangeDate}
+          onChangeLocation={onChangeLocation}
+        />
       </Overlay>
       <SlideNavigation currentStep={currentStep} nextActive={!orderRequirementsList.includes('fulfillment')} />
     </>

@@ -25,8 +25,8 @@ const AccountSidebar = () => {
           </button>
           <div className="collapse navbar-collapse w-100" id="navbarNav">
             <ul className="navbar-nav flex-column w-100">
-              <li key="/my-account" className="nav-item">
-                <Link to="/my-account" className={`nav-link ${loc.pathname === `/my-account` && isSelectedClass}`}>
+              <li key="/my-account/overview" className="nav-item">
+                <Link to="/my-account/overview" className={`nav-link ${loc.pathname === `/my-account` && isSelectedClass}`}>
                   <i className="far pr-2" /> {t('frontend.account.overview')}
                 </Link>
               </li>
