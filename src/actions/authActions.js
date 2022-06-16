@@ -2,8 +2,7 @@ import { toast } from 'react-toastify'
 import { SlatwalApiService } from '../services'
 import { getErrorMessage } from '../utils'
 import { getCart, receiveCart, requestCart } from './'
-import { receiveSubscriptionCart, requestSubscriptionCart } from './subscriptionCartActions'
-import { requestUser, receiveUser, clearUser, getWishLists } from './userActions'
+import { requestUser, receiveUser, clearUser, getWishLists, evictAllPages, receiveSubscriptionCart, requestSubscriptionCart } from './'
 import { isAuthenticated } from '../utils'
 
 export const REQUEST_LOGIN = 'REQUEST_LOGIN'
@@ -37,6 +36,7 @@ export const requestLogOut = () => {
 }
 export const logout = (success = '', failure = '') => {
   return async dispatch => {
+    dispatch(evictAllPages())
     return await SlatwalApiService.auth.revokeToken().then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
       dispatch(softLogout())

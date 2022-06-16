@@ -5,7 +5,7 @@ import queryString from 'query-string'
 import { getUser } from '../../actions'
 import { getWishlists } from '../../selectors/userSelectors'
 
-const SsoLogin = ({ redirectPath = '/my-account' }) => {
+const SsoLogin = ({ redirectPath = '/my-account/overview' }) => {
   const dispatch = useDispatch()
   const loc = useLocation()
   const params = queryString.parse(loc.search)

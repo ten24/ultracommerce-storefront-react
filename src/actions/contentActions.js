@@ -10,6 +10,7 @@ export const RECEIVE_COUNTRIES = 'RECEIVE_COUNTRIES'
 export const RECEIVE_STATE_CODES = 'RECEIVE_STATE_CODES'
 export const REQUEST_CONTENT_SILENTLY = 'REQUEST_CONTENT_SILENTLY'
 export const RECEIVE_CONTENT_SILENTLY = 'RECEIVE_CONTENT_SILENTLY'
+export const EVICT_ALL_PAGES = 'EVICT_ALL_PAGES'
 
 export const requestContent = () => {
   return {
@@ -46,7 +47,11 @@ export const receiveCountries = countries => {
     payload: countries,
   }
 }
-
+export const evictAllPages = () => {
+  return {
+    type: EVICT_ALL_PAGES,
+  }
+}
 export const getPageContent = (content = {}, slug = '') => {
   return async (dispatch, getState) => {
     if (getState().content[slug] || slug === 'product' || slug === 'blog' || slug === 'articles') {

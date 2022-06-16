@@ -49,7 +49,7 @@ const EditSubscriptionScheduleDateModal = ({ apply, scheduleDateValue, setSchedu
         <div className="col-md-6">
           <div className="form-group">
             <label htmlFor="frequencyTerm_scheduleDate">{t('frontend.account.scheduled.delivery.detail.toolbar.scheduleDateModal.inputTitle')}</label>
-            <DatePicker className="form-control" id="frequencyTerm_scheduleDate" selected={scheduleDateValue} onChange={date => setScheduleDateValue(date)} minDate={scheduleDateValue} disabled={skip ? 'disabled' : ''} />
+            <DatePicker className="form-control" id="frequencyTerm_scheduleDate" selected={scheduleDateValue} onChange={date => setScheduleDateValue(date)} minDate={new Date()} disabled={skip ? 'disabled' : ''} />
             {!scheduleDateValue && apply ? <span className="form-error-msg">{t('frontend.core.required')}</span> : null}
           </div>
         </div>

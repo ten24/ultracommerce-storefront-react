@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
 import { useLoginForm } from '../../../hooks'
 import { OauthGoogleLogin } from '../../OauthLogin/OauthGoogleLogin'
+import { OauthFacebookLogin } from '../../OauthLogin/OauthFacebookLogin'
 import { getSocialLogins } from '../../../selectors'
 
 const LoginForm = ({ isCheckout = false }) => {
@@ -12,7 +13,7 @@ const LoginForm = ({ isCheckout = false }) => {
   const location = useLocation()
   const allowGuestCheckout = useSelector(state => state.configuration.allowGuestCheckout)
   const socialLogins = useSelector(getSocialLogins)
-
+  
   return (
     <>
       <div className="mb-5 bg-white col-md-7">
@@ -52,8 +53,9 @@ const LoginForm = ({ isCheckout = false }) => {
                 <button className="btn btn-primary btn-lg" type="submit">
                   {t('frontend.account.sign_in')}
                 </button>
-                {socialLogins.map(integration => {
+                {socialLogins?.map(integration => {
                   if (integration.key === 'googlelogin') return <OauthGoogleLogin key={integration.key} />
+                  if (integration.key === 'facebooklogin') return <OauthFacebookLogin key={integration.key} buttonText={t('frontend.oauth.facebooksignin')} />
                   return null
                 })}
               </div>

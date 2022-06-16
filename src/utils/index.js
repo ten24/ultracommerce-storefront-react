@@ -1,5 +1,6 @@
 import jwt_decode from 'jwt-decode'
 import queryString from 'query-string'
+import { toast } from 'react-toastify'
 
 export const cleanHTML = data => data.replace('class=', 'className=')
 export const renameKeys = (obj, find, replace = '') => {
@@ -24,6 +25,16 @@ export const isAuthenticated = () => {
     } catch (error) {}
   }
   return false
+}
+export const getMyAccountUrl = () => {
+  let token = localStorage.getItem('token')
+  if (token) {
+    try {
+      token = jwt_decode(token)
+      return token.exp && token.exp * 1000 > Date.now() && token.accountID.length > 0
+    } catch (error) {}
+  }
+  return isAuthenticated() ? '/my-account/overview' : '/my-account/login'
 }
 export const isImpersonating = () => {
   let token = localStorage.getItem('token')
@@ -70,6 +81,10 @@ export const parseErrorMessages = error => {
 }
 export const getErrorMessage = error => {
   return parseErrorMessages(error)?.join('. ')
+}
+
+export const getFailureMessageOnSuccess = (response, message) => {
+  if (response.isSuccess() && Object.keys(response.success()?.messages || {}).length) return toast.error(message)
 }
 
 export const organizeProductTypes = (parents, list) => {

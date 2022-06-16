@@ -178,7 +178,7 @@ const getEntryBySlug = async (content = {}, slug) => {
           hydrated.menu = processForEnhancedMenu(page.enhancedMenu)
         }
         hydrated.contentPageType = 'BasicPage'
-
+        hydrated.permissions = { accessFlag: true, nonRestrictedFlag: true }
         hydrated.title = page.title
         hydrated.slug = page.slug
         hydrated.key = getContentID()

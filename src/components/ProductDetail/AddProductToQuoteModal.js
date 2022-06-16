@@ -78,8 +78,8 @@ const AddProductToQuoteModal = ({ sku, show, setQuoteModal }) => {
                       if (!!existingQuoteVal) setExistingQuoteVal(existingQuoteVal)
                       if (!existingQuoteVal) return null
                       setLoadingForExistingQuote(true)
-                      const payload = { skuID: sku.skuID, returnQuote: true, orderID: existingQuoteVal }
-                      dispatch(addToOrder({ params: payload })).then(response => {
+                      const payload = { skuID: sku.skuID, orderID: existingQuoteVal }
+                      dispatch(addToOrder({ params: payload, returnQuote: true})).then(response => {
                         if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) {
                           toast.error(getErrorMessage(response.success().errors))
                         } else {
@@ -129,7 +129,7 @@ const AddProductToQuoteModal = ({ sku, show, setQuoteModal }) => {
                 onClick={() => {
                   if (!quoteName) return null
                   setLoading(true)
-                  dispatch(addToOrder({ params: { quoteName, skuID: sku.skuID, returnQuote: true, isQuote: true } })).then(response => {
+                  dispatch(addToOrder({ params: { quoteName, skuID: sku.skuID }, returnQuote: true, isQuote: true })).then(response => {
                     if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) {
                       toast.error(getErrorMessage(response.success().errors))
                     } else {

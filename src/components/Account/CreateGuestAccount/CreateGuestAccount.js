@@ -12,7 +12,7 @@ const CreateGuestAccount = () => {
       <h2>{t('frontend.account.guest.checkout')}</h2>
       <p>
         {t('frontend.account.old_account')}
-        <Link className="ms-1 link" to="/my-account">
+        <Link className="ms-1 link" to="/my-account/login">
           {t('frontend.account.here')}
         </Link>
         .

@@ -2,6 +2,7 @@ import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { OauthGoogleLogin } from '../../OauthLogin/OauthGoogleLogin'
+import { OauthFacebookLogin } from '../../OauthLogin/OauthFacebookLogin'
 import { PromptLayout, SWForm, SWInput } from '../../'
 import { useCreateAccount } from '../../../hooks/'
 import { getSocialLogins } from '../../../selectors'
@@ -12,8 +13,9 @@ const OAuthSigninButtons = () => {
   const socialLogins = useSelector(getSocialLogins)
   return (
     <div className="text-right pt-4">
-      {socialLogins.map(integration => {
+      {socialLogins?.map(integration => {
         if (integration.key === 'googlelogin') return <OauthGoogleLogin key={integration.key} buttonText={t('frontend.oauth.googlesignup')} />
+        if (integration.key === 'facebooklogin') return <OauthFacebookLogin key={integration.key} buttonText={t('frontend.oauth.facebooksignup')} />
         return null
       })}
     </div>
@@ -29,7 +31,7 @@ const CreateAccount = () => {
       <h2>{t('frontend.account.createAccount')}</h2>
       <p>
         {t('frontend.account.old_account')}
-        <Link className="ms-1 link" to="/my-account">
+        <Link className="ms-1 link" to="/my-account/login">
           {t('frontend.account.here')}
         </Link>
         .

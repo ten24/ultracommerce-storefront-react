@@ -88,10 +88,14 @@ const MyAccount = () => {
           <Route path={`/my-account/impersonation`}>
             <AccountImpersonation />
           </Route>
+
           <Route path={`/my-account/order-detail`}>
             <GuestOrderConfirmation path={path[0]} />
           </Route>
-          <Route path={match.path}>{isAuthenticated() && <AccountOverview />}</Route>
+          <Route path={`/my-account/overview`}>
+            <AccountOverview />
+          </Route>
+          <Route path={match.path}>{isAuthenticated() && <Redirect to={`/my-account/overview`} />}</Route>
         </Switch>
       )}
 
@@ -109,12 +113,11 @@ const MyAccount = () => {
           <Route path={`/my-account/order-detail`}>
             <GuestOrderConfirmation path={path[0]} />
           </Route>
-          <Route exact path={match.path}>
+          <Route path={`/my-account/login`}>
             <AccountLogin />
           </Route>
-
           <Route path={match.path}>
-            <Redirect to={'/my-account'} />
+            <Redirect to={`/my-account/login`} />
           </Route>
         </Switch>
       )}

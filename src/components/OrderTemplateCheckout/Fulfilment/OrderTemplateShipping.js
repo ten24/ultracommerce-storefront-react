@@ -1,6 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { SlideNavigation, Overlay } from '../..'
-import { useTranslation } from 'react-i18next'
 import { requestSubscriptionCart, receiveSubscriptionCart, receiveUser } from '../../../actions'
 import { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
@@ -17,7 +16,6 @@ const OrderTemplateShippingSlide = ({ currentStep }) => {
 
   const [shipping, setShipping] = useState()
   const [shippingMethodOpt, setShippingMethodOpt] = useState()
-  const { t } = useTranslation()
   const [shippingMethodOptions, setShippingMethodOptions] = useState([])
   const hasShippingAddress = shipping !== '' && shippingMethodOpt !== '' ? true : false
 
@@ -51,9 +49,6 @@ const OrderTemplateShippingSlide = ({ currentStep }) => {
     return SlatwalApiService.orderTemplate.updateOrderTemplateShipping(values).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
       if (response.isSuccess()) dispatch(receiveSubscriptionCart(response.success().orderTemplateCart))
-      if (response.isSuccess() && response.success().successfulActions.length > 0) {
-        toast.success(t('frontend.account.scheduled.delivery.detail.toolbar.shippingModal.successMessage'))
-      }
     })
   }
   const foundAddress = accountAddresses.filter(accountAddress => shipping === accountAddress.accountAddressID)?.at(0)

@@ -21,7 +21,7 @@ const ProductPrice = ({ salePrice = 0, listPrice = 0, type = 'product', salePric
         <div className="alert alert-warning fs-6" role="alert">
           Login to view price
           <br />
-          <Link to="/my-account"> Login or Create Account </Link>
+          <Link to="/my-account/login"> Login or Create Account </Link>
         </div>
       )}
     </>

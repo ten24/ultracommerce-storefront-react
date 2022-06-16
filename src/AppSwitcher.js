@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useLocation, useHistory } from 'react-router-dom'
-import { getUser, getWishLists } from './actions'
+import { evictAllPages, getUser, getWishLists } from './actions'
 import { toast } from 'react-toastify'
 import { useTranslation } from 'react-i18next'
 import App from './App'
@@ -16,8 +16,9 @@ const AppSwitcher = () => {
   useEffect(() => {
     if (pathname.startsWith('/ssoLogin')) {
       const authCode = new URLSearchParams(search).get('token')
-      const redirect = new URLSearchParams(search).get('redirect') || '/my-account'
+      const redirect = new URLSearchParams(search).get('redirect') || '/my-account/overview'
       localStorage.setItem('token', authCode)
+      dispatch(evictAllPages())
       dispatch(getUser()).then(() => {
         dispatch(getWishLists())
         history.push(redirect)

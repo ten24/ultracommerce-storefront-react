@@ -16,7 +16,7 @@ const useCheckout = () => {
 
   useEffect(() => {
     if (!isAuthenticated()) {
-      history.replace(`/my-account?redirect=${loc.pathname}`)
+      history.replace(`/my-account/login?redirect=${loc.pathname}`)
     }
   }, [history, loc, cartState])
 

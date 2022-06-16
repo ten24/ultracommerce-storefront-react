@@ -193,6 +193,12 @@ const data = {
     //   types: 'authentication',
     //   settings: {},
     // },
+    // {
+    //   key: 'facebooklogin',
+    //   name: 'Facebook Login',
+    //   types: 'authentication',
+    //   settings: {},
+    // },
   ],
   enableMultiSite: true,
 }

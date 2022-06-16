@@ -117,7 +117,7 @@ const OrderTemplateConfig = ({ currentStep }) => {
             <div className="col-md-3">
               <div className="form-group">
                 <label htmlFor="frequencyTerm_scheduleDate">{t('frontend.account.scheduled.delivery.detail.toolbar.scheduleDateModal.inputTitle')}</label>
-                <DatePicker className="form-control" id="frequencyTerm_scheduleDate" selected={scheduleDateValue} onChange={date => setScheduleDateValue(date)} minDate={scheduleDateValue} />
+                <DatePicker className="form-control" id="frequencyTerm_scheduleDate" selected={scheduleDateValue} onChange={date => setScheduleDateValue(date)} minDate={new Date()} />
                 {!scheduleDateValue ? <span className="form-error-msg">{t('frontend.core.required')}</span> : null}
               </div>
             </div>

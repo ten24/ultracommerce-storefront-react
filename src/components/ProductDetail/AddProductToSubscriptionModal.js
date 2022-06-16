@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { SwSelect, Button } from '..'
 import { toast } from 'react-toastify'
 import { SlatwalApiService } from '../../services'
@@ -16,8 +16,14 @@ const AddProductToSubscriptionModal = ({ quantity, sku, show, setShow, orderTemp
   tomorrowDate.setDate(tomorrowDate.getDate() + 1)
   const [scheduleDateValue, setScheduleDateValue] = useState(tomorrowDate)
   const [isLoading, setLoading] = useState(false)
+  const [isLoadingForExisting, setLoadingForExisting] = useState(false)
   const [existingOrderTemplate, setExistingOrderTemplate] = useState(orderTemplates?.at(0) ? orderTemplates?.at(0)['orderTemplateID'] : {})
   const orderTemplateItems = useSelector(state => state.subscriptionCart.orderTemplateItems)
+
+  useEffect(() => {
+    setExistingOrderTemplate(orderTemplates?.at(0)?.['orderTemplateID'])
+    // eslint-disable-next-line
+  },[orderTemplates?.length])
 
   const saveOrderTemplateItem = () => {
     const payload = { quantity: quantity, skuID: sku.skuID, returnJsonObjects: 'orderTemplateCart' }
@@ -26,30 +32,26 @@ const AddProductToSubscriptionModal = ({ quantity, sku, show, setShow, orderTemp
         toast.error(getErrorMessage(response.success().errors))
       } else {
         if (response.isSuccess()) {
-          if (response.success()?.redirectUrl?.length) {
-          } else {
             if (Object.keys(response.success().orderTemplateCart).length > 0) updateScheduleDate(response.success().orderTemplateCart.orderTemplateID)
             updateFrequency(response.success().orderTemplateCart.orderTemplateID)
             setShow(false)
             setLoading(false)
-          }
         }
       }
     })
   }
 
   const saveExistingOrderTemplateItem = templateID => {
+    if(!templateID) return null
     const payload = { orderTemplateID: templateID, quantity: quantity, skuID: sku.skuID, returnJsonObjects: 'orderTemplateCart' }
+    setLoadingForExisting(true)
     SlatwalApiService.orderTemplate.addItem(payload).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) {
         toast.error(getErrorMessage(response.success().errors))
       } else {
         if (response.isSuccess()) {
-          if (response.success()?.redirectUrl?.length) {
-          } else {
             setShow(false)
-            setLoading(false)
-          }
+            setLoadingForExisting(false)
         }
       }
     })
@@ -93,15 +95,17 @@ const AddProductToSubscriptionModal = ({ quantity, sku, show, setShow, orderTemp
                   {!existingOrderTemplate ? <span className="form-error-msg">{t('frontend.core.required')}</span> : null}
                 </div>
                 <div className="form-group p-3">
-                  <button
-                    className="btn btn-primary btn-block mt-4 d-block"
+                  <Button
+                    isLoading={isLoadingForExisting}
+                    classList="btn btn-primary btn-block mt-4"
                     type="button"
                     onClick={() => {
                       if (!!existingOrderTemplate) saveExistingOrderTemplateItem(existingOrderTemplate)
                     }}
+                    disabled={isLoadingForExisting}
                   >
                     <span className="d-none d-sm-inline">{t('frontend.product.addThisToSubscription')}</span>
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -129,7 +133,7 @@ const AddProductToSubscriptionModal = ({ quantity, sku, show, setShow, orderTemp
               </div>
               <div className="form-group col-md-4 p-3">
                 <label htmlFor="frequencyTerm_scheduleDate">{t('frontend.account.scheduled.delivery.detail.toolbar.scheduleDateModal.inputTitle')}</label>
-                <DatePicker className="form-control" id="frequencyTerm_scheduleDate" selected={scheduleDateValue} onChange={date => setScheduleDateValue(date)} minDate={scheduleDateValue} />
+                <DatePicker className="form-control" id="frequencyTerm_scheduleDate" selected={scheduleDateValue} onChange={date => setScheduleDateValue(date)} minDate={new Date()} />
                 {!scheduleDateValue ? <span className="form-error-msg">{t('frontend.core.required')}</span> : null}
               </div>
               <div className="form-group col-md-4 p-3">

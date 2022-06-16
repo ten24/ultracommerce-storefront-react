@@ -4,7 +4,7 @@ export { getCart, setOrderOnCart, clearCartData, addMultipleItemsToCart, addToCa
 export { REQUEST_SUBSCRIPTION_CART, RECEIVE_SUBSCRIPTION_CART, CLEAR_SUBSCRIPTION_CART, receiveSubscriptionCart, requestSubscriptionCart, removeOrderTemplateItem, applyOrderTemplatePromoCode, removeOrderTemplatePromoCode, clearSubscriptionCart } from './subscriptionCartActions'
 
 export { REQUEST_CONFIGURATION, RECIVE_CONFIGURATION, SET_TITLE, SET_TITLE_META, setTitle, reciveConfiguration, requestConfiguration, getConfiguration } from './configActions'
-export { requestContentSiltently, receiveContentSiltently, REQUEST_CONTENT_SILENTLY, RECEIVE_CONTENT_SILENTLY, REQUEST_CONTENT, RECEIVE_CONTENT, RECEIVE_STATE_CODES, requestContent, receiveContent, receiveStateCodes, getPageContent, getStateCodeOptionsByCountryCode, getCountries, addContent, getProductTypes, getContentByType } from './contentActions'
+export { evictAllPages, EVICT_ALL_PAGES, requestContentSiltently, receiveContentSiltently, REQUEST_CONTENT_SILENTLY, RECEIVE_CONTENT_SILENTLY, REQUEST_CONTENT, RECEIVE_CONTENT, RECEIVE_STATE_CODES, requestContent, receiveContent, receiveStateCodes, getPageContent, getStateCodeOptionsByCountryCode, getCountries, addContent, getProductTypes, getContentByType } from './contentActions'
 export {
   REQUEST_CART,
   RECEIVE_CART,

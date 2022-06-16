@@ -7,7 +7,7 @@ import { SlatwalApiService } from '../../../services'
 import { useFormik } from 'formik'
 import { useHistory } from 'react-router'
 import { Link } from 'react-router-dom'
-import { getErrorMessage } from '../../../utils'
+import { getErrorMessage, getFailureMessageOnSuccess } from '../../../utils'
 import { useFormatDate } from '../../../hooks'
 
 const OrderTemplateToolbar = ({ templateID, orderTemplateInfo, updateOrderTemplate }) => {
@@ -38,6 +38,7 @@ const OrderTemplateToolbar = ({ templateID, orderTemplateInfo, updateOrderTempla
   const saveSubscriptionName = async values => {
     SlatwalApiService.orderTemplate.editOrderTemplate({ orderTemplateID: templateID, orderTemplateName: formikSubscriptionName.values.subscriptionName }).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
+      getFailureMessageOnSuccess(response,getErrorMessage(response.success().messages))
       if (response.isSuccess()) {
         setModal(false)
         toast.success(t('frontend.account.scheduled.delivery.detail.toolbar.subscriptionModal.successMessage'))
@@ -56,7 +57,8 @@ const OrderTemplateToolbar = ({ templateID, orderTemplateInfo, updateOrderTempla
   const updateFrequency = async => {
     SlatwalApiService.orderTemplate.updateOrderTemplateFrequency({ orderTemplateID: templateID, frequencyTerm: { value: frequencyTermValue } }).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-      if (response.isSuccess()) {
+      getFailureMessageOnSuccess(response,getErrorMessage(response.success().messages))
+      if (response.isSuccess() && response.success()?.successfulActions.length > 0) {
         setFrequencyModal(false)
         toast.success(t('frontend.account.scheduled.delivery.detail.toolbar.frequencyModal.successMessage'))
         updateOrderTemplate(prevState => ({
@@ -107,8 +109,9 @@ const OrderTemplateToolbar = ({ templateID, orderTemplateInfo, updateOrderTempla
       })
       .then(response => {
         if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-        if (response.isSuccess()) {
-          setScheduleDateModal(false)
+        getFailureMessageOnSuccess(response,t('frontend.account.scheduled.delivery.detail.toolbar.cancelModal.errorMessage'))
+        if (response.isSuccess() && response.success()?.successfulActions.length > 0) {
+          setCancelSubscriptionModal(false)
           toast.success(t('frontend.account.scheduled.delivery.detail.toolbar.scheduleDateModal.successMessage'))
           updateOrderTemplate(prevState => ({
             ...prevState,
@@ -128,7 +131,8 @@ const OrderTemplateToolbar = ({ templateID, orderTemplateInfo, updateOrderTempla
       })
       .then(response => {
         if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-        if (response.isSuccess()) {
+        getFailureMessageOnSuccess(response,getErrorMessage(response.success().messages))
+        if (response.isSuccess() && response.success()?.successfulActions.length > 0) {
           setScheduleDateModal(false)
           toast.success(t('frontend.account.scheduled.delivery.detail.toolbar.scheduleDateModal.successMessage'))
           updateOrderTemplate(prevState => ({
@@ -159,7 +163,8 @@ const OrderTemplateToolbar = ({ templateID, orderTemplateInfo, updateOrderTempla
       })
       .then(response => {
         if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-        if (response.isSuccess()) {
+        getFailureMessageOnSuccess(response,getErrorMessage(response.success().messages))
+        if (response.isSuccess() && response.success()?.successfulActions.length > 0) {
           setCancelSubscriptionModal(false)
           toast.success(t('frontend.account.scheduled.delivery.detail.toolbar.cancelModal.successMessage'))
           setTimeout(() => {
@@ -198,9 +203,9 @@ const OrderTemplateToolbar = ({ templateID, orderTemplateInfo, updateOrderTempla
 
     SlatwalApiService.orderTemplate.updateOrderTemplateShipping(data).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-      if (response.isSuccess()) {
+      getFailureMessageOnSuccess(response,getErrorMessage(response.success().messages))
+      if (response.isSuccess() && response.success()?.successfulActions.length > 0) {
         setShippingUpdateModal(false)
-        toast.success(t('frontend.account.scheduled.delivery.detail.toolbar.shippingModal.successMessage'))
         updateOrderTemplate(prevState => ({
           ...prevState,
           ...response.success().orderTemplate,
@@ -246,7 +251,8 @@ const OrderTemplateToolbar = ({ templateID, orderTemplateInfo, updateOrderTempla
     }
     SlatwalApiService.orderTemplate.updateOrderTemplateBilling(data).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-      if (response.isSuccess()) {
+      getFailureMessageOnSuccess(response,getErrorMessage(response.success().messages))
+      if (response.isSuccess() && response.success()?.successfulActions.length > 0) {
         setPaymentMethodModal(false)
         toast.success(t('frontend.account.scheduled.delivery.detail.toolbar.paymentModal.successMessage'))
         updateOrderTemplate(prevState => ({

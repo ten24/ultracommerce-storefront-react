@@ -5,14 +5,13 @@ import { useTranslation } from 'react-i18next'
 import * as Yup from 'yup'
 import { SlatwalApiService } from '../../../services'
 import { toast } from 'react-toastify'
-import { errorLogin, receiveLogin, receiveUser, receiveCart, getWishLists, requestLogin, requestUser, requestCart } from '../../../actions/'
+import { errorLogin, receiveLogin, receiveUser, receiveCart, getWishLists, requestLogin, requestUser, requestCart, evictAllPages } from '../../../actions/'
 import { getErrorMessage } from '../../../utils'
 import { receiveSubscriptionCart, requestSubscriptionCart } from '../../../actions/subscriptionCartActions'
 
 const useLoginForm = () => {
   const dispatch = useDispatch()
   const { t } = useTranslation()
-
   const formik = useFormik({
     initialValues: {
       loginEmail: '',
@@ -24,6 +23,7 @@ const useLoginForm = () => {
       loginPassword: Yup.string().required('Required'),
     }),
     onSubmit: values => {
+      dispatch(evictAllPages())
       dispatch(requestLogin())
       dispatch(requestUser())
       dispatch(requestCart())

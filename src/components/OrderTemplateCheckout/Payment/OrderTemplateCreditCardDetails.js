@@ -16,6 +16,7 @@ const OrderTemplateCreditCardDetails = ({ onSubmit, onCancel }) => {
   const { months, years, CREDIT_CARD } = useCheckoutUtilities()
   const [paymentMethodErrors, setPaymentMethodErrors] = useState({})
   const { orderTemplateID, shippingMethod } = useSelector(state => state.subscriptionCart)
+  const [savePaymentMethodToAccount, setSavePaymentMethodToAccount] = useState(false)
   const [saveShippingAsBilling, setSaveShippingAsBilling] = useState(false)
   const billingAccountAddress = useSelector(state => state.subscriptionCart.billingAccountAddress)
   let [redirectUrl, setRedirectUrl] = useState()
@@ -31,8 +32,8 @@ const OrderTemplateCreditCardDetails = ({ onSubmit, onCancel }) => {
     expirationYear: dayjs().add(1, 'month').format('YYYY'),
     securityCode: '',
     accountAddressID: billingAccountAddress ? billingAccountAddress.accountAddressID : '',
-    saveShippingAsBilling: true,
-    savePaymentMethodToAccount: true,
+    saveShippingAsBilling: false,
+    savePaymentMethodToAccount: false,
     returnJSONObjects: 'orderTemplateCart',
   })
 
@@ -256,23 +257,29 @@ const OrderTemplateCreditCardDetails = ({ onSubmit, onCancel }) => {
                       {t('frontend.checkout.shipping_address_clone')}
                     </label>
                   </div>
+                   <div className="custom-control custom-checkbox savePaymentMethodCheckbox">
+                    <input
+                      className="custom-control-input"
+                      type="checkbox"
+                      id="savePaymentMethodToAccount"
+                      checked={savePaymentMethodToAccount}
+                      onChange={e => {
+                        setSavePaymentMethodToAccount(!savePaymentMethodToAccount)
+                      }}
+                    />
+                    <label className="custom-control-label ms-1" htmlFor="savePaymentMethodToAccount">
+                      {t('frontend.checkout.payment.save_to_account')}
+                    </label>
+                  </div>
                 </div>
                 <div className="col-12 mt-3">
-                  <button
-                    className="btn btn-secondary mt-2"
-                    onClick={() => {
-                      onCancel()
-                    }}
-                  >
-                    {t('frontend.checkout.payment.cancel')}
-                  </button>
                   {saveShippingAsBilling && validCreditCard && (
                     <Button
                       label="Submit"
                       onClick={e => {
                         e.preventDefault()
                         //TODO: BROKEN
-                        if (paymentMethod.savePaymentMethodToAccount && saveShippingAsBilling) {
+                        if (savePaymentMethodToAccount && saveShippingAsBilling) {
                           // Create account Payment and use cloned shpiing address
                           // Payment with Account  CC
                           addPayment({
@@ -285,7 +292,7 @@ const OrderTemplateCreditCardDetails = ({ onSubmit, onCancel }) => {
                               securityCode: paymentMethod.securityCode,
                             },
                             saveAccountPaymentMethodName: paymentMethod.accountPaymentMethodName,
-                            saveAccountPaymentMethodFlag: paymentMethod.savePaymentMethodToAccount,
+                            saveAccountPaymentMethodFlag: savePaymentMethodToAccount,
                           })
                         } else {
                           // Payment with Single use CC and address cloned from billing
@@ -320,8 +327,10 @@ const OrderTemplateCreditCardDetails = ({ onSubmit, onCancel }) => {
                 onSelect={value => {
                   // NOTE: Works
                   addPayment({
+                    billingAccountAddress:{
+                      value : value
+                    },
                     newAccountPaymentMethod: {
-                      accountAddressID: value,
                       nameOnCreditCard: paymentMethod.nameOnCreditCard,
                       creditCardNumber: paymentMethod.creditCardNumber,
                       expirationMonth: paymentMethod.expirationMonth,
@@ -333,11 +342,11 @@ const OrderTemplateCreditCardDetails = ({ onSubmit, onCancel }) => {
                     },
                     accountAddressID: value,
                     saveAccountPaymentMethodName: paymentMethod.accountPaymentMethodName,
-                    saveAccountPaymentMethodFlag: paymentMethod.savePaymentMethodToAccount,
+                    saveAccountPaymentMethodFlag: savePaymentMethodToAccount,
                   })
                 }}
                 onSave={values => {
-                  if (paymentMethod.savePaymentMethodToAccount && values.saveAddress) {
+                  if (savePaymentMethodToAccount && values.saveAddress) {
                     // Create account address
                     // Create account Payment
                     // Payment with new Account Address and new Account Payment Method
@@ -365,7 +374,7 @@ const OrderTemplateCreditCardDetails = ({ onSubmit, onCancel }) => {
                         },
                       },
                       saveAccountPaymentMethodName: paymentMethod.accountPaymentMethodName,
-                      saveAccountPaymentMethodFlag: paymentMethod.savePaymentMethodToAccount,
+                      saveAccountPaymentMethodFlag: savePaymentMethodToAccount,
                     })
                   } else if (values.saveAddress) {
                     // Create account address

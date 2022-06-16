@@ -57,6 +57,7 @@ const processForPage = (item, depth) => {
   }
   hydrated.contentID = getContentID()
   hydrated.slug = item.slug.value
+  hydrated.permissions = { accessFlag: true, nonRestrictedFlag: true }
   hydrated.title = item.title.value
   hydrated.body = item.body.value
   hydrated.contentBody = item.body.value

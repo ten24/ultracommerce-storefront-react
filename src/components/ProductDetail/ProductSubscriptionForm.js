@@ -8,6 +8,8 @@ import { Button, ProductQuantityInput } from '../'
 import { checkInvetory } from '../../selectors'
 import { useOrderTemplateList } from '../../hooks/'
 import { Modal, AddProductToSubscriptionModal } from '..'
+import { isAuthenticated } from '../../utils'
+import { toast } from 'react-toastify'
 
 const ProductQuantityMessage = () => {
   const { t } = useTranslation()
@@ -87,7 +89,7 @@ const ProductSubscriptionForm = ({ sku, productType }) => {
                   label={t('frontend.product.addToSubscription')}
                   onClick={event => {
                     event.preventDefault()
-                    setAddToSubscriptionModal(!showAddToSubscriptionModal)
+                    !isAuthenticated() ? toast.error(t('frontend.account.scheduled.delivery.unauthenticatedErrorMessage')) : setAddToSubscriptionModal(!showAddToSubscriptionModal)
                   }}
                 />
               )}
@@ -96,7 +98,7 @@ const ProductSubscriptionForm = ({ sku, productType }) => {
         )}
       </form>
       <Modal show={showAddToSubscriptionModal} setShow={setAddToSubscriptionModal} title={t('frontend.product.subscriptionModal.heading')} size="xLarge">
-        <div className="container">{frequencyTermOptions.length > 0 && <AddProductToSubscriptionModal show={showAddToSubscriptionModal} orderTemplates={orderTemplates} setShow={setAddToSubscriptionModal} frequencyTermOptions={frequencyTermOptions} sku={sku} quantity={quantity} />}</div>
+        <div className="container">{frequencyTermOptions.length > 0 && showAddToSubscriptionModal && <AddProductToSubscriptionModal show={showAddToSubscriptionModal} orderTemplates={orderTemplates} setShow={setAddToSubscriptionModal} frequencyTermOptions={frequencyTermOptions} sku={sku} quantity={quantity} />}</div>
       </Modal>
     </div>
   )
