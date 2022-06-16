@@ -2,6 +2,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { ContentSlider, ProductSliderWithConfig, BrandSlider, ContentColumns, Layout, LatestNews, ContentBlock, ActionBanner } from '@ultracommerce/ultracommerce-storefront-react/components'
 import { useTranslation } from 'react-i18next'
+
 function Home() {
   const { home = {} } = useSelector(state => state.content)
   const { callToAction, contentColumns, popularProducts, slider } = home

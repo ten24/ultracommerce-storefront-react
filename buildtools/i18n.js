@@ -36,7 +36,7 @@ const propertiesToJSONObject = properties => {
     })
   return globalTranlations
 }
-const rootPropertiesPath = `${__dirname}/../node_modules/@slatwall/slatwall-storefront-react/resourceBundles`
+const rootPropertiesPath = `${__dirname}/../node_modules/@ultracommerce/ultracommerce-storefront-react/resourceBundles`
 const items = fs.readdirSync(rootPropertiesPath)
 
 items.forEach(fileName => {

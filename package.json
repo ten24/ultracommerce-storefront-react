@@ -1,24 +1,25 @@
 {
-  "name": "sample-storefront",
-  "version": "0.1.0",
-  "description": "Slatwall Storefront",
-  "author": "Slatwall Inc. <contact@slatwallcommerce.com> (https://www.slatwallcommerce.com)",
+  "name": "storefront",
+  "version": "2.1.0",
+  "description": "Ultra Commerce Storefront",
+  "author": "Ultra Commerce <contact@ultracommerce.co> (https://www.ultracommerce.co)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ten24/slatwall-storefront-react/issues"
+    "url": "https://github.com/ten24/ultracommerce-storefront-react/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ten24/slatwall-storefront-react.git"
+    "url": "git+https://github.com/ten24/ultracommerce-storefront-react.git"
   },
-  "homepage": "https://www.slatwallcommerce.com/",
+  "homepage": "https://www.ultracommerce.co/",
   "dependencies": {
-    "@ultracommerce/ultracommerce-storefront-react": "^2.0.0",
+    "@ultracommerce/ultracommerce-storefront-react": "2.1.0",
+    "@contentful/rich-text-react-renderer": "^15.12.0",
     "@kentico/kontent-delivery": "10.4.1",
     "@palmabit/react-cookie-law": "^0.6.2",
     "@sentry/react": "^6.19.3",
     "@sentry/tracing": "^6.19.3",
-    "@ultracommerce/ultracommerce-sdk": "^1.3.0",
+    "@ultracommerce/ultracommerce-sdk": "1.4.0",
     "bootstrap": "^5.1.3",
     "bootstrap-icons": "^1.8.1",
     "braintree-web": "^3.85.2",

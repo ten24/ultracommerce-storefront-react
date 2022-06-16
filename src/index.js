@@ -3,17 +3,16 @@ import ReactDOM from 'react-dom'
 // import reportWebVitals from './reportWebVitals'
 import { BrowserRouter as Router } from 'react-router-dom'
 import { createBrowserHistory } from 'history'
-
-import './i18n'
 import { Provider } from 'react-redux'
-import store from './createStore'
-import App from './App'
-import './assets/theme'
 import TagManager from 'react-gtm-module'
-import devData from './preload'
 import * as Sentry from '@sentry/react'
 import { Integrations } from '@sentry/tracing'
 import { AnalyticsManager } from '@ultracommerce/ultracommerce-storefront-react/components'
+import './i18n'
+import store from './createStore'
+import './assets/theme'
+import devData from './preload'
+import { AppSwitcher } from './AppSwitcher'
 
 const release = process.env.REACT_APP_NAME + '@' + process.env.REACT_APP_VERSION
 const dsn = process.env.REACT_APP_SENTRY_DSN
@@ -46,7 +45,7 @@ ReactDOM.render(
 
   <Provider store={store}>
     <Router>
-      <App />
+      <AppSwitcher />
       <AnalyticsManager />
     </Router>
   </Provider>,

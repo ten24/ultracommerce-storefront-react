@@ -1,9 +1,17 @@
 import { default as preload } from '@ultracommerce/ultracommerce-storefront-react/src/preload'
 const data = {
   ...preload,
-  site: { ...preload.site, hibachiInstanceApplicationScopeKey: '', siteName: process.env.REACT_APP_NAME, siteID: '', defaultCountry: 'US', siteCode: process.env.REACT_APP_SITE_CODE },
+  site: {
+    ...preload.site,
+    siteName: process.env.REACT_APP_NAME,
+    siteCode: process.env.REACT_APP_SITE_CODE,
+  },
   footer: {
     formLink: '',
+  },
+  seo: {
+    title: 'Storefront',
+    titleMeta: '',
   },
   cmsProvider: 'slatwallCMS',
   theme: {
@@ -14,5 +22,19 @@ const data = {
   forms: {
     contact: '',
   },
+  integrations: [
+    // {
+    //   key: 'googlelogin',
+    //   name: 'Google Login',
+    //   types: 'authentication',
+    //   settings: {},
+    // },
+    // {
+    //   key: 'facebooklogin',
+    //   name: 'Facebook Login',
+    //   types: 'authentication',
+    //   settings: {},
+    // },
+  ],
 }
 export default data
