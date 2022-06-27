@@ -199,6 +199,14 @@ const data = {
     //   types: 'authentication',
     //   settings: {},
     // },
+    // {
+    //   key: 'paypalCommerce',
+    //   name: 'Paypal Commerce',
+    //   types: 'payment',
+    //   settings: {
+    //     clientID: '',
+    //   },
+    // },
   ],
   enableMultiSite: true,
 }

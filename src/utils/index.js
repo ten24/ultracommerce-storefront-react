@@ -27,13 +27,6 @@ export const isAuthenticated = () => {
   return false
 }
 export const getMyAccountUrl = () => {
-  let token = localStorage.getItem('token')
-  if (token) {
-    try {
-      token = jwt_decode(token)
-      return token.exp && token.exp * 1000 > Date.now() && token.accountID.length > 0
-    } catch (error) {}
-  }
   return isAuthenticated() ? '/my-account/overview' : '/my-account/login'
 }
 export const isImpersonating = () => {

@@ -10,11 +10,11 @@ import * as Yup from 'yup'
 import { useState } from 'react'
 import dayjs from 'dayjs'
 
-const CreditCardDetails = ({ onSubmit, fulfillment, isQuote = false, orderID }) => {
+const CreditCardDetails = ({ paymentMethodID, onSubmit, fulfillment, isQuote = false, orderID }) => {
   const { t } = useTranslation()
   const dispatch = useDispatch()
   const { fulfillmentMethod } = fulfillment
-  const { months, years, CREDIT_CARD } = useCheckoutUtilities()
+  const { months, years } = useCheckoutUtilities()
   const [paymentMethodErrors, setPaymentMethodErrors] = useState({})
   const [savePaymentMethodToAccount, setSavePaymentMethodToAccount] = useState(false)
   const [saveShippingAsBilling, setSaveShippingAsBilling] = useState(false)
@@ -297,7 +297,7 @@ const CreditCardDetails = ({ onSubmit, fulfillment, isQuote = false, orderID }) 
                               expirationYear: paymentMethod.expirationYear,
                               securityCode: paymentMethod.securityCode,
                               paymentMethod: {
-                                paymentMethodID: CREDIT_CARD,
+                                paymentMethodID,
                               },
                             },
                             saveAccountPaymentMethodName: paymentMethod.accountPaymentMethodName,
@@ -314,7 +314,7 @@ const CreditCardDetails = ({ onSubmit, fulfillment, isQuote = false, orderID }) 
                               expirationYear: paymentMethod.expirationYear,
                               securityCode: paymentMethod.securityCode,
                               paymentMethod: {
-                                paymentMethodID: CREDIT_CARD,
+                                paymentMethodID,
                               },
                             },
                           })
@@ -347,7 +347,7 @@ const CreditCardDetails = ({ onSubmit, fulfillment, isQuote = false, orderID }) 
                       expirationYear: paymentMethod.expirationYear,
                       securityCode: paymentMethod.securityCode,
                       paymentMethod: {
-                        paymentMethodID: CREDIT_CARD,
+                        paymentMethodID,
                       },
                     },
                     accountAddressID: value,
@@ -383,7 +383,7 @@ const CreditCardDetails = ({ onSubmit, fulfillment, isQuote = false, orderID }) 
                             expirationYear: paymentMethod.expirationYear,
                             securityCode: paymentMethod.securityCode,
                             paymentMethod: {
-                              paymentMethodID: CREDIT_CARD,
+                              paymentMethodID,
                             },
                           },
                           saveAccountPaymentMethodName: paymentMethod.accountPaymentMethodName,
@@ -416,7 +416,7 @@ const CreditCardDetails = ({ onSubmit, fulfillment, isQuote = false, orderID }) 
                             expirationYear: paymentMethod.expirationYear,
                             securityCode: paymentMethod.securityCode,
                             paymentMethod: {
-                              paymentMethodID: CREDIT_CARD,
+                              paymentMethodID,
                             },
                           },
                         })
@@ -441,7 +441,7 @@ const CreditCardDetails = ({ onSubmit, fulfillment, isQuote = false, orderID }) 
                         expirationYear: paymentMethod.expirationYear,
                         securityCode: paymentMethod.securityCode,
                         paymentMethod: {
-                          paymentMethodID: CREDIT_CARD,
+                          paymentMethodID,
                         },
                       },
                     })

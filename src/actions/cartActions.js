@@ -214,16 +214,16 @@ const updateOrderNotes = params => {
     })
   }
 }
-const updateItemQuantity = (skuID, quantity = 1) => {
+const updateItemQuantity = (orderItemID, quantity = 1) => {
   return async dispatch => {
     dispatch(
       updateOrderItemQuantity({
-        orderItem: {
-          sku: {
-            skuID,
-          },
-          qty: quantity,
-        },
+        params:{
+          orderItem: {
+            orderItemID,
+            quantity,
+          }
+        }
       })
     ).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))

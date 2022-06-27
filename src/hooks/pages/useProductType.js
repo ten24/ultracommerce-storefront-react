@@ -2,12 +2,10 @@ import { useGetEntity } from '../../hooks/useAPI'
 import { useSelector } from 'react-redux'
 import { getProductTypeRoute } from '../../selectors/configurationSelectors'
 import { useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
 import { useHistory, useParams } from 'react-router-dom'
 import { useUtilities } from '../useUtilities'
 
 const useProductType = () => {
-  const { t } = useTranslation()
   const { id } = useParams()
   const history = useHistory()
   const { augmentProductType } = useUtilities()
@@ -48,7 +46,6 @@ const useProductType = () => {
   }
   if (!productTypeRequest.isFetching && productTypeRequest.isLoaded && Object.keys(productTypeRequest.data).length === 0) {
     isError = true
-    errorMessage = t('frontend.core.error.no_products')
     //throw new Error(t('frontend.core.error.title'))
   }
   if (!productTypeListRequest.isFetching && !productTypeListRequest.isLoaded && productTypeRequest.isLoaded) {

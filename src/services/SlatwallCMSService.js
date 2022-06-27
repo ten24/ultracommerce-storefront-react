@@ -315,7 +315,7 @@ const getEntryBySlug = (payload = {}) => {
 }
 const processForPage = (page, content) => {
   let hydrated = {}
-  hydrated.permissions = { accessFlag: true, nonRestrictedFlag: true }
+  hydrated.permissions = { accessFlag: true }
   const descendants = getDescendants(content, page.contentID)
   hydrated.tabs = getContentByType(descendants, 'cetTab')
   hydrated.slider = processForSlider(descendants)

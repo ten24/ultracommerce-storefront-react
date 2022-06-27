@@ -36,7 +36,7 @@ const BrandSearchListing = ({ brandSlug }) => {
         </div>
       </div>
       <div className="container product-listing mb-5">
-        <ListingToolBar hide={hide} {...potentialFilters} removeFilter={updateAttribute} setSort={setSort} />
+        {records.length > 0 && <ListingToolBar hide={hide} {...potentialFilters} removeFilter={updateAttribute} setSort={setSort} />}
         <div className="row mt-3">
           <ListingSidebar isFetching={isFetching} hide={hide} filtering={potentialFilters} recordsCount={total} keyword={params['keyword']} setKeyword={setKeyword} updateAttribute={updateAttribute} />
           <ListingGrid isFetching={isFetching} pageRecords={records} />

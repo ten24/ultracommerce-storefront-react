@@ -2,12 +2,10 @@ import { useGetEntity, useGetEntityByID } from '../useAPI'
 import { useSelector } from 'react-redux'
 import { getCategoryRoute } from '../../selectors'
 import { useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
 import { useHistory, useLocation } from 'react-router-dom'
 import { useUtilities } from '../useUtilities'
 
 const useCategory = () => {
-  const { t } = useTranslation()
   const { pathname } = useLocation()
   const pathKey = pathname.split('/').reverse()[0]
   const history = useHistory()
@@ -48,7 +46,6 @@ const useCategory = () => {
   }, [])
   if (!categoryListRequest?.isFetching && categoryListRequest?.isLoaded && Object.keys(categoryListRequest?.data)?.length === 0) {
     isError = true
-    errorMessage = t('frontend.core.error.no_products')
   }
   let categoryData = nestDataByKey(categoryListRequest.data, 'parentCategory_categoryID', 'categoryID')
   categoryData = categoryData.filter(con => con.urlTitle === pathKey).reduce((accumulator, con) => con, {})

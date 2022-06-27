@@ -67,7 +67,7 @@ const AccountAddressForm = ({ billingAddress, setBillingAddress, billingAddressE
               options={countryCodeOptions}
               onBlur={value => requiredValidation({ value, name: 'countryCode', msg: t('frontend.core.required') })}
             />
-            {!!billingAddressErrors.countryCode && <span className="form-error-msg">{billingAddressErrors.countryCode}</span>}
+           {!!billingAddressErrors.countryCode && <span className="form-error-msg">{billingAddressErrors.countryCode?.message}</span>}
           </div>
         </div>
         <div className="col-md-6">
@@ -200,7 +200,7 @@ const AccountAddressForm = ({ billingAddress, setBillingAddress, billingAddressE
                 onBlur={value => requiredValidation({ value, name: 'stateCode', msg: t('frontend.core.required') })}
                 options={stateCodeOptions[billingAddress.countryCode]}
               />
-              {!!billingAddressErrors.stateCode && <span className="form-error-msg">{billingAddressErrors.stateCode}</span>}
+              {!!billingAddressErrors.stateCode && <span className="form-error-msg">{billingAddressErrors.stateCode?.message}</span>}
             </div>
           )}
 

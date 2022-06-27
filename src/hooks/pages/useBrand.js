@@ -4,12 +4,10 @@ import queryString from 'query-string'
 import { useEffect } from 'react'
 import { useGetEntity } from '../useAPI'
 import { getBrandRoute } from '../../selectors'
-import { useTranslation } from 'react-i18next'
 import { useUtilities } from '../useUtilities'
 
 const useBrand = () => {
   const loc = useLocation()
-  const { t } = useTranslation()
   const brandRoute = useSelector(getBrandRoute)
   const productTypeBase = useSelector(state => state.configuration.filtering.productTypeBase)
   const [brandResponse, setBrandRequest] = useGetEntity()
@@ -53,7 +51,6 @@ const useBrand = () => {
 
   if (!productTypeRequest.isFetching && productTypeRequest.isLoaded && Object.keys(productTypeRequest.data).length === 0) {
     isError = true
-    errorMessage = t('frontend.core.error.no_products')
     // throw new Error(t('frontend.core.error.title'))
   }
 

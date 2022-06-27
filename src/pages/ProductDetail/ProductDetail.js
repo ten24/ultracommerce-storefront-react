@@ -35,7 +35,7 @@ const ProductDetail = () => {
       return <RedirectWithReplace pathname={location.pathname} search={found[0].slug} />
     }
   }
-
+  if (!product) return <RedirectWithReplace pathname="/404" />
   if (optionGroupPairs.length === 0 && product.defaultSku_slug) {
     // This check is for no optionGroupPairs passed
     console.log('<------- product.defaultSku_slug', optionGroupPairs, product)
@@ -92,8 +92,8 @@ const ProductDetail = () => {
           </div>
           <div className="col-sm-6 col-md-6 offset-md-1">
             {product?.productID && <ProductDetails sku={selectedSKu} product={product} {...ratingData} />}
-            {!isFetching && !cart.isFetching && skus?.length === 0 && <SkuOptions sku={selectedSKu} selection={params} productOptions={updatedProductOptions} skus={skus} />}
-            {!isFetching && !cart.isFetching && productOptions?.length === 0 && product.skus.length > 1 && <SkuSelector sku={selectedSKu} selection={params} productOptions={updatedProductOptions} skus={skus} />}
+            {!isFetching && <SkuOptions sku={selectedSKu} selection={params} productOptions={updatedProductOptions} skus={skus} />}
+            {!isFetching && product.skus.length > 1 && <SkuSelector sku={selectedSKu} selection={params} productOptions={updatedProductOptions} skus={skus} />}
             <ProductForm sku={selectedSKu} isDisabled={isDisabled} isLoading={isFetching || cart.isFetching} />
             <ProductTypeRadioList selectedSKu={selectedSKu} product={product} isDisabled={isDisabled} isLoading={isFetching || cart.isFetching} />
             <ProductTypeQuote selectedSKu={selectedSKu} product={product} />

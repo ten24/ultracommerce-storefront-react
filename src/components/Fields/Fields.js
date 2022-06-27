@@ -1,13 +1,13 @@
 import { useTranslation } from 'react-i18next'
 import * as Yup from 'yup'
 
-const TextInput = ({ name = '', label = '', value = '', isError = false, errorMessage = '', onChange, onBlur }) => {
+const TextInput = ({ name = '', label = '', value = '', type = '', isError = false, errorMessage = '', onChange, onBlur }) => {
   return (
     <div className="form-group">
       <label htmlFor={name}>{label}</label>
       <input
         className="form-control"
-        type="text"
+        type={type || "text"}
         id={name}
         value={value}
         onChange={event => {

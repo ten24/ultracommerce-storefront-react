@@ -52,6 +52,7 @@ const SkuOptions = ({ productOptions, selection, skus = [], selectedOptionInMode
       })
     }
   }
+  if (skus?.length === 0) return null
   return (
     <div className="d-flex flex-row">
       {productOptions.length > 0 &&
@@ -99,9 +100,10 @@ const SkuOptions = ({ productOptions, selection, skus = [], selectedOptionInMode
   )
 }
 
-const SkuSelector = ({ sku, skus = [], selectedOptionInModel }) => {
+const SkuSelector = ({ sku, skus = [], productOptions, selectedOptionInModel }) => {
   let loc = useLocation()
   let history = useHistory()
+  if (productOptions?.length !== 0 || skus.length === 0) return null
   return (
     <div className="d-flex flex-row">
       <div className="form-group pe-4 mb-4">

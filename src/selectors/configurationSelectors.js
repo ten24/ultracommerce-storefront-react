@@ -12,6 +12,7 @@ export const getBlogRoute = state => state.configuration.blog.url
 export const getSites = state => state.configuration.sites
 export const getEnableMultiSite = state => state.configuration.enableMultiSite
 export const getSocialLogins = state => state.configuration?.integrations?.filter(({ types }) => types.includes('authentication'))
+export const getPaymentIntegrations = state => state.configuration?.integrations?.filter(({ types }) => types.includes('payment'))
 
 export const isVatCountry = createSelector([getSiteSetting, getGlobalSettings], ({ siteDefaultCountry }, { globalVATCountries }) => {
   return globalVATCountries?.split(',')?.includes(siteDefaultCountry) || false

@@ -7,11 +7,13 @@ const OrderToolbar = ({ delivered, orderPayments }) => {
     <div className="d-flex justify-content-between align-items-center pt-lg-2 pb-4 pb-lg-5">
       <div className="row justify-content-between w-100 align-items-center">
         <div className="col-sm-6">
-          <div>
+         {orderPayments && (
+            <div>
             <h6 className="h6">
               {t('frontend.order.OrderNo')} #<span>{orderPayments.order_orderNumber}</span>
             </h6>
           </div>
+         )}
           <div className="text-muted">
             {t('frontend.order.statusText')} <span className="badge bg-success m-0 p-2 ml-2">{delivered.orderStatusType_typeName}</span>
           </div>

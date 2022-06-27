@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { Button, CartLineItem, OrderSummary, CartPromoBox, FulfillmentList, OrderToolbar, SwRadioSelect, PaymentList, CreditCardPayment, TermPayment, PickupLocationDetails } from '../..'
 import { SlatwalApiService } from '../../../services'
 import { toast } from 'react-toastify'
-import { getErrorMessage } from '../../../utils'
+import { getErrorMessage, getFailureMessageOnSuccess } from '../../../utils'
 import { useState, useEffect } from 'react'
 import { useCheckoutUtilities } from '../../../hooks'
 import { clearCart, getEligibleOrderFulfillmentMethods, getAllPickupLocations, setPickupDateToOrderFulfillment, addPickupLocationToOrderFulfillment, clearOrderData, removeOrderItem, updateOrderItemQuantity, applyPromoCodeToOrder, removePromoCodeFromOrder, placeMyOrder, addPaymentToOrder, changeFulfillmentOnOrder, addShippingAddressUsingAccountAddressToOrderFulfillment, addNewAddressAndAttachAsShippingOnOrderFulfillment, addShippingMethodToOrderFulfillment, addShippingAddressToOrderFulfillment, removeOrderPayment } from '../../../actions'
@@ -43,9 +43,11 @@ const QuoteDetailDraft = ({ quoteDetail, updateQuote }) => {
       setEligibleMethods(response?.success()?.eligibleFulfillmentMethods)
     })
     dispatch(getAllPickupLocations({ isQuote: true })).then(response => {
-      setPickupLocations(response?.success()?.locations.map(location => {
-        return { name: location['NAME'], value: location['VALUE'] }
-      }))
+      setPickupLocations(
+        response?.success()?.locations.map(location => {
+          return { name: location['NAME'], value: location['VALUE'] }
+        })
+      )
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quoteDetail.orderID])
@@ -318,11 +320,11 @@ const QuoteDetailDraft = ({ quoteDetail, updateQuote }) => {
 
 const QuoteDetailReadyForPayment = ({ quoteDetail, updateQuote }) => {
   const dispatch = useDispatch()
-  const { CREDIT_CARD, TERM_PAYMENT_CODE, TERM_PAYMENT, CREDIT_CARD_CODE, CASH_PAYMENT, CASH_PAYMENT_CODE } = useCheckoutUtilities()
+  const { TERM_PAYMENT_CODE, CREDIT_CARD_CODE, CASH_PAYMENT_CODE, getPaymentMethodByIDFromList } = useCheckoutUtilities()
   const eligiblePaymentMethodDetails = quoteDetail.eligiblePaymentMethodDetails
     .filter(({ paymentMethod }) => paymentMethod.paymentMethodType === CASH_PAYMENT_CODE || paymentMethod.paymentMethodType === CREDIT_CARD_CODE || paymentMethod.paymentMethodType === TERM_PAYMENT_CODE)
     .map(({ paymentMethod }) => {
-      return { name: paymentMethod.paymentMethodName, value: paymentMethod.paymentMethodID, type: paymentMethod.paymentMethodType }
+      return { ...paymentMethod, name: paymentMethod.paymentMethodName, value: paymentMethod.paymentMethodID, type: paymentMethod.paymentMethodType }
     })
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('')
   const [paymentMethodOnOrder, setPaymentMethodOnOrder] = useState(false)
@@ -332,12 +334,13 @@ const QuoteDetailReadyForPayment = ({ quoteDetail, updateQuote }) => {
   useEffect(() => {
     const paymentMethod = quoteDetail?.orderPayments?.at(0)
     if (paymentMethod && paymentMethod.paymentMethodID && paymentMethodOnOrder !== paymentMethod.paymentMethodID) {
-      setPaymentMethodOnOrder(paymentMethod.paymentMethodID)
-      setSelectedPaymentMethod(paymentMethod.paymentMethodID)
+      setPaymentMethodOnOrder(paymentMethod)
+      setSelectedPaymentMethod(paymentMethod)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quoteDetail.orderID])
   if (!quoteDetail) return null
+
   return (
     <QuoteDetailViewOnly quoteDetail={quoteDetail} updateQuote={updateQuote}>
       <div className="card ">
@@ -368,15 +371,16 @@ const QuoteDetailReadyForPayment = ({ quoteDetail, updateQuote }) => {
                     <SwRadioSelect
                       label={t('frontend.checkout.payment.select')}
                       options={eligiblePaymentMethodDetails}
-                      onChange={value => {
-                        setSelectedPaymentMethod(value)
-                        if (value === CASH_PAYMENT) {
+                      onChange={paymentMethodID => {
+                        const foundPaymentMethod = getPaymentMethodByIDFromList(eligiblePaymentMethodDetails, paymentMethodID)
+                        setSelectedPaymentMethod(foundPaymentMethod)
+                        if (foundPaymentMethod.paymentMethodType === CASH_PAYMENT_CODE) {
                           dispatch(
                             addPaymentToOrder({
                               params: {
                                 newOrderPayment: {
                                   paymentMethod: {
-                                    paymentMethodID: value,
+                                    paymentMethodID,
                                   },
                                 },
                                 orderID: quoteDetail.orderID,
@@ -390,15 +394,13 @@ const QuoteDetailReadyForPayment = ({ quoteDetail, updateQuote }) => {
                           })
                         }
                       }}
-                      selectedValue={selectedPaymentMethod.length > 0 ? selectedPaymentMethod : paymentMethodOnOrder}
+                      selectedValue={selectedPaymentMethod?.paymentMethodID?.length ? selectedPaymentMethod.paymentMethodID : paymentMethodOnOrder}
                     />
                   )}
                 </div>
               </div>
-              {selectedPaymentMethod === CREDIT_CARD && <CreditCardPayment method={selectedPaymentMethod} fulfillment={quoteDetail.orderFulfillments.at(0)} isQuote={true} orderID={quoteDetail.orderID} updateQuote={updateQuote} />}
-              {/* {selectedPaymentMethod === GIFT_CARD && <GiftCardPayment method={selectedPaymentMethod} />} */}
-              {/* {selectedPaymentMethod === PAYPAL_PAYMENT && <PayPalPayment />} */}
-              {selectedPaymentMethod === TERM_PAYMENT && <TermPayment method={selectedPaymentMethod} fulfillment={quoteDetail.orderFulfillments.at(0)} isQuote={true} orderID={quoteDetail.orderID} updateQuote={updateQuote} />}
+              {selectedPaymentMethod.paymentMethodType === CREDIT_CARD_CODE && <CreditCardPayment method={selectedPaymentMethod.paymentMethodID} fulfillment={quoteDetail.orderFulfillments.at(0)} isQuote={true} orderID={quoteDetail.orderID} updateQuote={updateQuote} />}
+              {selectedPaymentMethod.paymentMethodType === TERM_PAYMENT_CODE && <TermPayment method={selectedPaymentMethod.paymentMethodID} fulfillment={quoteDetail.orderFulfillments.at(0)} isQuote={true} orderID={quoteDetail.orderID} updateQuote={updateQuote} />}
             </>
           )}
         </div>
@@ -498,7 +500,7 @@ const QuoteFulfillmentsViewOnly = ({ quoteDetail }) => {
                     })}
                 </AddressCard>
               )}
-              {fulfillment.fulfillmentMethod.fulfillmentMethodType === PICKUP_CODE && <PickupLocationDetails pickupLocation={fulfillment.pickupLocation} displayOnly={true}/>}
+              {fulfillment.fulfillmentMethod.fulfillmentMethodType === PICKUP_CODE && <PickupLocationDetails pickupLocation={fulfillment.pickupLocation} displayOnly={true} />}
             </div>
           </div>
         )
@@ -591,7 +593,8 @@ const QuoteActions = ({ quoteDetail }) => {
                   })
                 ).then(response => {
                   if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-                  if (response.isSuccess() && Object.keys(response.success()?.successfulActions || {}).length) {
+                  getFailureMessageOnSuccess(response, getErrorMessage(response.success().messages))
+                  if (response.isSuccess() && response.success()?.successfulActions.length > 0) {
                     toast.success(t('frontend.order.placed'))
                     setTimeout(() => {
                       history.push('/my-account/quotes')
@@ -624,11 +627,14 @@ const QuoteSubmitForApprovalForm = ({ quoteDetail, updateQuote }) => {
       .then(response => {
         if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
         if (response.isSuccess()) {
-          updateQuote(prevState => ({
-            ...prevState,
-            ...response.success().quote,
-          }))
-          setDisabled(false)
+          toast.success(t('frontend.account.quote.approval.successMessage'))
+          setTimeout(() => {
+            updateQuote(prevState => ({
+              ...prevState,
+              ...response.success().quote,
+            }))
+            setDisabled(false)
+          }, 2000)
         }
       })
   }
@@ -667,8 +673,12 @@ const QuoteSubmitForApprovalForm = ({ quoteDetail, updateQuote }) => {
                   type="button"
                   classList="btn btn-primary btn-block mt-4 d-block m-auto"
                   onClick={() => {
-                    if (!quoteRequestDetails) return null
-                    submitQuoteForApproval(quoteDetail.orderID)
+                    if (!quoteRequestDetails) {
+                      toast.error(t('frontend.account.quote.requiredMessage'))
+                      return null
+                    } else {
+                      submitQuoteForApproval(quoteDetail.orderID)
+                    }
                   }}
                 >
                   <span className="d-sm-inline">{t('frontend.account.quote.submitForApproval')}</span>

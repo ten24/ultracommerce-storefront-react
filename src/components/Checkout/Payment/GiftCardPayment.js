@@ -1,15 +1,21 @@
-import { useState } from 'react'
-import { useSelector } from 'react-redux'
-import { PaymentAddressSelector, Button } from '../../'
-import { billingAccountAddressSelector } from '../../../selectors'
 import { useTranslation } from 'react-i18next'
-import { useGiftCardPayment } from '../../../hooks/'
+import { useGiftCardPayment, useFormatCurrency } from '../../../hooks/'
+import { SwRadioSelect } from '../../SwRadioSelect/SwRadioSelect'
 
 const GiftCardPayment = ({ method }) => {
   const { t } = useTranslation()
-  const selectedAccountID = useSelector(billingAccountAddressSelector)
-  const [saveShippingAsBilling, setSaveShippingAsBilling] = useState('')
-  const { onPaymentAddressSelect, onPaymentAddressSave, onSaveShippingAsBilling, fulfillmentMethodType, accountAddressID, setGiftCardNumber, giftCardNumber } = useGiftCardPayment({ method })
+  const { onSaveShippingAsBilling, setGiftCardNumber, giftCardNumber, giftCards } = useGiftCardPayment({ method })
+  const [formatCurrency] = useFormatCurrency({})
+
+  const getGiftCardOptions = () => {
+    if (giftCards) {
+      return giftCards.map(giftCard => ({
+        name: `${giftCard.giftCardCode} - ${formatCurrency(Number(giftCard.calculatedBalanceAmount))}`,
+        value: giftCard.giftCardCode
+      }))
+    }
+    return []
+  }
 
   return (
     <>
@@ -29,29 +35,23 @@ const GiftCardPayment = ({ method }) => {
             />
           </div>
         </div>
-        {fulfillmentMethodType === 'shipping' && (
-          <div className="col-sm-12 mt-2">
-            <div className="form-group">
-              <div className="custom-control custom-checkbox">
-                <input
-                  className="custom-control-input"
-                  type="checkbox"
-                  id="saveShippingAsBilling"
-                  checked={saveShippingAsBilling}
-                  onChange={e => {
-                    setSaveShippingAsBilling(!saveShippingAsBilling)
-                  }}
-                />
-                <label className="custom-control-label ms-1" htmlFor="saveShippingAsBilling">
-                  {t(`frontend.checkout.payment.sameAsShippingAddress`)}
-                </label>
-              </div>
-            </div>
+        { giftCards && giftCards.length > 0 && (
+          <div>
+            <p>Account Gift Cards</p>
+            <SwRadioSelect
+              options={getGiftCardOptions()}
+              selectedValue={giftCardNumber}
+              onChange={v => setGiftCardNumber(v)}
+            />
           </div>
         )}
       </div>
-      {saveShippingAsBilling && setGiftCardNumber && setGiftCardNumber.length > 0 && <Button label="Submit" onClick={onSaveShippingAsBilling} />}
-      {!saveShippingAsBilling && setGiftCardNumber && setGiftCardNumber.length > 0 && <PaymentAddressSelector addressTitle={'Billing Address'} selectedAccountID={selectedAccountID || accountAddressID} onSelect={onPaymentAddressSelect} onSave={onPaymentAddressSave} />}
+
+      { giftCardNumber.length > 0 &&
+        <button className="btn btn-primary me-2" onClick={onSaveShippingAsBilling}>
+          <span className="d-inline">{t('frontend.core.save')}</span>
+        </button>
+      }
     </>
   )
 }
