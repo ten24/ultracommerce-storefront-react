@@ -13,10 +13,11 @@
   },
   "homepage": "https://www.ultracommerce.co/",
   "dependencies": {
-    "@ultracommerce/ultracommerce-storefront-react": "2.1.0",
+    "@ultracommerce/ultracommerce-storefront-react": "2.1.1",
     "@contentful/rich-text-react-renderer": "^15.12.0",
     "@kentico/kontent-delivery": "10.4.1",
     "@palmabit/react-cookie-law": "^0.6.2",
+    "@paypal/react-paypal-js": "^7.6.0",
     "@sentry/react": "^6.19.3",
     "@sentry/tracing": "^6.19.3",
     "@ultracommerce/ultracommerce-sdk": "1.4.0",
