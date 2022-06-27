@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { addNewAccountAndSetAsBilling } from '../../../actions/'
-import { orderPayment, fulfillmentSelector } from '../../../selectors'
+import { fulfillmentSelector } from '../../../selectors'
 import { SlatwalApiService } from '../../../services'
 import { receiveCart, receiveUser } from '../../../actions'
 import { getErrorMessage } from '../../../utils'
@@ -10,10 +10,11 @@ import { toast } from 'react-toastify'
 const useGiftCardPayment = ({ method }) => {
   const dispatch = useDispatch()
   const [accountAddressID, setAccountAddressID] = useState('')
-  const { purchaseOrderNumber } = useSelector(orderPayment)
-  const [giftCardNumber, setGiftCardNumber] = useState(purchaseOrderNumber)
+  const [giftCardNumber, setGiftCardNumber] = useState('')
   const { fulfillmentMethod } = useSelector(fulfillmentSelector)
   const { fulfillmentMethodType } = fulfillmentMethod
+  const { giftCards } = useSelector(state => state.userReducer)
+
   const onPaymentAddressSelect = async value => {
     await addGiftCardService({
       newOrderPayment: {
@@ -80,6 +81,6 @@ const useGiftCardPayment = ({ method }) => {
         }
       })
   }
-  return { onPaymentAddressSelect, onPaymentAddressSave, onSaveShippingAsBilling, fulfillmentMethodType, accountAddressID, setGiftCardNumber, giftCardNumber }
+  return { onPaymentAddressSelect, onPaymentAddressSave, onSaveShippingAsBilling, fulfillmentMethodType, accountAddressID, setGiftCardNumber, giftCardNumber, giftCards }
 }
 export { useGiftCardPayment }

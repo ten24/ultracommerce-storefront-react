@@ -50,6 +50,7 @@ const AddProductToSubscriptionModal = ({ quantity, sku, show, setShow, orderTemp
         toast.error(getErrorMessage(response.success().errors))
       } else {
         if (response.isSuccess()) {
+            toast.success(t('frontend.account.scheduled.delivery.detail.toolbar.existingSubscription.successMessage'))
             setShow(false)
             setLoadingForExisting(false)
         }

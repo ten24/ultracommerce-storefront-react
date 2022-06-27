@@ -97,10 +97,10 @@ const SkuRow = ({ config, product, quantity = 0, onButtonClick, onInputChange })
   // const {headings} = config TODO: use this one day to make headings dynamic
   return (
     <tr>
-      <td>
+      <td className='product-image'>
         <SimpleImage style={{ maxHeight: '100px' }} src={product.images[0] || product.imagePath} />
       </td>
-      <td><Link to={`/${brand}/${product.brandUrlTitle}`} className="text-capitalize mb-3" style={{ fontSize: 12 }}>
+      <td className='product-sku'><Link to={`/${brand}/${product.brandUrlTitle}`} className="text-capitalize mb-3" style={{ fontSize: 12 }}>
           {product.brandName}
         </Link>
         <h2>
@@ -111,10 +111,10 @@ const SkuRow = ({ config, product, quantity = 0, onButtonClick, onInputChange })
         {!product.skuCode && product.productCode && <div className="product-brand">{product.productCode}</div>}
         {product.skuCode && <div className="product-brand">{product.skuCode}</div>}</td>
 
-      <td>
+      <td className='product-price'>
         <ProductPrice salePrice={product.salePrice} listPrice={product.listPrice} className="d-flex" />
       </td>
-      <td>
+      <td className='product-quantity'>
         <input
           type="number"
           className="form-control"
@@ -126,7 +126,7 @@ const SkuRow = ({ config, product, quantity = 0, onButtonClick, onInputChange })
           }}
         />
       </td>
-      <td>
+      <td className='product-btn'>
         <Button
           className="btn btn-primary btn-block my-3"
           label={t(config.buttonLabel)}

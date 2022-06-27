@@ -18,7 +18,6 @@ const CreditCardPayment = ({ method, fulfillment, isQuote = false, orderID, upda
       setNewOrderPayment('new')
     }
   }, [paymentMethods])
-
   return (
     <>
       <div className="row mb-3">
@@ -65,6 +64,7 @@ const CreditCardPayment = ({ method, fulfillment, isQuote = false, orderID, upda
       {newOrderPayment === 'new' && (
         <CreditCardDetails
           fulfillment={fulfillment}
+          paymentMethodID={method}
           isQuote={isQuote}
           orderID={orderID}
           onSubmit={() => {

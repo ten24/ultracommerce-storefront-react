@@ -31,9 +31,10 @@ const AccountImpersonation = ({ crumbs, title, customBody, contentTitle }) => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
       if (response.isSuccess()) {
         toast.success(t('frontend.account.end_impersonation_successful'))
-        dispatch(getUser())
         dispatch(receiveCart(response.success().cart))
-        dispatch(getWishLists(true))
+        dispatch(getUser()).then(() => {
+          dispatch(getWishLists(true))
+        })
       } else {
         toast.error(t('frontend.account.end_impersonation_failed'))
       }

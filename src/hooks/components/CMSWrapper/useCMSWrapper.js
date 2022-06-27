@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory, useLocation } from 'react-router'
-import { getWishLists, getPageContent, getContentByType, receiveContent, requestContent } from '../../../actions'
+import { getPageContent, getContentByType, receiveContent, requestContent } from '../../../actions'
 import { getBlogRoute, getProductRoute } from '../../../selectors'
 import { SlatwallCMSService } from '../../../services'
 
@@ -117,7 +117,6 @@ const useCMSWrapper = () => {
     if (!isLoaded) {
       let basePath = pathname.split('/')[1].toLowerCase()
       basePath = basePath.length ? basePath : 'home'
-      dispatch(getWishLists())
       if (cmsProvider === 'slatwallCMS') {
         if (basePath === blogRoute) {
           requestUltraPageContent({

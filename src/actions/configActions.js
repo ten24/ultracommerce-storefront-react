@@ -3,7 +3,7 @@ import { SlatwalApiService } from '../services'
 import { getErrorMessage } from '../utils'
 import { receiveCart, requestCart } from './'
 import { receiveSubscriptionCart, requestSubscriptionCart } from './subscriptionCartActions'
-import { receiveUser, requestUser } from './userActions'
+import { getWishLists, receiveUser, requestUser } from './userActions'
 // import { receiveCart } from './cartActions'
 // import { receiveSubscriptionCart } from './subscriptionCartActions'
 // import { receiveUser } from './userActions'
@@ -52,6 +52,7 @@ export const getConfiguration = (siteCode = localStorage.getItem('siteCode'), re
           // serverConfig.router = [...serverConfig.router, ...legacyRoutes]
           dispatch(reciveConfiguration(serverConfig))
           dispatch(receiveUser(response.success().account))
+          if (response.success()?.account?.accountID?.length) dispatch(getWishLists())
           dispatch(receiveCart(response.success().cart))
           if (response.success()?.orderTemplateCart) {
             dispatch(receiveSubscriptionCart(response.success()?.orderTemplateCart))

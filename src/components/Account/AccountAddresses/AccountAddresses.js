@@ -1,11 +1,11 @@
 import React from 'react'
-// import PropTypes from 'prop-types'
+import { toast } from 'react-toastify'
 import { useDispatch, useSelector } from 'react-redux'
 import { AccountContent, AccountLayout } from '../../'
 import { Link } from 'react-router-dom'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
-import { deleteAccountAddress } from '../../../actions/'
+import { deleteAccountAddress, setPrimaryAccountAddress } from '../../../actions/'
 import { useTranslation } from 'react-i18next'
 import { getAllAccountAddresses, getPrimaryAddress } from '../../../selectors/'
 
@@ -23,7 +23,34 @@ const Address = props => {
         <br />
         <span className="font-weight-normal">{`${streetAddress}, ${city}, ${stateCode} ${postalCode}`}</span>
       </td>
-      <td>{isPrimary && <span className="align-middle badge bg-info ">{t('frontend.core.prinary')}</span>}</td>
+      <td>{isPrimary ? <span className="align-middle badge bg-info ">{t('frontend.core.prinary')}</span> : 
+        <button
+          type="button"
+          className="link-button link nav-link-style"
+          onClick={() => {
+            MySwal.fire({
+              icon: 'info',
+              title: <p>{t('frontend.address.setAsPrimary')}</p>,
+              showCloseButton: true,
+              showCancelButton: true,
+              focusConfirm: false,
+              confirmButtonText: t('frontend.payment.button.setAsPrimary'),
+            }).then(data => {
+              if (data.isConfirmed) {
+                dispatch(setPrimaryAccountAddress(accountAddressID)).then((response) => {
+                  if (response.isSuccess()) {
+                    toast.success(t('frontend.primaryFlag.successMessage'))
+                  } else {
+                    toast.error(t('frontend.primaryFlag.errorMessage'))
+                  }
+                })
+              }
+            })
+          }}
+        >
+          {t('frontend.address.button.setAsPrimary')}
+        </button>}
+      </td>
       <td>
         <Link
           className="link-button link nav-link-style"

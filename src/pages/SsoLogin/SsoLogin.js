@@ -14,8 +14,9 @@ const SsoLogin = ({ redirectPath = '/my-account/overview' }) => {
     redirectPath = params?.redirect
   }
 
-  dispatch(getUser())
-  dispatch(getWishlists())
+  dispatch(getUser()).then(() => {
+    dispatch(getWishlists())
+  })
 
   return <Redirect to={redirectPath} />
 }

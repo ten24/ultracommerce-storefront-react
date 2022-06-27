@@ -46,6 +46,8 @@ export { ForgotPasswordReset } from './Account/ForgotPasswordReset/ForgotPasswor
 
 export { UpdatePassword } from './Account/UpdatePassword/UpdatePassword'
 
+export { GiftCardList, GiftCardView } from './Account/GiftCardManagement'
+
 // Cart Components
 
 export { CartLineItem } from './Cart/CartLineItem'
@@ -89,8 +91,10 @@ export { PayPalPayment } from './Checkout/Payment/PayPalPayment'
 export { PaymentSlide } from './Checkout/Payment/Payment'
 export { CreditCardDetails } from './Checkout/Payment/CreditCardDetails'
 export { PaymentAddressSelector } from './Checkout/Payment/PaymentAddressSelector'
+export { PayPalCommercePayment } from './Checkout/Payment/PayPalCommercePayment'
 
 export { OrderTemplatePaymentSlide } from './OrderTemplateCheckout/Payment/OrderTemplatePayment'
+export { OrderTemplateCreditCardDetails } from './OrderTemplateCheckout/Payment/OrderTemplateCreditCardDetails'
 
 export { PickupLocationPicker } from './Checkout/Fulfilment/PickupLocationPicker'
 export { ShippingMethodPicker } from './Checkout/Fulfilment/ShippingMethodPicker'

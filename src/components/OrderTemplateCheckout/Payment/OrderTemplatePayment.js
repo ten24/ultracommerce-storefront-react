@@ -2,21 +2,23 @@ import { SlideNavigation, Overlay } from '../..'
 import { useTranslation } from 'react-i18next'
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { SwRadioSelect } from '../..'
+import { SwRadioSelect, CCDetails } from '../..'
 import { getSavedCreditCardMethods } from '../../../selectors/'
 import { OrderTemplateCreditCardDetails } from './OrderTemplateCreditCardDetails'
 import { SlatwalApiService } from '../../../services'
 import { requestSubscriptionCart, receiveSubscriptionCart } from '../../../actions'
 import { toast } from 'react-toastify'
 import { getErrorMessage } from '../../../utils'
+import { useCheckoutUtilities } from '../../../hooks'
 
 const OrderTemplatePaymentSlide = ({ currentStep }) => {
   const paymentMethods = useSelector(getSavedCreditCardMethods)
-
   const dispatch = useDispatch()
   const { isFetching, orderTemplateID, accountPaymentMethod } = useSelector(state => state.subscriptionCart)
   const [newOrderPayment, setNewOrderPayment] = useState(accountPaymentMethod ? accountPaymentMethod.accountPaymentMethodID : false)
   const { t } = useTranslation()
+  const [changeSelection, setChangeSelection] = useState(true)
+  const { CREDIT_CARD_CODE } = useCheckoutUtilities()
 
   const updatePaymentMethod = accountPaymentMethodID => {
     dispatch(requestSubscriptionCart())
@@ -31,9 +33,10 @@ const OrderTemplatePaymentSlide = ({ currentStep }) => {
       .then(response => {
         if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
         if (response.isSuccess()) {
-          return dispatch(receiveSubscriptionCart(response.success().orderTemplateCart))
+          setChangeSelection(true)
+          dispatch(receiveSubscriptionCart(response.success().orderTemplateCart))
         }
-        return dispatch(receiveSubscriptionCart({}))
+        dispatch(receiveSubscriptionCart({}))
       })
   }
   useEffect(() => {
@@ -52,6 +55,26 @@ const OrderTemplatePaymentSlide = ({ currentStep }) => {
             <hr />
             {newOrderPayment === 'new' ? (
               <label className="w-100 h4">{t('frontend.checkout.cardInfo')}</label>
+            ) : changeSelection && accountPaymentMethod ? (
+              <>
+                <p className="h4">{t('frontend.checkout.payments')}:</p>
+                <div className="row ">
+                  <div className="bg-lightgray rounded mb-5 col-md-4 p-3" key={accountPaymentMethod.paymentMethod.paymentMethodID}>
+                    {accountPaymentMethod.paymentMethod.paymentMethodType === CREDIT_CARD_CODE && <CCDetails hideHeading={true} creditCardPayment={accountPaymentMethod} />}
+                    <hr />
+                    <button
+                      className="btn btn-link px-0 text-danger"
+                      type="button"
+                      onClick={event => {
+                        setChangeSelection(false)
+                      }}
+                    >
+                      <i className="fal fa-times-circle"></i>
+                      <span className="small"> {t('frontend.core.changeSelection')}</span>
+                    </button>
+                  </div>
+                </div>
+              </>
             ) : (
               <SwRadioSelect
                 label={t('frontend.checkout.cardInfo')}
@@ -69,7 +92,7 @@ const OrderTemplatePaymentSlide = ({ currentStep }) => {
               />
             )}
 
-            {newOrderPayment !== 'new' && (
+            {!changeSelection && newOrderPayment !== 'new' && (
               <button
                 className="btn btn-secondary mt-2"
                 onClick={() => {
@@ -81,7 +104,7 @@ const OrderTemplatePaymentSlide = ({ currentStep }) => {
             )}
           </div>
         </div>
-        {newOrderPayment === 'new' && (
+        {newOrderPayment === 'new' && !changeSelection && (
           <OrderTemplateCreditCardDetails
             onSubmit={() => {
               setNewOrderPayment(false)
@@ -90,6 +113,7 @@ const OrderTemplatePaymentSlide = ({ currentStep }) => {
               setNewOrderPayment('')
             }}
             setNewOrderPayment={setNewOrderPayment}
+            setChangeSelection={setChangeSelection}
           />
         )}
       </>

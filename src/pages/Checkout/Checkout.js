@@ -56,6 +56,7 @@ const Checkout = () => {
   }
 
   useEffect(() => {
+    
     if (!isAuthenticated()) {
       dispatch(clearUser())
       dispatch(requestLogOut())
@@ -104,7 +105,7 @@ const Checkout = () => {
                 </Route>
 
                 <Route path={`${match.path}/payment`}>
-                  <PaymentSlide currentStep={currentStep} />
+                  <PaymentSlide currentStep={currentStep} cartState={cartState}/>
                 </Route>
                 <Route path={`${match.path}/review`}>
                   <ReviewSlide currentStep={currentStep} />

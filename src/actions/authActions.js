@@ -1,7 +1,7 @@
 import { toast } from 'react-toastify'
-import { SlatwalApiService } from '../services'
+import { axios, sdkURL, SlatwalApiService } from '../services'
 import { getErrorMessage } from '../utils'
-import { getCart, receiveCart, requestCart } from './'
+import { receiveCart, requestCart } from './'
 import { requestUser, receiveUser, clearUser, getWishLists, evictAllPages, receiveSubscriptionCart, requestSubscriptionCart } from './'
 import { isAuthenticated } from '../utils'
 
@@ -37,11 +37,19 @@ export const requestLogOut = () => {
 export const logout = (success = '', failure = '') => {
   return async dispatch => {
     dispatch(evictAllPages())
-    return await SlatwalApiService.auth.revokeToken().then(response => {
-      if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
+    return await axios({
+      method: 'POST',
+      withCredentials: true,
+      url: `${sdkURL}api/scope/logout`,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: { returnJSONObjects: 'cart,account' },
+    }).then(response => {
       dispatch(softLogout())
-      dispatch(getCart())
-      if (response.isSuccess()) {
+      if (response?.status === 200) {
+        dispatch(receiveUser(response.data.account))
+        dispatch(receiveCart(response.data.cart))
         toast.success(success)
       } else {
         toast.error(failure)

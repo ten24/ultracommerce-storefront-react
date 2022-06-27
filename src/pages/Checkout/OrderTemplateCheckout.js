@@ -2,7 +2,7 @@ import { PageHeader, Layout, OrderTemplateCheckoutSideBar, OrderTemplateCheckout
 import { useDispatch, useSelector } from 'react-redux'
 import { Redirect, Route, Switch, useHistory, useLocation, useRouteMatch } from 'react-router-dom'
 import './checkout.css'
-import { isAuthenticated } from '../../utils'
+import { isAuthenticated, getErrorMessage } from '../../utils'
 import { useEffect, useState } from 'react'
 import { clearUser, requestLogOut, requestSubscriptionCart, receiveSubscriptionCart } from '../../actions'
 import { useTranslation } from 'react-i18next'
@@ -36,15 +36,15 @@ const OrderTemplateCheckout = () => {
         'Content-Type': 'application/json',
       },
     }).then(response => {
-      if (response.status === 200) {
+      if (response.status === 200 && response.data.successfulActions.length > 0) {
         dispatch(clearSubscriptionCart())
         dispatch(receiveSubscriptionCart(response.data.orderTemplateCart))
-        toast.success('Successfully Activated')
+        toast.success(t('frontend.order.placed'))
         setTimeout(() => {
           history.push('/my-account/subscription-orders')
         }, 2000)
       } else {
-        toast.error(t('frontend.core.error.network'))
+        toast.error(getErrorMessage(response.data.messages))
       }
     })
   }

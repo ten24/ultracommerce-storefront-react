@@ -59,6 +59,8 @@ const CreateOrEditAccountAddress = ({ path, heading, action = 'Account Address' 
   }
 
   const verifyOnSubmit = address => {
+    const phoneRegExp = '^[0-9]*$'
+    const emailRegExp = '^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$'
     try {
       Yup.object()
         .shape({
@@ -66,6 +68,12 @@ const CreateOrEditAccountAddress = ({ path, heading, action = 'Account Address' 
           name: Yup.string().required('Required'),
           streetAddress: Yup.string().required('Required'),
           city: Yup.string().required('Required'),
+          phoneNumber: Yup.string().matches(phoneRegExp, {
+            excludeEmptyString : true,
+            message: t('frontend.account.phoneValidation')}),
+          emailAddress : Yup.string().matches(emailRegExp, {
+            excludeEmptyString : true,
+            message: t('frontend.account.emailValidation')}),
           stateCode: Yup.string().required('Required'),
           postalCode: Yup.string().required('Required'),
         })
@@ -274,6 +282,7 @@ const CreateOrEditAccountAddress = ({ path, heading, action = 'Account Address' 
           <div className="col-md-6">
             <TextInput
               name={billingAddress.emailAddress}
+              type="email"
               label={t('frontend.account.emailAddress')}
               value={billingAddress.emailAddress}
               isError={!!billingAddressErrors?.emailAddress}

@@ -1,11 +1,10 @@
-import React, { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import { Switch, Route, useRouteMatch, useLocation, Redirect } from 'react-router-dom'
-import { getUser } from '../../actions/userActions'
 import { isAuthenticated } from '../../utils'
 import queryString from 'query-string'
-import { Layout, CreateAccount, ForgotPassword, ForgotPasswordReset, AccountCarts, AccountLogin, AccountOverview, AccountProfile, AccountFavorites, AccountAddresses, CreateOrEditAccountAddress, AccountOrderDetail, AccountPaymentMethods, AccountOrderHistory, CreateOrEditAccountPaymentMethod, UpdatePassword, AccountSubscriptionOrders, AccountSubscriptionOrderDetail, AccountImpersonation, AccountQuotes, AccountQuoteDetail } from '../../components'
+import { Layout, CreateAccount, ForgotPassword, ForgotPasswordReset, AccountCarts, AccountLogin, AccountOverview, AccountProfile, AccountFavorites, AccountAddresses, CreateOrEditAccountAddress, AccountOrderDetail, AccountPaymentMethods, AccountOrderHistory, CreateOrEditAccountPaymentMethod, UpdatePassword, AccountSubscriptionOrders, AccountSubscriptionOrderDetail, AccountImpersonation, AccountQuotes, AccountQuoteDetail, GiftCardList, GiftCardView } from '../../components'
 import GuestOrderConfirmation from '../OrderConfirmation/GuestOrderConfirmation'
+import { useSelector } from 'react-redux'
+import { useEffect } from 'react'
 
 // eslint-disable-next-line no-unused-vars
 const pageComponents = {
@@ -24,19 +23,16 @@ const pageComponents = {
 const MyAccount = () => {
   let match = useRouteMatch()
   let loc = useLocation()
-  const dispatch = useDispatch()
   const user = useSelector(state => state.userReducer)
 
   useEffect(() => {
-    if (isAuthenticated() && !user.isFetching && !user.accountID.length) {
-      dispatch(getUser())
+    if (isAuthenticated() && loc.search.includes('redirect=')) {
+      const params = queryString.parse(loc.search)
+      return <Redirect to={params.redirect} />
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-  if (isAuthenticated() && loc.search.includes('redirect=')) {
-    const params = queryString.parse(loc.search)
-    return <Redirect to={params.redirect} />
-  }
+  }, [user.accountID])
+
   const path = loc.pathname.split('/').reverse()
 
   return (
@@ -92,6 +88,13 @@ const MyAccount = () => {
           <Route path={`/my-account/order-detail`}>
             <GuestOrderConfirmation path={path[0]} />
           </Route>
+          <Route path={`/my-account/gift-cards/:id`}>
+            <GiftCardView id={path[0]} />
+          </Route>
+          <Route path={`/my-account/gift-cards`}>
+            <GiftCardList />
+          </Route>
+
           <Route path={`/my-account/overview`}>
             <AccountOverview />
           </Route>

@@ -182,8 +182,14 @@ const useListing = (preFilter, type = 'productListing') => {
     params[attribute.filterName] = attributeFilters
     params['currentPage'] = 1
 
-    // This is a check for if we deselct a brand or Poroduct type and need to reset other checked params
-    if (Object.keys(params).length >= 6 && !params.brand_slug.length && !params.productType_slug.length) {
+    // This is a check for if we deselct a brand or Product type and need to reset other checked params
+    const hasValidFilter =
+      !attributeFilters?.length ||
+      attributeFilters.reduce((result, filterKey) => {
+        if (params[filterKey]?.length) return true
+        return result
+      }, false)
+    if (hasValidFilter) {
       params = { ...initialData, ...preFilter, orderBy: params.orderBy, keyword: params.keyword }
     }
     history.push({

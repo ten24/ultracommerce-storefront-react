@@ -10,10 +10,13 @@
             
             &:nth-child(odd){background: #fafafa;}
             td{
-                &:nth-child(1) img {width: 80px;height: 80px;object-fit: cover;}
-                &:nth-child(2),  &:nth-child(3) {width: 20%;line-height: 1.4;}
-                &:nth-child(5) {width: 80px;}
-                &:nth-child(1) {padding: 10px 10px;}
+                &.product-image{
+               
+                    img {width: 80px;height: 80px;object-fit: cover;}
+                } 
+                 &.product-sku,  .product-price {width: 35%;line-height: 1.4;}
+                &.product-quantity {width: 80px;}
+              
             }
         }
     }

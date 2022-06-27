@@ -1,17 +1,16 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { SlideNavigation, SwRadioSelect, Overlay, PaymentList, CreditCardPayment, TermPayment, GiftCardPayment, PayPalPayment } from '../..'
 import { eligiblePaymentMethodDetailSelector, orderPayment, getAllOrderPayments, disableInteractionSelector, fulfillmentSelector } from '../../../selectors/'
+import { SlideNavigation, SwRadioSelect, Overlay, PaymentList, CreditCardPayment, TermPayment, GiftCardPayment, PayPalPayment, PayPalCommercePayment } from '../..'
 import { useTranslation } from 'react-i18next'
 import { useCheckoutUtilities } from '../../../hooks'
 import { addPayment, removeOrderPayment } from '../../../actions'
 import { toast } from 'react-toastify'
 import { getErrorMessage } from '../../../utils'
 
-const PaymentSlide = ({ currentStep }) => {
+const PaymentSlide = ({ currentStep, cartState }) => {
   const disableInteraction = useSelector(disableInteractionSelector)
   const fulfillment = useSelector(fulfillmentSelector)
-
   const orderRequirementsList = useSelector(state => state.cart.orderRequirementsList)
   const eligiblePaymentMethodDetails = useSelector(eligiblePaymentMethodDetailSelector)
   const { paymentMethod } = useSelector(orderPayment)
@@ -21,7 +20,7 @@ const PaymentSlide = ({ currentStep }) => {
   const { isFetching } = useSelector(state => state.cart)
   const { t } = useTranslation()
   const dispatch = useDispatch()
-  const { CREDIT_CARD, GIFT_CARD, TERM_PAYMENT, PAYPAL_PAYMENT, CASH_PAYMENT } = useCheckoutUtilities()
+  const { EXTERNAL_PAYMENT_CODE, CREDIT_CARD_CODE, GIFT_CARD_CODE, TERM_PAYMENT_CODE, PAYPAL_PAYMENT_CODE, CASH_PAYMENT_CODE, PAYPAL_COMMERCE_CODE, getPaymentMethodByIDFromList } = useCheckoutUtilities()
 
   const processCashPayment = value => {
     dispatch(
@@ -37,8 +36,8 @@ const PaymentSlide = ({ currentStep }) => {
 
   useEffect(() => {
     if (paymentMethod && paymentMethod.paymentMethodID && paymentMethodOnOrder !== paymentMethod.paymentMethodID) {
-      setPaymentMethodOnOrder(paymentMethod.paymentMethodID)
-      setSelectedPaymentMethod(paymentMethod.paymentMethodID)
+      setPaymentMethodOnOrder(paymentMethod)
+      setSelectedPaymentMethod(paymentMethod)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paymentMethod])
@@ -73,20 +72,22 @@ const PaymentSlide = ({ currentStep }) => {
                   label={t('frontend.checkout.payment.select')}
                   options={eligiblePaymentMethodDetails}
                   onChange={value => {
-                    setSelectedPaymentMethod(value)
-                    if (value === CASH_PAYMENT) {
+                    const foundPaymentMethod = getPaymentMethodByIDFromList(eligiblePaymentMethodDetails, value)
+                    setSelectedPaymentMethod(foundPaymentMethod)
+                    if (foundPaymentMethod.paymentMethodType === CASH_PAYMENT_CODE) {
                       processCashPayment(value)
                     }
                   }}
-                  selectedValue={selectedPaymentMethod.length > 0 ? selectedPaymentMethod : paymentMethodOnOrder}
+                  selectedValue={selectedPaymentMethod?.paymentMethodID?.length ? selectedPaymentMethod.paymentMethodID : paymentMethodOnOrder}
                 />
               )}
             </div>
           </div>
-          {selectedPaymentMethod === CREDIT_CARD && <CreditCardPayment method={selectedPaymentMethod} fulfillment={fulfillment} />}
-          {selectedPaymentMethod === GIFT_CARD && <GiftCardPayment method={selectedPaymentMethod} />}
-          {selectedPaymentMethod === PAYPAL_PAYMENT && <PayPalPayment />}
-          {selectedPaymentMethod === TERM_PAYMENT && <TermPayment method={selectedPaymentMethod} fulfillment={fulfillment} />}
+          {selectedPaymentMethod.paymentMethodType === CREDIT_CARD_CODE && <CreditCardPayment method={selectedPaymentMethod.paymentMethodID} fulfillment={fulfillment} />}
+          {selectedPaymentMethod.paymentMethodType === GIFT_CARD_CODE && <GiftCardPayment method={selectedPaymentMethod.paymentMethodID} />}
+          {selectedPaymentMethod.paymentMethodType === TERM_PAYMENT_CODE && <TermPayment method={selectedPaymentMethod.paymentMethodID} fulfillment={fulfillment} />}
+          {selectedPaymentMethod.paymentMethodType === EXTERNAL_PAYMENT_CODE && selectedPaymentMethod.paymentIntegration.integrationPackage === PAYPAL_COMMERCE_CODE && <PayPalCommercePayment method={selectedPaymentMethod.paymentMethodID} cartState={cartState} />}
+          {selectedPaymentMethod.paymentMethodType === EXTERNAL_PAYMENT_CODE && selectedPaymentMethod.paymentIntegration.integrationPackage === PAYPAL_PAYMENT_CODE && <PayPalPayment />}
         </>
       )}
 

@@ -44,8 +44,9 @@ const useCreateAccount = () => {
         if (response.isSuccess()) {
           if (!response.success().failureActions.length) {
             toast.success('Success')
-            dispatch(getUser())
-            dispatch(getWishLists())
+            dispatch(getUser()).then(() => {
+              dispatch(getWishLists())
+            })
             if (history.location.search.includes('redirect')) {
               history.replace(`/my-account${history.location.search}`)
             }
