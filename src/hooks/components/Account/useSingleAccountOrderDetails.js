@@ -25,7 +25,7 @@ const transformExternalPayment = orderPayment => {
 
 const useSingleAccountOrderDetails = ({ orderInfo, orderFulfillments, orderPayments }) => {
   const { orderFulfillment_shippingAddress_emailAddress, orderFulfillment_fulfillmentMethod_fulfillmentMethodType: fulfillmentMethodType, orderFulfillment_shippingAddress_name, orderFulfillment_shippingAddress_streetAddress, orderFulfillment_shippingAddress_city, orderFulfillment_shippingAddress_stateCode, orderFulfillment_shippingMethod_shippingMethodName, orderFulfillment_shippingAddress_postalCode, orderFulfillment_pickupLocation_locationName } = orderFulfillments
-  const { paymentMethod_paymentMethodType, paymentMethod_paymentMethodName, purchaseOrderNumber } = orderPayments
+  const { paymentMethod_paymentMethodType, paymentMethod_paymentMethodName, purchaseOrderNumber } = orderPayments ? orderPayments : {}
   const billingAddressDetails = { billingAddress: { name: orderInfo.billingAddress_name || orderPayments.billingAddress_name, streetAddress: orderInfo.billingAddress_streetAddress || orderPayments.billingAddress_streetAddress, city: orderInfo.billingAddress_city || orderPayments.billingAddress_city, stateCode: orderInfo.billingAddress_stateCode || orderPayments.billingAddress_stateCode, postalCode: orderInfo.billingAddress_postalCode || orderPayments.billingAddress_postalCode, emailAddress: orderInfo.billingAddress_emailAddress || orderPayments.billingAddress_emailAddress } }
 
   let shippingAddressDetails = {}
@@ -66,7 +66,7 @@ const useSingleAccountOrderDetails = ({ orderInfo, orderFulfillments, orderPayme
     externalPaymentDetails = { ...orderPayments, paymentMethod: { paymentMethodName: orderPayments.paymentMethod_paymentMethodName } }
   }
 
-  return { billingAddressDetails, shippingAddressDetails, pickupLocationDetails, termPaymentDetails, creditCardPaymentDetails, externalPaymentDetails, giftCardPaymentDetails, cashPaymentDetails, paymentMethodType: paymentMethod_paymentMethodType, fulfillmentMethodType }
+  return { billingAddressDetails, shippingAddressDetails, pickupLocationDetails, termPaymentDetails, creditCardPaymentDetails, externalPaymentDetails, giftCardPaymentDetails, cashPaymentDetails, paymentMethodType: paymentMethod_paymentMethodType ? paymentMethod_paymentMethodType : '', fulfillmentMethodType }
 }
 
 export { useSingleAccountOrderDetails, transformBillingAddressDetails, transformShipping, transformPickup, transformCreditCardPayment, transformGiftCardPayment, transformCashPayment, transformTermPayment, transformExternalPayment }

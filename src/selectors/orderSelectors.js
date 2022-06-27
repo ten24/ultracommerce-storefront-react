@@ -110,7 +110,7 @@ export const orderPayment = createSelector(getAllOrderPayments, orderPayments =>
 
 export const eligiblePaymentMethodDetailSelector = createSelector(getAllEligiblePaymentMethodDetails, (eligiblePaymentMethodDetails = []) => {
   return eligiblePaymentMethodDetails.map(({ paymentMethod }) => {
-    return { name: paymentMethod.paymentMethodName, value: paymentMethod.paymentMethodID }
+    return { ...paymentMethod, name: paymentMethod.paymentMethodName, value: paymentMethod.paymentMethodID }
   })
 })
 

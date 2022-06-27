@@ -1,8 +1,9 @@
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import { useDispatch } from 'react-redux'
-import { deletePaymentMethod } from '../../../actions/'
+import { deletePaymentMethod, setPrimaryPaymentMethod } from '../../../actions/'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'react-toastify'
 
 const PaymentMethodItem = props => {
   const { accountPaymentMethodID, isPrimary = false, creditCardType, expirationYear, expirationMonth, creditCardLastFour, accountPaymentMethodName } = props
@@ -21,7 +22,39 @@ const PaymentMethodItem = props => {
           </div>
         </div>
       </td>
-      <td className="py-2"> {isPrimary && <span className="badge bg-info">{t('frontend.core.prinary')}</span>} </td>
+      <td className="py-2">
+        {' '}
+        {isPrimary ? (
+          <span className="badge bg-info">{t('frontend.core.prinary')}</span>
+        ) : (
+          <button
+            type="button"
+            className="link-button link nav-link-style"
+            onClick={() => {
+              MySwal.fire({
+                icon: 'info',
+                title: <p>{t('frontend.payment.setAsPrimary')}</p>,
+                showCloseButton: true,
+                showCancelButton: true,
+                focusConfirm: false,
+                confirmButtonText: t('frontend.payment.button.setAsPrimary'),
+              }).then(data => {
+                if (data.isConfirmed) {
+                  dispatch(setPrimaryPaymentMethod(accountPaymentMethodID)).then(response => {
+                    if (response.isSuccess()) {
+                      toast.success(t('frontend.primaryFlag.successMessage'))
+                    } else {
+                      toast.error(t('frontend.primaryFlag.errorMessage'))
+                    }
+                  })
+                }
+              })
+            }}
+          >
+            {t('frontend.payment.button.setAsPrimary')}
+          </button>
+        )}{' '}
+      </td>
       <td className="py-2">
         <button
           type="button"

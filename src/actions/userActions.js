@@ -3,7 +3,7 @@ import { SlatwalApiService } from '../services'
 import { toast } from 'react-toastify'
 import { receiveCart } from './'
 import { receiveSubscriptionCart } from './subscriptionCartActions'
-import { getErrorMessage, isAuthenticated } from '../utils'
+import { getErrorMessage, isAuthenticated, getFailureMessageOnSuccess } from '../utils'
 
 export const REQUEST_USER = 'REQUEST_USER'
 export const RECEIVE_USER = 'RECEIVE_USER'
@@ -22,6 +22,9 @@ export const ERROR_CREATE_USER = 'ERROR_CREATE_USER'
 
 export const REQUEST_CARTS_AND_QUOTES = 'REQUEST_CARTS_AND_QUOTES'
 export const RECEIVE_CARTS_AND_QUOTES = 'RECEIVE_CARTS_AND_QUOTES'
+
+export const REQUEST_REDEEM_GIFT_CARD = 'REQUEST_REDEEM_GIFT_CARD'
+export const TOGGLE_GIFT_CARD_STATUS = 'TOGGLE_GIFT_CARD_STATUS'
 
 export const requestAccountCartsAndQuotes = () => {
   return {
@@ -97,6 +100,18 @@ export const receiveAccountOrders = ordersOnAccount => {
   return {
     type: RECEIVE_ACCOUNT_ORDERS,
     ordersOnAccount,
+  }
+}
+
+export const requestRedeemGiftCard = () => {
+  return {
+    type: REQUEST_REDEEM_GIFT_CARD,
+  }
+}
+
+export const requestToggleGiftCardStatus = () => {
+  return {
+    type: TOGGLE_GIFT_CARD_STATUS,
   }
 }
 
@@ -263,11 +278,10 @@ export const deletePaymentMethod = accountPaymentMethodID => {
   return async dispatch => {
     return await SlatwalApiService.account.deletePaymentMethod({ accountPaymentMethodID, returnJSONObjects: 'account' }).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-      if (response.isSuccess()) {
+      getFailureMessageOnSuccess(response,getErrorMessage(response.success().messages))
+      if (response.isSuccess() && response.success()?.successfulActions.length > 0) {
         toast.success('Delete Successful')
         dispatch(receiveUser(response.success().account))
-      } else {
-        toast.error('Delete Failed')
       }
       return response
     })
@@ -350,6 +364,65 @@ export const removeWishlistItem = (removalSkuID = '', orderTemplateID) => {
         return response
       })
     }
+    return new Promise((resolve, reject) => resolve({}))
+  }
+}
+
+export const redeemGiftCard = (payload) => {
+  return async (dispatch) => {
+    dispatch(requestRedeemGiftCard())
+    if (isAuthenticated()) {
+      return SlatwalApiService.account.addGiftCard({...payload, returnJSONObjects: 'account'}).then(response => {
+        if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
+        if (response.isSuccess()) {
+          dispatch(receiveUser(response.success().account))
+        }
+        return response
+      })
+    }
+    return new Promise((resolve, reject) => resolve({}))
+  }
+}
+
+export const toggleGiftCardStatus = (giftCardID, status) => {
+  return async (dispatch) => {
+    dispatch(requestToggleGiftCardStatus())
+    if (isAuthenticated()) {
+      const payload = { giftCardID, activeFlag: status, returnJSONObjects: 'account' }
+      return SlatwalApiService.account.updateGiftCardStatus(payload).then(response => {
+        if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
+        if (response.isSuccess()) {
+          dispatch(receiveUser(response.success().account))
+        }
+      })
+    }
+
+    return new Promise((resolve, reject) => resolve({}))
+  }
+}
+
+export const setPrimaryPaymentMethod = accountPaymentMethodID => {
+  return async dispatch => {
+    return await SlatwalApiService.account.sePrimaryPaymentMethod({ accountPaymentMethodID, returnJSONObjects: 'account' }).then(response => {
+      if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
+      if (response.isSuccess()) {
+        dispatch(receiveUser(response.success().account))
+      }
+      return response
+    })
+    return new Promise((resolve, reject) => resolve({}))
+  }
+}
+
+export const setPrimaryAccountAddress = accountAddressID => {
+  return async dispatch => {
+    return await SlatwalApiService.account.setPrimaryAddress({ accountAddressID, returnJSONObjects: 'account' }).then(response => {
+      if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
+      if (response.isSuccess()) {
+        dispatch(receiveUser(response.success().account))
+      }
+      return response
+    })
     return new Promise((resolve, reject) => resolve({}))
   }
 }

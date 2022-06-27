@@ -208,14 +208,19 @@ const Header = ({ logo }) => {
       <nav className="my-3 no-print">
         <div className="container">
           <div className="row justify-content-center justify-content-lg-between align-items-center">
-            <div className="col-xl-4 col-md-5 col-10 text-center text-md-start mb-3 mb-lg-0 order-xl-1">
+            <div className="col-xl-4 col-md-5 col-9 text-center text-md-start mb-3 mb-lg-0 order-xl-1">
               <Link className="d-block" to="/">
                 <span className="navbar-brand d-block">
                   <img src={logo} className="img-fluid" alt={t('frontend.logo')} style={{ maxHeight: '60px' }} />
                 </span>
               </Link>
             </div>
-            <MainNavBar />
+            <button className="navbar-toggler collapsed align-items-end d-xl-none d-lg-none col-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+              <span className="bi bi-list h1"></span>
+            </button>
+            <div className="col-xl-auto col-md-7 mb-3 mb-lg-0 order-xl-3 d-none d-lg-block d-xl-block">
+              <MainNavBar />
+            </div>
 
             <div className="col-xl-3 order-xl-2">
               <SearchBar redirectToSearchPage={true} />

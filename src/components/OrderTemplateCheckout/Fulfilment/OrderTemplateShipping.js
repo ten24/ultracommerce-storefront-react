@@ -8,9 +8,11 @@ import { axios, sdkURL, SlatwalApiService } from '../../../services'
 import { FulfilmentAddressSelector } from '../../Checkout/Fulfilment/FulfilmentAddressSelector'
 import { getAllAccountAddresses } from '../../../selectors'
 import { ShippingMethodRates } from '../../Checkout/Fulfilment/Shipping/ShippingMethodRates'
+import { useTranslation } from 'react-i18next'
 
 const OrderTemplateShippingSlide = ({ currentStep }) => {
   const dispatch = useDispatch()
+  const { t } = useTranslation()
   const { orderTemplateID, shippingMethod, shippingAccountAddress, isFetching } = useSelector(state => state.subscriptionCart)
   const accountAddresses = useSelector(getAllAccountAddresses)
 
@@ -48,9 +50,13 @@ const OrderTemplateShippingSlide = ({ currentStep }) => {
 
     return SlatwalApiService.orderTemplate.updateOrderTemplateShipping(values).then(response => {
       if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-      if (response.isSuccess()) dispatch(receiveSubscriptionCart(response.success().orderTemplateCart))
+      if (response.isSuccess() && response.success()?.successfulActions.length > 0){
+        toast.success(t('frontend.account.scheduled.delivery.detail.toolbar.shippingModal.successMessage'))
+        dispatch(receiveSubscriptionCart(response.success().orderTemplateCart))
+      }
     })
   }
+
   const foundAddress = accountAddresses.filter(accountAddress => shipping === accountAddress.accountAddressID)?.at(0)
 
   return (

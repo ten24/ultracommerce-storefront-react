@@ -10,15 +10,15 @@ import * as Yup from 'yup'
 import { useState } from 'react'
 import dayjs from 'dayjs'
 
-const OrderTemplateCreditCardDetails = ({ onSubmit, onCancel }) => {
+const OrderTemplateCreditCardDetails = ({ onSubmit, onCancel, setChangeSelection }) => {
   const { t } = useTranslation()
   const dispatch = useDispatch()
   const { months, years, CREDIT_CARD } = useCheckoutUtilities()
+
   const [paymentMethodErrors, setPaymentMethodErrors] = useState({})
-  const { orderTemplateID, shippingMethod } = useSelector(state => state.subscriptionCart)
+  const { orderTemplateID, shippingMethod, shippingAccountAddress } = useSelector(state => state.subscriptionCart)
   const [savePaymentMethodToAccount, setSavePaymentMethodToAccount] = useState(false)
   const [saveShippingAsBilling, setSaveShippingAsBilling] = useState(false)
-  const billingAccountAddress = useSelector(state => state.subscriptionCart.billingAccountAddress)
   let [redirectUrl, setRedirectUrl] = useState()
   let [redirectPayload, setRedirectPayload] = useState({})
   let [redirectMethod, setRedirectMethod] = useState('')
@@ -31,7 +31,7 @@ const OrderTemplateCreditCardDetails = ({ onSubmit, onCancel }) => {
     expirationMonth: dayjs().add(1, 'month').format('MM'),
     expirationYear: dayjs().add(1, 'month').format('YYYY'),
     securityCode: '',
-    accountAddressID: billingAccountAddress ? billingAccountAddress.accountAddressID : '',
+    accountAddressID: '',
     saveShippingAsBilling: false,
     savePaymentMethodToAccount: false,
     returnJSONObjects: 'orderTemplateCart',
@@ -45,7 +45,7 @@ const OrderTemplateCreditCardDetails = ({ onSubmit, onCancel }) => {
       .updateOrderTemplateBilling({
         orderTemplateID,
         transactionInitiator: 'CHECKOUT_PAYMENT',
-        returnJSONObjects: 'orderTemplateCart',
+        returnJSONObjects: 'account,orderTemplateCart',
         shippingMethodID: shippingMethod.shippingMethodID,
         ...params,
       })
@@ -57,8 +57,10 @@ const OrderTemplateCreditCardDetails = ({ onSubmit, onCancel }) => {
             setRedirectPayload(response.success().redirectPayload)
             setRedirectMethod(response.success().redirectMethod)
           } else {
+            onSubmit()
             dispatch(receiveSubscriptionCart(response.success().orderTemplateCart))
             dispatch(receiveUser(response.success().account))
+            setChangeSelection(true)
           }
         } else {
           dispatch(receiveSubscriptionCart({}))
@@ -257,7 +259,7 @@ const OrderTemplateCreditCardDetails = ({ onSubmit, onCancel }) => {
                       {t('frontend.checkout.shipping_address_clone')}
                     </label>
                   </div>
-                   <div className="custom-control custom-checkbox savePaymentMethodCheckbox">
+                  <div className="custom-control custom-checkbox savePaymentMethodCheckbox">
                     <input
                       className="custom-control-input"
                       type="checkbox"
@@ -283,7 +285,12 @@ const OrderTemplateCreditCardDetails = ({ onSubmit, onCancel }) => {
                           // Create account Payment and use cloned shpiing address
                           // Payment with Account  CC
                           addPayment({
+                            billingAccountAddress: {
+                              value: shippingAccountAddress.accountAddressID,
+                            },
+                            accountAddressID: shippingAccountAddress.accountAddressID,
                             newAccountPaymentMethod: {
+                              accountAddressID: shippingAccountAddress.accountAddressID,
                               saveShippingAsBilling: 1,
                               nameOnCreditCard: paymentMethod.nameOnCreditCard,
                               creditCardNumber: paymentMethod.creditCardNumber,
@@ -297,7 +304,12 @@ const OrderTemplateCreditCardDetails = ({ onSubmit, onCancel }) => {
                         } else {
                           // Payment with Single use CC and address cloned from billing
                           addPayment({
+                            billingAccountAddress: {
+                              value: shippingAccountAddress.accountAddressID,
+                            },
+                            accountAddressID: shippingAccountAddress.accountAddressID,
                             newAccountPaymentMethod: {
+                              accountAddressID: shippingAccountAddress.accountAddressID,
                               saveShippingAsBilling: 1,
                               nameOnCreditCard: paymentMethod.nameOnCreditCard,
                               creditCardNumber: paymentMethod.creditCardNumber,
@@ -322,13 +334,13 @@ const OrderTemplateCreditCardDetails = ({ onSubmit, onCancel }) => {
           <div className="col-sm-12">
             {!saveShippingAsBilling && (
               <PaymentAddressSelector
-                addressTitle={'Billing Address'}
+                addressTitle={t('frontend.account.address.billingAddress')}
                 selectedAccountID={paymentMethod.accountAddressID}
                 onSelect={value => {
                   // NOTE: Works
                   addPayment({
-                    billingAccountAddress:{
-                      value : value
+                    billingAccountAddress: {
+                      value: value,
                     },
                     newAccountPaymentMethod: {
                       nameOnCreditCard: paymentMethod.nameOnCreditCard,
@@ -435,6 +447,11 @@ const OrderTemplateCreditCardDetails = ({ onSubmit, onCancel }) => {
             )}
           </div>
         </div>
+      )}
+      {onCancel && (
+        <button className="btn btn-secondary mx-2" onClick={onCancel}>
+          <span className="d-inline">{t('frontend.account.address.cancel')}</span>
+        </button>
       )}
     </>
   )
