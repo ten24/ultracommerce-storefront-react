@@ -410,7 +410,6 @@ export const setPrimaryPaymentMethod = accountPaymentMethodID => {
       }
       return response
     })
-    return new Promise((resolve, reject) => resolve({}))
   }
 }
 
@@ -423,6 +422,5 @@ export const setPrimaryAccountAddress = accountAddressID => {
       }
       return response
     })
-    return new Promise((resolve, reject) => resolve({}))
   }
 }
