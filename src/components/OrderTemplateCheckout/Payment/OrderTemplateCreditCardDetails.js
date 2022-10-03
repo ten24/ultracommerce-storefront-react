@@ -10,7 +10,7 @@ import * as Yup from 'yup'
 import { useState } from 'react'
 import dayjs from 'dayjs'
 
-const OrderTemplateCreditCardDetails = ({ onSubmit, onCancel, setChangeSelection }) => {
+const OrderTemplateCreditCardDetails = ({ updateOrderTemplate={}, orderInfo, onSubmit, onCancel, setChangeSelection }) => {
   const { t } = useTranslation()
   const dispatch = useDispatch()
   const { months, years, CREDIT_CARD } = useCheckoutUtilities()
@@ -39,14 +39,14 @@ const OrderTemplateCreditCardDetails = ({ onSubmit, onCancel, setChangeSelection
 
   let validCreditCard = paymentMethod.nameOnCreditCard.length > 0 && paymentMethod.creditCardNumber.length > 0 && paymentMethod.securityCode.length > 0
 
-  const addPayment = (params = {}) => {
+    const addPayment = (params = {}) => {
     dispatch(requestSubscriptionCart())
     SlatwalApiService.orderTemplate
       .updateOrderTemplateBilling({
-        orderTemplateID,
+        orderTemplateID: orderTemplateID ? orderTemplateID : orderInfo.orderTemplateID,
         transactionInitiator: 'CHECKOUT_PAYMENT',
         returnJSONObjects: 'account,orderTemplateCart',
-        shippingMethodID: shippingMethod.shippingMethodID,
+        shippingMethodID: !orderInfo ? shippingMethod?.shippingMethodID : orderInfo.shippingMethod_shippingMethodID,
         ...params,
       })
       .then(response => {
@@ -58,8 +58,11 @@ const OrderTemplateCreditCardDetails = ({ onSubmit, onCancel, setChangeSelection
             setRedirectMethod(response.success().redirectMethod)
           } else {
             onSubmit()
-            dispatch(receiveSubscriptionCart(response.success().orderTemplateCart))
-            dispatch(receiveUser(response.success().account))
+            orderInfo ? updateOrderTemplate(prevState => ({
+              ...prevState,
+              ...response.success()?.orderTemplate,
+            })) : dispatch(receiveSubscriptionCart(response.success()?.orderTemplateCart))
+            dispatch(receiveUser(response.success()?.account))
             setChangeSelection(true)
           }
         } else {
@@ -286,11 +289,12 @@ const OrderTemplateCreditCardDetails = ({ onSubmit, onCancel, setChangeSelection
                           // Payment with Account  CC
                           addPayment({
                             billingAccountAddress: {
-                              value: shippingAccountAddress.accountAddressID,
+                              value: !orderInfo ? shippingAccountAddress?.accountAddressID : orderInfo?.shippingAccountAddress_accountAddressID,
                             },
-                            accountAddressID: shippingAccountAddress.accountAddressID,
+                            accountAddressID: !orderInfo ? shippingAccountAddress?.accountAddressID : orderInfo?.shippingAccountAddress_accountAddressID,
                             newAccountPaymentMethod: {
-                              accountAddressID: shippingAccountAddress.accountAddressID,
+                              accountPaymentMethodName: paymentMethod.accountPaymentMethodName,
+                              accountAddressID: !orderInfo ? shippingAccountAddress.accountAddressID : orderInfo?.shippingAccountAddress_accountAddressID,
                               saveShippingAsBilling: 1,
                               nameOnCreditCard: paymentMethod.nameOnCreditCard,
                               creditCardNumber: paymentMethod.creditCardNumber,
@@ -305,11 +309,12 @@ const OrderTemplateCreditCardDetails = ({ onSubmit, onCancel, setChangeSelection
                           // Payment with Single use CC and address cloned from billing
                           addPayment({
                             billingAccountAddress: {
-                              value: shippingAccountAddress.accountAddressID,
+                              value: !orderInfo ? shippingAccountAddress?.accountAddressID : orderInfo?.shippingAccountAddress_accountAddressID,
                             },
-                            accountAddressID: shippingAccountAddress.accountAddressID,
+                            accountAddressID: !orderInfo ? shippingAccountAddress?.accountAddressID : orderInfo?.shippingAccountAddress_accountAddressID,
                             newAccountPaymentMethod: {
-                              accountAddressID: shippingAccountAddress.accountAddressID,
+                              accountPaymentMethodName: paymentMethod.accountPaymentMethodName,
+                              accountAddressID: !orderInfo ? shippingAccountAddress.accountAddressID : orderInfo?.shippingAccountAddress_accountAddressID,
                               saveShippingAsBilling: 1,
                               nameOnCreditCard: paymentMethod.nameOnCreditCard,
                               creditCardNumber: paymentMethod.creditCardNumber,
@@ -343,6 +348,7 @@ const OrderTemplateCreditCardDetails = ({ onSubmit, onCancel, setChangeSelection
                       value: value,
                     },
                     newAccountPaymentMethod: {
+                      accountPaymentMethodName: paymentMethod.accountPaymentMethodName,
                       nameOnCreditCard: paymentMethod.nameOnCreditCard,
                       creditCardNumber: paymentMethod.creditCardNumber,
                       expirationMonth: paymentMethod.expirationMonth,
@@ -376,6 +382,7 @@ const OrderTemplateCreditCardDetails = ({ onSubmit, onCancel, setChangeSelection
                     addPayment({
                       newAccountAddress: { address: payload },
                       newAccountPaymentMethod: {
+                        accountPaymentMethodName: paymentMethod.accountPaymentMethodName,
                         nameOnCreditCard: paymentMethod.nameOnCreditCard,
                         creditCardNumber: paymentMethod.creditCardNumber,
                         expirationMonth: paymentMethod.expirationMonth,
@@ -406,6 +413,7 @@ const OrderTemplateCreditCardDetails = ({ onSubmit, onCancel, setChangeSelection
                         address: payload,
                       },
                       newAccountPaymentMethod: {
+                        accountPaymentMethodName: paymentMethod.accountPaymentMethodName,
                         nameOnCreditCard: paymentMethod.nameOnCreditCard,
                         creditCardNumber: paymentMethod.creditCardNumber,
                         expirationMonth: paymentMethod.expirationMonth,
@@ -420,6 +428,7 @@ const OrderTemplateCreditCardDetails = ({ onSubmit, onCancel, setChangeSelection
                     // and payment with new single use CC and Single use address
                     addPayment({
                       newAccountPaymentMethod: {
+                        accountPaymentMethodName: paymentMethod.accountPaymentMethodName,
                         nameOnCreditCard: paymentMethod.nameOnCreditCard,
                         creditCardNumber: paymentMethod.creditCardNumber,
                         expirationMonth: paymentMethod.expirationMonth,

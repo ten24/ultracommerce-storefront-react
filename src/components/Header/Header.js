@@ -1,16 +1,17 @@
 import { useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import { useTranslation } from 'react-i18next'
 import queryString from 'query-string'
 import { useSelector } from 'react-redux'
-import { AccountBubble, MiniCart, AccountImpersonationBanner } from '../../components'
+import { AccountBubble, MiniCart, AccountImpersonationBanner, LanguagePicker } from '../../components'
 import { useLocation } from 'react-use'
 import { useUtilities } from '../../hooks'
 import { SearchBar } from './SearchBar'
 import { MultiSitePicker } from '../MultiSitePicker/MultiSitePicker'
 import { getMyAccountUrl } from '../../utils'
+import { getThemeConfig } from '../../selectors'
 
 const MegaMenuPanel = ({ subMenu = [] }) => {
   const { eventHandlerForWSIWYG } = useUtilities()
@@ -78,7 +79,7 @@ const MegaMenu = ({ menuItems = [] }) => {
 
 const NavBar = () => {
   const { t } = useTranslation()
-  let history = useHistory()
+  const navigate = useNavigate()
   const menu_items = useSelector(state => state.content?.header?.mega_menu?.menu_items)
   const mobileTextInput = useRef(null)
 
@@ -97,7 +98,7 @@ const NavBar = () => {
                   className="bi bi-search"
                   onClick={e => {
                     e.preventDefault()
-                    history.push({
+                    navigate({
                       pathname: '/shop',
                       search: mobileTextInput.stringify({ keyword: mobileTextInput.current.value }, { arrayFormat: 'comma' }),
                     })
@@ -111,7 +112,7 @@ const NavBar = () => {
               onKeyDown={e => {
                 if (e.key === 'Enter') {
                   e.preventDefault()
-                  history.push({
+                  navigate({
                     pathname: '/shop',
                     search: queryString.stringify({ keyword: e.target.value }, { arrayFormat: 'comma' }),
                   })
@@ -134,37 +135,71 @@ const MainNavBar = () => {
   const { eventHandlerForWSIWYG } = useUtilities()
   const mainNavigation = useSelector(state => state.content?.header?.utility_menu?.menu_items)
   const location = useLocation()
+  const { themeKey } = useSelector(getThemeConfig)
   return (
-    <div className="col-xl-auto col-md-7 mb-3 mb-lg-0 order-xl-3">
-      <ul className="nav justify-content-center justify-content-lg-end">
-        {mainNavigation && !Array.isArray(mainNavigation) && (
-          <div
-            className="d-flex column"
-            onClick={eventHandlerForWSIWYG}
-            dangerouslySetInnerHTML={{
-              __html: mainNavigation || '',
-            }}
-          />
-        )}
-        {mainNavigation &&
-          Array.isArray(mainNavigation) &&
-          mainNavigation?.map(({ bootstrapIconClass, linkUrl, linkTitle }) => {
-            return (
-              <Link to={linkUrl} className="nav-item link-button" key={linkUrl}>
-                <span className={`nav-link text-center ${location?.pathname === linkUrl && `active`}`} aria-current="page">
-                  <i className={bootstrapIconClass}></i> <span className="d-block">{linkTitle}</span>
-                </span>
-              </Link>
-            )
-          })}
-        <Link to={getMyAccountUrl()} className="nav-item link-button">
-          <AccountBubble />
-        </Link>
+    <div className="col-xl-auto col-md-10 mb-3 mb-lg-0 order-xl-3">
+      {themeKey === 'default' && (
+        <ul className="nav justify-content-center justify-content-lg-end">
+          {mainNavigation && !Array.isArray(mainNavigation) && (
+            <div
+              className="d-flex column"
+              onClick={eventHandlerForWSIWYG}
+              dangerouslySetInnerHTML={{
+                __html: mainNavigation || '',
+              }}
+            />
+          )}
+          {mainNavigation &&
+            Array.isArray(mainNavigation) &&
+            mainNavigation?.map(({ bootstrapIconClass, linkUrl, linkTitle }) => {
+              return (
+                <Link to={linkUrl} className="nav-item link-button" key={linkUrl}>
+                  <span className={`nav-link text-center ${location?.pathname === linkUrl && `active`}`} aria-current="page">
+                    <i className={bootstrapIconClass}></i> <span className="d-block">{linkTitle}</span>
+                  </span>
+                </Link>
+              )
+            })}
+          <Link to={getMyAccountUrl()} className="nav-item link-button">
+            <AccountBubble />
+          </Link>
 
-        <MiniCart />
+          <MiniCart />
 
-        <MultiSitePicker />
-      </ul>
+          <MultiSitePicker />
+
+          <LanguagePicker />
+        </ul>
+      )}
+
+      {themeKey === 'industrial' && (
+        <ul className="nav justify-content-center justify-content-lg-end">
+          {mainNavigation && !Array.isArray(mainNavigation) && (
+            <div
+              className="d-flex column"
+              onClick={eventHandlerForWSIWYG}
+              dangerouslySetInnerHTML={{
+                __html: mainNavigation || '',
+              }}
+            />
+          )}
+          {mainNavigation &&
+            Array.isArray(mainNavigation) &&
+            mainNavigation?.map(({ bootstrapIconClass, linkUrl, linkTitle }) => {
+              return (
+                <Link to={linkUrl} className="nav-item link-button" key={linkUrl}>
+                  <span className={`nav-link text-center ${location?.pathname === linkUrl && `active`}`} aria-current="page">
+                    <i className={bootstrapIconClass}></i> <span className="d-block">{linkTitle}</span>
+                  </span>
+                </Link>
+              )
+            })}
+
+          <MultiSitePicker />
+
+          <LanguagePicker />
+        </ul>
+      )}
     </div>
   )
 }
@@ -200,34 +235,71 @@ const UtilityBar = ({ socialItems = [] }) => {
 const Header = ({ logo }) => {
   const { t } = useTranslation()
   const social_items = useSelector(state => state.content?.header?.social_menu?.social_items)
+  const { themeKey } = useSelector(getThemeConfig)
 
   return (
     <>
       <AccountImpersonationBanner />
       <UtilityBar socialItems={social_items} />
-      <nav className="my-3 no-print">
-        <div className="container">
-          <div className="row justify-content-center justify-content-lg-between align-items-center">
-            <div className="col-xl-4 col-md-5 col-9 text-center text-md-start mb-3 mb-lg-0 order-xl-1">
-              <Link className="d-block" to="/">
-                <span className="navbar-brand d-block">
-                  <img src={logo} className="img-fluid" alt={t('frontend.logo')} style={{ maxHeight: '60px' }} />
-                </span>
-              </Link>
-            </div>
-            <button className="navbar-toggler collapsed align-items-end d-xl-none d-lg-none col-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-              <span className="bi bi-list h1"></span>
-            </button>
-            <div className="col-xl-auto col-md-7 mb-3 mb-lg-0 order-xl-3 d-none d-lg-block d-xl-block">
-              <MainNavBar />
-            </div>
 
-            <div className="col-xl-3 order-xl-2">
-              <SearchBar redirectToSearchPage={true} />
+      {themeKey === 'default' && (
+        <nav className="my-3 no-print">
+          <div className="container">
+            <div className="row justify-content-center justify-content-lg-between align-items-center">
+              <div className="col-xl-3 col-md-2 col-9 text-center text-md-start mb-3 mb-lg-0 order-xl-1">
+                <Link className="d-block" to="/">
+                  <span className="navbar-brand d-block">
+                    <img src={logo} className="img-fluid" alt={t('frontend.logo')} style={{ maxHeight: '60px', minWidth: '150px' }} />
+                  </span>
+                </Link>
+              </div>
+              <button className="navbar-toggler collapsed align-items-end d-xl-none d-lg-none col-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span className="bi bi-list h1"></span>
+              </button>
+              <div className="col-xl-6 col-md-10 mb-3 mb-lg-0 order-xl-3 d-none d-lg-block d-xl-block">
+                <MainNavBar />
+              </div>
+              <div className="col-xl-3 order-xl-2">
+                <SearchBar redirectToSearchPage={true} />
+              </div>
             </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+      )}
+
+      {themeKey === 'industrial' && (
+        <nav className="py-3 no-print navbar-dark">
+          <div className="container">
+            <div className="row justify-content-center justify-content-lg-between align-items-center">
+              <div className="col-xl-3 col-md-2 col-9 text-center text-md-start mb-3 mb-lg-0 order-xl-1">
+                <Link className="d-block" to="/">
+                  <span className="navbar-brand d-block">
+                    <img src={logo} className="img-fluid" alt={t('frontend.logo')} style={{ maxHeight: '60px', minWidth: '150px' }} />
+                  </span>
+                </Link>
+              </div>
+              <button className="navbar-toggler collapsed align-items-end d-xl-none d-lg-none col-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span className="bi bi-list h1"></span>
+              </button>
+              <div className="col-xl-auto col-md-10 mb-3 mb-lg-0 order-xl-3 d-none d-lg-block d-xl-block">
+                <div className="navbar-topright">
+                  <SearchBar redirectToSearchPage={true} />
+                  <Link to={'/my-account/login'} className="nav-item link-button">
+                    <AccountBubble />
+                  </Link>
+
+                  <ul>
+                    <MiniCart />
+                  </ul>
+                </div>
+
+                <MainNavBar />
+              </div>
+            </div>
+          </div>
+        </nav>
+      )}
+
       <NavBar />
     </>
   )

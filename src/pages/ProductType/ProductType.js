@@ -1,19 +1,19 @@
-import { useHistory, useParams } from 'react-router-dom'
-import { Layout, ProductTypeList, PageHeader, ListingToolBar, ListingSidebar, ListingGrid, ListingPagination } from '../../components'
+import { useNavigate, useParams, useLocation } from 'react-router-dom'
+import { Layout, ListingBanner, ListingToolBar, ProductTypeList, ListingSidebar, ListingPagination, ListingGrid, ListingViewToggle, ListingListView, ProductRow, SkuRow, ProductCard, SkuCard, LISTING, GRID } from '../../components'
+
 import { Helmet } from 'react-helmet'
 import { useProductType, useListing } from '../../hooks'
 import { useState } from 'react'
-import { useLocation } from 'react-router'
 import { useSelector } from 'react-redux'
 
 const ProductType = () => {
   const { id } = useParams()
-  const history = useHistory()
+  const navigate = useNavigate()
   const { productTypeRequest, productTypeData, productTypeListRequest, crumbCalculator, productTypeRoute, isError, errorMessage } = useProductType()
   return (
     <Layout>
       {productTypeRequest.isLoaded && <Helmet title={productTypeRequest.data?.settings?.productHTMLTitleString} />}
-      <PageHeader title={productTypeData?.productTypeName} crumbs={crumbCalculator()} />
+      <ListingBanner crumbs={crumbCalculator()} heading={productTypeData?.productTypeName} images={[productTypeData?.imageFile]} description={productTypeData?.productTypeDescription} type="productType" />
       {isError && (
         <div className="container bg-light box-shadow-lg rounded-lg p-5">
           <div className="row">
@@ -27,7 +27,7 @@ const ProductType = () => {
       <ProductTypeList
         isFetching={productTypeListRequest.isFetching || !productTypeRequest.isLoaded}
         onSelect={urlTitle => {
-          history.push(`/${productTypeRoute}/${urlTitle}`)
+          navigate(`/${productTypeRoute}/${urlTitle}`)
         }}
         data={productTypeData}
       />
@@ -43,7 +43,8 @@ const ProductTypeSearchListing = ({ productType }) => {
   })
   const loc = useLocation()
   const content = useSelector(state => state.content[loc.pathname.substring(1)])
-  const { records, isFetching, potentialFilters, total, totalPages, setSort, updateAttribute, setPage, setKeyword, params } = useListing(preFilter)
+  const { records, isFetching, potentialFilters, total, totalPages, setSort, updateAttribute, setPage, setKeyword, params, config } = useListing(preFilter)
+  const [viewMode, setViewMode] = useState(config.viewMode || LISTING)
 
   return (
     <>
@@ -56,9 +57,11 @@ const ProductTypeSearchListing = ({ productType }) => {
       </div>
       <div className="container product-listing mb-5">
         <ListingToolBar hide={hide} {...potentialFilters} removeFilter={updateAttribute} setSort={setSort} recordsCount={total} />
+        <ListingViewToggle config={config} viewMode={viewMode} setViewMode={setViewMode} />
         <div className="row mt-3">
           <ListingSidebar isFetching={isFetching} hide={hide} filtering={potentialFilters} recordsCount={total} keyword={params['keyword']} setKeyword={setKeyword} updateAttribute={updateAttribute} />
-          <ListingGrid isFetching={isFetching} pageRecords={records} />
+          {viewMode === LISTING && <ListingListView Card={config?.params?.productsListingFlag ? ProductRow : SkuRow} config={config} isFetching={isFetching} pageRecords={records} />}
+          {viewMode === GRID && <ListingGrid Card={config?.params?.productsListingFlag ? ProductCard : SkuCard} config={config} isFetching={isFetching} pageRecords={records} />}
         </div>
         <ListingPagination recordsCount={total} currentPage={params['currentPage']} totalPages={totalPages} setPage={setPage} />
       </div>

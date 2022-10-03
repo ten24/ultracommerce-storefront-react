@@ -16,7 +16,7 @@ const CheckoutSideBar = ({ placeOrder }) => {
   const disableInteraction = useSelector(disableInteractionSelector)
   const { isFetching } = cart
   const loc = useLocation()
-  const path = loc.pathname.split('/').reverse()[0].toLowerCase()
+  const path = loc.pathname.split('/').reverse()?.at(0).toLowerCase()
   const currentStep = getCurrentStep(path)
   const { t } = useTranslation()
   const dispatch = useDispatch()
@@ -25,16 +25,24 @@ const CheckoutSideBar = ({ placeOrder }) => {
     <aside className="col-lg-4 pt-4 pt-lg-0">
       <div className=" rounded-lg box-shadow-lg ml-lg-auto">
         <PromotionalMessaging />
-        <OrderSummary cart={cart} disabled={disableInteraction} onRemovePromoCode={(event,promotionCode)=>{
-           event.preventDefault()
-           dispatch(removePromoCode(promotionCode, undefined, t('frontend.cart.promo_code_removed')))
-          }
-        }/>
+        <OrderSummary
+          cart={cart}
+          disabled={disableInteraction}
+          onRemovePromoCode={(event, promotionCode) => {
+            event.preventDefault()
+            dispatch(removePromoCode(promotionCode, undefined, t('frontend.cart.promo_code_removed')))
+          }}
+        />
         {currentStep.key === REVIEW && <Button disabled={isFetching} isLoading={isFetching} label={t('frontend.order.complete')} classList="btn btn-primary btn-lg btn-block w-100" onClick={placeOrder} />}
-        {currentStep.key !== REVIEW && <CartPromoBox disabledInteraction={disableInteraction} onApplyCode={(promoCode,setPromoCode)=>{
-                  dispatch(applyPromoCode(promoCode, t('frontend.cart.promo_code_applied')))
-                  setPromoCode('')
-                }}/>}
+        {currentStep.key !== REVIEW && (
+          <CartPromoBox
+            disabledInteraction={disableInteraction}
+            onApplyCode={(promoCode, setPromoCode) => {
+              dispatch(applyPromoCode(promoCode, t('frontend.cart.promo_code_applied')))
+              setPromoCode('')
+            }}
+          />
+        )}
         {currentStep.key === REVIEW && <OrderNotes />}
       </div>
     </aside>

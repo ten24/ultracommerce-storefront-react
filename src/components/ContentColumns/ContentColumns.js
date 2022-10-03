@@ -1,6 +1,6 @@
 const ContentColumns = ({ children, title }) => {
   return (
-    <section className="mb-5 pb-5">
+    <section className="mb-5 pb-5 content-columns-sec">
       {title?.trim()?.length > 0 && (
         <header className="section-title">
           <h2>{title}</h2>

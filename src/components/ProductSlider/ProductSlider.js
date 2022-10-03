@@ -1,5 +1,5 @@
 import Slider from 'react-slick'
-import { ProductCard } from '../'
+import { SkuCard } from '../'
 import { useGetProductsByEntityModified } from '../../hooks/'
 import { useEffect } from 'react'
 import { sorting } from '../../utils'
@@ -45,12 +45,12 @@ const ProductSlider = ({ children, settings, title, slidesToShow = 4, products =
       <div className="card border-0 bg-transparent">
         {children}
         <Slider {...settings}>
-          {products.map(slide => {
+          {products?.map(slide => {
             return (
               <div className="repeater" key={slide.defaultSku_skuID}>
                 {/*Fixed the slider design issue */}
                 <div className="card-body h-100">
-                  <ProductCard {...slide} imageFile={slide.defaultSku_imageFile} skuID={slide.defaultSku_skuID} salePrice={slide.salePrice} listPrice={slide.listPrice} key={slide.defaultSku_skuID} />
+                  <SkuCard {...slide} imageFile={slide.defaultSku_imageFile} skuID={slide.defaultSku_skuID} salePrice={slide.salePrice} listPrice={slide.listPrice} key={slide.defaultSku_skuID} />
                 </div>
               </div>
             )

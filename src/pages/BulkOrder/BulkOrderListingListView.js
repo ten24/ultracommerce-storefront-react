@@ -1,8 +1,8 @@
 import { NoProductFound, Spinner } from '../../components'
 import { useTranslation } from 'react-i18next'
-import { SkuRow } from './ProductRow'
+import { SkuRow } from '../../components/Listing/SearchDisplayModes'
 
-const ProductListingListView = ({ Card = { SkuRow }, isFetching, pageRecords, list, config, onButtonClick, onInputChange }) => {
+const BulkOrderListingListView = ({ Card = { SkuRow }, isFetching, pageRecords, list, config, onButtonClick, onInputChange }) => {
   const { t } = useTranslation()
   // const {headings} = config TODO: use this one day to make headings dynamic
   return (
@@ -33,4 +33,4 @@ const ProductListingListView = ({ Card = { SkuRow }, isFetching, pageRecords, li
   )
 }
 
-export { ProductListingListView }
+export { BulkOrderListingListView }

@@ -17,6 +17,7 @@ export { default as GuestOrderConfirmation } from './OrderConfirmation/GuestOrde
 export { default as Product } from './Product/Product'
 export { default as ProductDetail } from './ProductDetail/ProductDetail'
 export { default as Search } from './Search/Search'
+export { default as ProductSearch } from './ProductSearch/ProductSearch'
 export { default as DrillDownSearch } from './Search/DrillDownSearch'
 export { default as ProductType } from './ProductType/ProductType'
 export { default as Manufacturer } from './Manufacturer/Manufacturer'

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useProductDetail } from '../../hooks'
-import { useHistory, useLocation } from 'react-router'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 // selection is an object of current paramters
 // optionGroupPairs is an array of current paramters key=value
@@ -8,7 +8,7 @@ const SkuOptions = ({ productOptions, selection, skus = [], selectedOptionInMode
   const { filterSkusBySelectedOptions, generateOptionGroupPair } = useProductDetail()
   const { t } = useTranslation()
   let loc = useLocation()
-  let history = useHistory()
+  const navigate = useNavigate()
 
   // http://localhost:3006/product/test-product?colors=global-black&soccerBallColor=orange&soccerBallSize=3
   const selectedOption = (skus = [], optionGroupCode, optionCode, selection) => {
@@ -22,23 +22,23 @@ const SkuOptions = ({ productOptions, selection, skus = [], selectedOptionInMode
     if (matchingSkus.length === 1) {
       // http://localhost:3006/product/test-product?colors=global-black&soccerBallSize=3
       console.log('Single Matching sku')
-      history.replace({
+      navigate({
         pathname: loc.pathname,
-        search: matchingSkus[0].slug,
+        search: matchingSkus?.at(0).slug,
       })
     } else if (matchingSkus.length === 0) {
       const possibleSKus = filterSkusBySelectedOptions(skus, [singlePair])
       if (possibleSKus.length === 1) {
         console.log('Single Matching sku')
         // http://localhost:3006/product/test-product?soccerBallColor=orange&colors=global-red&soccerBallSize=3  select 4
-        history.replace({
+        navigate({
           pathname: loc.pathname,
-          search: possibleSKus[0].slug,
+          search: possibleSKus?.at(0).slug,
         })
       } else if (possibleSKus.length > 1) {
         console.log('The selection was not valid so we will reset option selection to current selection')
         // http://localhost:3006/product/test-product?soccerBallColor=yellow&colors=global-black&soccerBallSize=4 ==> select red
-        history.replace({
+        navigate({
           pathname: loc.pathname,
           search: singlePair,
         })
@@ -46,7 +46,7 @@ const SkuOptions = ({ productOptions, selection, skus = [], selectedOptionInMode
     } else {
       console.log('Multiple remaining skus after new selection')
       // http://localhost:3006/product/test-product?soccerBallColor=orange&soccerBallSize=3 select orange
-      history.replace({
+      navigate({
         pathname: loc.pathname,
         search: optionsToTest.join('&'),
       })
@@ -102,7 +102,7 @@ const SkuOptions = ({ productOptions, selection, skus = [], selectedOptionInMode
 
 const SkuSelector = ({ sku, skus = [], productOptions, selectedOptionInModel }) => {
   let loc = useLocation()
-  let history = useHistory()
+  const navigate = useNavigate()
   if (productOptions?.length !== 0 || skus.length === 0) return null
   return (
     <div className="d-flex flex-row">
@@ -116,7 +116,7 @@ const SkuSelector = ({ sku, skus = [], productOptions, selectedOptionInModel }) 
             if (selectedOptionInModel) {
               selectedOptionInModel('', e.target.value)
             } else {
-              history.replace({
+              navigate({
                 pathname: loc.pathname,
                 search: `skuid=${e.target.value}`,
               })

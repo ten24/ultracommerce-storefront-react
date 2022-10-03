@@ -1,37 +1,21 @@
-import React, { Suspense, useEffect } from 'react'
-import { Switch, Route, useLocation } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
+import React, { Suspense } from 'react'
+import { Routes as RouterRoutes, Route, useLocation } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import { Loading, Header, Footer } from './components'
-import { getConfiguration } from './actions'
-import { AffiliateUser, Blog, NotFound, Home, Cart, MyAccount, Search, Checkout, ThreeDSHandover, ProductDetail, Brand, ContentPage, Product, ProductType, Category, Account, OrderConfirmation, GuestOrderConfirmation, BlogPost, Manufacturer, ErrorFallback, Contact, BulkOrder, OrderTemplateCart, OrderTemplateCheckout } from './pages'
+import * as Sentry from '@sentry/react'
+import { AffiliateUser, Blog, NotFound, Home, Cart, MyAccount, Search, ProductSearch, Checkout, ThreeDSHandover, Brand, ContentPage, Product, ProductType, Category, OrderConfirmation, GuestOrderConfirmation, BlogPost, Manufacturer, ErrorFallback, Contact, BulkOrder, OrderTemplateCart, OrderTemplateCheckout } from './pages'
 import logo from './assets/images/logo.svg'
 import mobileLogo from './assets/images/logo-mobile.svg'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useCMSWrapper, useScrollToTop } from './hooks'
 import Testing from './pages/Testing/Testing'
 import { getBlogRoute } from './selectors/configurationSelectors'
-
+const Routes = Sentry.withSentryReactRouterV6Routing(RouterRoutes)
 const pageComponents = {
-  Blog,
-  Home,
-  Checkout,
-  Cart,
-  Manufacturer,
-  MyAccount,
-  Search,
-  ProductDetail,
-  NotFound,
-  ContentPage,
-  Product,
-  ProductType,
-  Category,
-  Contact,
-  Brand,
-  Account,
-  OrderConfirmation,
-  GuestOrderConfirmation,
-  BlogPost,
-  ErrorFallback,
+  Product: <Product />,
+  ProductType: <ProductType />,
+  Category: <Category />,
+  Brand: <Brand />,
 }
 
 //https://itnext.io/react-router-transitions-with-lazy-loading-2faa7a1d24a
@@ -45,12 +29,6 @@ export default function App() {
   // eslint-disable-next-line no-unused-vars
   const scroll = useScrollToTop()
 
-  const dispatch = useDispatch()
-
-  useEffect(() => {
-    dispatch(getConfiguration())
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
   return (
     <Suspense fallback={<Loading />}>
       <Header logo={logo} mobileLogo={mobileLogo} />
@@ -62,35 +40,35 @@ export default function App() {
         }}
       >
         {/* <SEO /> */}
-        <Switch>
-          <Route path="/404" component={NotFound} />
-          <Route path="/testing" component={Testing} />
-          <Route path="/Error" component={ErrorFallback} />
-          <Route path="/contact" component={Contact} />
-          <Route path={`/${blogUrlTitle}/:id`} component={BlogPost} />
-          <Route path={`/${blogUrlTitle}`} component={Blog} />
-          {routing.length &&
-            routing.map(({ URLKey, URLKeyType }, index) => {
-              return <Route key={index} path={`/${URLKey}/:id`} component={pageComponents[URLKeyType]} />
-            })}
-          <Route path="/order-confirmation" component={OrderConfirmation} />
-          <Route path="/guest-order-confirmation" component={GuestOrderConfirmation} />
-          <Route path={shopByManufacturer.slug} component={Manufacturer} />
-          <Route path="/shop" component={Search} />
-          <Route path="/product-type/:id" component={ProductType} />
-          <Route path="/my-account/:id" component={MyAccount} />
-          <Route exact path="/my-account" component={MyAccount} />
-          <Route path="/checkout" component={Checkout} />
-          <Route path="/checkout/:id" component={Checkout} />
-          <Route path="/threeDSHandover" component={ThreeDSHandover} />
-          <Route path="/shopping-cart" component={Cart} />
-          <Route path="/scheduled-delivery-cart" component={OrderTemplateCart} />
-          <Route path="/scheduled-delivery-checkout" component={OrderTemplateCheckout} />
-          <Route path="/bulkorder" component={BulkOrder} />
-          <Route path="/affiliate" component={AffiliateUser} />
-          <Route exact path="/" component={Home} />
-          <Route path="" component={ContentPage} />
-        </Switch>
+        <Routes>
+          <Route path="/404" element={<NotFound />} />
+          <Route path="/testing" element={<Testing />} />
+          <Route path="/Error" element={<ErrorFallback />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path={`/${blogUrlTitle}`}>
+            <Route index element={<Blog />} />
+            <Route path={`*`} element={<BlogPost />} />
+          </Route>
+          {routing?.map(({ URLKey, URLKeyType }, index) => {
+            return !!pageComponents[URLKeyType] && <Route key={index} path={`/${URLKey}/:id`} element={pageComponents[URLKeyType]} />
+          })}
+          <Route path="/order-confirmation" element={<OrderConfirmation />} />
+          <Route path="/guest-order-confirmation" element={<GuestOrderConfirmation />} />
+          <Route path={shopByManufacturer.slug} element={<Manufacturer />} />
+          <Route path="/shop" element={<Search />} />
+          <Route path="/productSearch" element={<ProductSearch />} />
+          <Route path="/product-type/:id" element={<ProductType />} />
+          <Route path="/my-account/*" element={<MyAccount />} />
+          <Route path="/checkout/*" element={<Checkout />} />
+          <Route path="/threeDSHandover" element={<ThreeDSHandover />} />
+          <Route path="/shopping-cart" element={<Cart />} />
+          <Route path="/scheduled-delivery-cart" element={<OrderTemplateCart />} />
+          <Route path="/scheduled-delivery-checkout/*" element={<OrderTemplateCheckout />} />
+          <Route path="/bulkorder" element={<BulkOrder />} />
+          <Route path="/affiliate" element={<AffiliateUser />} />
+          <Route path={'*'} element={<ContentPage />} />
+          <Route index element={<Home />} />
+        </Routes>
       </ErrorBoundary>
       <Footer />
     </Suspense>

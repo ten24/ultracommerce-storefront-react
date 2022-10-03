@@ -63,8 +63,8 @@ const CSVReaderContainer = ({ updateItem }) => {
           skus = [],
           items = []
         for (let i = 0; i < data.length; i++) {
-          if (data[i][0] !== '') skus[i] = data[i][0]
-          skuQtyMapper[data[i][0].toUpperCase()] = data[i][1]
+          if (data[i]?.at(0) !== '') skus[i] = data[i]?.at(0)
+          skuQtyMapper[data[i]?.at(0).toUpperCase()] = data[i][1]
         }
 
         fetchSkus(skus.join(), source).then(skus => {

@@ -11,7 +11,7 @@ function Home() {
     <Layout>
       <ContentSlider slider={slider} />
 
-      <section className="content-spacer">
+      <section className="content-spacer product-slider-sec">
         <ProductSliderWithConfig
           title={popularProducts?.title || t('frontend.home.popular_products')}
           params={{

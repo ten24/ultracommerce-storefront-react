@@ -4,7 +4,7 @@ import ListingPage from '../../components/Listing/Listing'
 const Attribute = props => {
   const path = props.location.pathname.split('/').reverse()
   const filter = {
-    attributeOptions: path[0],
+    attributeOptions: path?.at(0),
   }
   return (
     <Layout>

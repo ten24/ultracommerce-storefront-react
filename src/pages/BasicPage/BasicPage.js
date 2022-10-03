@@ -18,6 +18,7 @@ const BarrierPage = ({ accessFlag = false }) => {
 }
 const PageDisplay = ({ content, setPage, request }) => {
   let { eventHandlerForWSIWYG } = useUtilities()
+
   return (
     <div className="barrierContent">
       {content.isMarkup && (

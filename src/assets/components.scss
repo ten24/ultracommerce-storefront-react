@@ -14,3 +14,11 @@
 @import './components/productReview.scss';
 @import './components/sitePicker.scss';
 @import './components/spinner';
+@import './theme/default.scss';
+@import './theme/industrial.scss';
+
+@if $theme-name == 'industrial' {
+  @include industrialTheme;
+} @else if $theme-name == 'default' {
+  @include defaultTheme;
+}

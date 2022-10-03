@@ -1,4 +1,4 @@
-import { useHistory, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import queryString from 'query-string'
 import { getErrorMessage, processQueryParameters } from '../../../utils'
 import { useSelector } from 'react-redux'
@@ -83,7 +83,7 @@ const useReconcile = ({ option, brand, attribute, category, priceRange, productT
   return { shouldUpdate: JSON.stringify(queryStringParams) !== JSON.stringify(core), queryStringParams }
 }
 
-const useListing = (preFilter, type = 'productListing') => {
+const useListing = (preFilter, type = 'skuListing') => {
   let [isFetching, setFetching] = useState(true)
   let [records, setRecords] = useState([])
   let [total, setTotal] = useState(0)
@@ -99,7 +99,7 @@ const useListing = (preFilter, type = 'productListing') => {
   let initialData = listing.filters
   let initialForcedFilterOptions = listing.forcedFilterOptions
 
-  let history = useHistory()
+  const navigate = useNavigate()
   let params = processQueryParameters(loc.search)
   params = { ...initialData, ...params, ...preFilter }
   const hasValidFilter =
@@ -108,9 +108,10 @@ const useListing = (preFilter, type = 'productListing') => {
       if (params[filterKey]?.length) return true
       return result
     }, false)
-  const returnFacetList = hasValidFilter ? 'brand,option,category,attribute,sorting,priceRange,productType' : 'category,brand,sorting,productType'
 
-  const payload = { ...params, ...productSearch, returnFacetList }
+  const returnFacetList = hasValidFilter ? listings.productListing.returnFacetListWithFilter : listings.productListing.returnFacetList
+  const selectedLocale = { lang: localStorage.getItem('i18nextLng') ? localStorage.getItem('i18nextLng') : 'en_us' }
+  const payload = { ...params, ...productSearch, ...selectedLocale, returnFacetList }
 
   useDeepCompareEffect(() => {
     let source = axios.CancelToken.source()
@@ -151,14 +152,14 @@ const useListing = (preFilter, type = 'productListing') => {
   const { shouldUpdate, queryStringParams } = useReconcile({ ...potentialFilters })
   const setPage = pageNumber => {
     params['currentPage'] = pageNumber
-    history.push({
+    navigate({
       pathname: loc.pathname,
       search: buildPath(params, { arrayFormat: 'comma' }),
     })
   }
   const setKeyword = keyword => {
     params = { ...initialData, ...preFilter, orderBy: params.orderBy, keyword: keyword }
-    history.push({
+    navigate({
       pathname: loc.pathname,
       search: buildPath(params, { arrayFormat: 'comma' }),
     })
@@ -166,7 +167,7 @@ const useListing = (preFilter, type = 'productListing') => {
   const setSort = orderBy => {
     params['orderBy'] = orderBy
     params['currentPage'] = 1
-    history.push({
+    navigate({
       pathname: loc.pathname,
       search: buildPath(params, { arrayFormat: 'comma' }),
     })
@@ -192,7 +193,7 @@ const useListing = (preFilter, type = 'productListing') => {
     if (hasValidFilter) {
       params = { ...initialData, ...preFilter, orderBy: params.orderBy, keyword: params.keyword }
     }
-    history.push({
+    navigate({
       pathname: loc.pathname,
       search: buildPath(params, { arrayFormat: 'comma' }),
     })
@@ -201,7 +202,7 @@ const useListing = (preFilter, type = 'productListing') => {
   if (shouldUpdate && !isFetching) {
     const path = queryString.stringify(queryStringParams, { arrayFormat: 'comma' })
     params = processQueryParameters(path)
-    history.replace({
+    navigate({
       pathname: loc.pathname,
       search: path,
     })

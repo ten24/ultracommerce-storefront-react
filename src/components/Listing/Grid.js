@@ -1,4 +1,4 @@
-import { ProductCard } from '../'
+import { SkuCard } from '../'
 import ContentLoader from 'react-content-loader'
 
 const ListingGridLoader = props => (
@@ -26,10 +26,10 @@ const Grid = ({ isFetching, products = [] }) => {
         </>
       )}
       {!isFetching &&
-        products.map((product, index) => {
+        products?.map((product, index) => {
           return (
             <div key={`${product.productID}${index}`} className="col-md-4 col-sm-6 px-2 mb-4">
-              <ProductCard {...product} />
+              <SkuCard {...product} />
             </div>
           )
         })}

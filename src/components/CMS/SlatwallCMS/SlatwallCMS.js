@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useHistory, useLocation } from 'react-router'
+import { useLocation } from 'react-router-dom'
 import { getWishLists, receiveContent, requestContent } from '../../../actions'
 import { getBlogRoute, getProductRoute } from '../../../selectors'
 import { SlatwallCMSService } from '../../../services'
 
 const SlatwallCMS = ({ children, additionalProcessing = response => response }) => {
   const { pathname } = useLocation('home')
-  const history = useHistory()
   const [isLoaded, setIsLoaded] = useState(false)
   const [currentPath, setCurrentPath] = useState(pathname)
   const conData = useSelector(state => state.content)
@@ -60,7 +59,7 @@ const SlatwallCMS = ({ children, additionalProcessing = response => response }) 
           setDisplayPropertiesSearchable: true,
         })
       } else if (basePath === productRoute) {
-        const productUrlTitle = pathname.split('/').reverse()[0].toLowerCase()
+        const productUrlTitle = pathname.split('/').reverse()?.at(0).toLowerCase()
 
         requestUltraPageContent({
           urlTitle: '404',
@@ -106,35 +105,32 @@ const SlatwallCMS = ({ children, additionalProcessing = response => response }) 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   useEffect(() => {
-    const unload = history.listen(location => {
-      if (location.pathname !== currentPath) {
-        let newPath = location.pathname.split('/')[1].toLowerCase()
-        newPath = newPath.length ? newPath : 'home'
-        setCurrentPath(location.pathname)
-        if (newPath === productRoute) {
-          const productUrlTitle = location.pathname.split('/').reverse()[0].toLowerCase()
-          requestUltraPageContent({
-            productUrlTitle,
-            productRoute,
-            'p:show': 500,
-            includeImages: true,
-            includeCategories: true,
-          })
-        } else {
-          requestUltraPageContent({
-            urlTitle: location.pathname !== '/' ? newPath : 'home',
-            'p:show': 500,
-            includeImages: true,
-            includeCategories: true,
-          })
-        }
+
+    if (pathname !== currentPath) {
+      let newPath = pathname.split('/')[1].toLowerCase()
+      newPath = newPath.length ? newPath : 'home'
+      setCurrentPath(pathname)
+      if (newPath === productRoute) {
+        const productUrlTitle = pathname.split('/').reverse()?.at(0)?.toLowerCase()
+        requestUltraPageContent({
+          productUrlTitle,
+          productRoute,
+          'p:show': 500,
+          includeImages: true,
+          includeCategories: true,
+        })
+      } else {
+        requestUltraPageContent({
+          urlTitle: pathname !== '/' ? newPath : 'home',
+          'p:show': 500,
+          includeImages: true,
+          includeCategories: true,
+        })
       }
-    })
-    return () => {
-      unload()
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPath])
+  }, [pathname])
 
   return children
 }

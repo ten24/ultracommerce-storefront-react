@@ -1,18 +1,18 @@
-import { Layout,SimpleImage } from '../../components'
-import { useDispatch,useSelector } from 'react-redux'
+import { Layout, SimpleImage } from '../../components'
+import { useDispatch, useSelector } from 'react-redux'
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { addMultipleItemsToCart } from '../../actions'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useFormatCurrency } from '../../hooks'
 import { axios, SlatwalApiService } from '../../services'
 import { toast } from 'react-toastify'
-import { CSVReaderContainer}  from './CSVReaderContainer'
+import { CSVReaderContainer } from './CSVReaderContainer'
 import { getBrandRoute, getProductRoute } from '../../selectors'
 import { Link } from 'react-router-dom'
 
 const ListingLineByLine = () => {
-  let history = useHistory()
+  const navigate = useNavigate()
   const { t } = useTranslation()
   const dispatch = useDispatch()
   const [lineItems, setLineItems] = useState([])
@@ -29,7 +29,7 @@ const ListingLineByLine = () => {
       }
     }
     dispatch(addMultipleItemsToCart(skuIDs.join(), quantities.join())).then(e => {
-      history.push({ pathname: '/shopping-cart' })
+      navigate({ pathname: '/shopping-cart' })
     })
   }
 
@@ -62,7 +62,6 @@ const ListingLineByLine = () => {
                 {lineItems.map(lineItem => {
                   return lineItem.quantity > 0 && <LineItemRow key={lineItem.sku.skuCode} lineItem={lineItem} updateItem={setLineItems} />
                 })}
-               
               </tbody>
             </table>
           </div>
@@ -97,23 +96,22 @@ const NewLine = ({ updateItem }) => {
   }, [])
 
   return (
-    
-      <div className="row">
-        <div className="col-7">
-          <input
-            type="text"
-            name="productCode"
-            required="required"
-            placeholder="Enter the product code"
-            className="form-control appended-form-control rounded-pill"
-            value={keyword}
-            onChange={e => {
-              e.preventDefault()
-              setKeyword(e.currentTarget.value)
-            }}
-          />
-        </div>
-        <div className="col-2">
+    <div className="row">
+      <div className="col-7">
+        <input
+          type="text"
+          name="productCode"
+          required="required"
+          placeholder="Enter the product code"
+          className="form-control appended-form-control rounded-pill"
+          value={keyword}
+          onChange={e => {
+            e.preventDefault()
+            setKeyword(e.currentTarget.value)
+          }}
+        />
+      </div>
+      <div className="col-2">
         <input
           type="number"
           name="quantity"
@@ -125,42 +123,40 @@ const NewLine = ({ updateItem }) => {
             setQuantity(e.currentTarget.value)
           }}
         />
-       </div>
-       <div className="col-3">
-          <button
-            type="button"
-            className="btn btn-primary btn-block"
-            onClick={e => {
-              e.preventDefault()
-              setFetching(true)
-              searchforSku(keyword, source).then(result => {
-                setFetching(false)
-                if (result?.skuCode) {
-                  setKeyword('')
-                  updateItem(items => {
-                    return [...items, { sku: result, quantity: quantity }]
-                  })
-                }
-                if(result?.err){
-                  toast.error(result?.err)
-                }
-              })
-            }}
-          >
-            {t('frontend.bulkorder.add_to_list')}
-          </button>
-        </div>
       </div>
-    
+      <div className="col-3">
+        <button
+          type="button"
+          className="btn btn-primary btn-block"
+          onClick={e => {
+            e.preventDefault()
+            setFetching(true)
+            searchforSku(keyword, source).then(result => {
+              setFetching(false)
+              if (result?.skuCode) {
+                setKeyword('')
+                updateItem(items => {
+                  return [...items, { sku: result, quantity: quantity }]
+                })
+              }
+              if (result?.err) {
+                toast.error(result?.err)
+              }
+            })
+          }}
+        >
+          {t('frontend.bulkorder.add_to_list')}
+        </button>
+      </div>
+    </div>
   )
 }
-
 
 const searchforSku = (skuCode, source, params = {}) => {
   return SlatwalApiService.general.getEntity({ 'f:skuCode': skuCode, entityName: 'sku', includeOptions: true, includeSettings: true, ...params }, [], source).then(response => {
     if (response.isSuccess()) {
       if (response.success().data?.pageRecords?.length) {
-        return response.success().data?.pageRecords[0]
+        return response.success().data?.pageRecords?.at(0)
       } else {
         return { err: 'SKU is not found' }
       }
@@ -176,11 +172,14 @@ const LineItemRow = ({ lineItem, updateItem }) => {
   const brand = useSelector(getBrandRoute)
   const producturl = useSelector(getProductRoute)
   const productLink = `/${producturl}/${lineItem.sku.urlTitle}` + (lineItem.sku.skuID.length ? `?skuid=${lineItem.sku.skuID}` : '')
-  
+
   return (
     <tr>
-      <td><SimpleImage style={{ maxHeight: '100px' }} src={lineItem.sku.images[0] || lineItem.sku.imagePath} /></td>
-      <td><Link to={`/${brand}/${lineItem.sku.product_brand_urlTitle}`} className="text-capitalize mb-3" style={{ fontSize: 12 }}>
+      <td>
+        <SimpleImage style={{ maxHeight: '100px' }} src={lineItem.sku.images?.at(0) || lineItem.sku.imagePath} />
+      </td>
+      <td>
+        <Link to={`/${brand}/${lineItem.sku.product_brand_urlTitle}`} className="text-capitalize mb-3" style={{ fontSize: 12 }}>
           {lineItem.sku.product_brand_brandName}
         </Link>
         <h2>
@@ -189,7 +188,8 @@ const LineItemRow = ({ lineItem, updateItem }) => {
           </Link>
         </h2>
         {!lineItem.sku.skuCode && lineItem.sku.productCode && <div className="product-brand">{lineItem.sku.productCode}</div>}
-        {lineItem.sku.skuCode && <div className="product-brand">{lineItem.sku.skuCode}</div>}</td>
+        {lineItem.sku.skuCode && <div className="product-brand">{lineItem.sku.skuCode}</div>}
+      </td>
       <td>{formatCurrency(lineItem.sku.salePrice)}</td>
       <td className="text-end">
         <input
@@ -241,4 +241,4 @@ const LineItemRow = ({ lineItem, updateItem }) => {
   )
 }
 
-export {ListingLineByLine}
+export { ListingLineByLine }

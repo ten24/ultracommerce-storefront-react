@@ -3,7 +3,7 @@ import { getEligibleFulfillmentMethods, getPickupLocations, changeOrderFulfillme
 import { SlideNavigation, Overlay } from '../../'
 import { useEffect } from 'react'
 import { getAllOrderItems, getAllOrderFulfillments, isAllowedToSwitchFulfillmentMethod, getAllEligibleFulfillmentMethods, fulfillmentMethodSelector, pickupLocationOptions } from '../../../selectors/'
-import { Redirect } from 'react-router'
+import { Navigate } from 'react-router-dom'
 import { FulfillmentList } from './FulfillmentList'
 import { usePickupLocation } from '../../../hooks'
 
@@ -24,7 +24,7 @@ const ShippingSlide = ({ currentStep }) => {
   }, [dispatch])
   const pickupLocations = useSelector(pickupLocationOptions)
   if (allOrderFulfillments?.length === 1 && allOrderFulfillments?.at(0)?.fulfillmentMethod?.fulfillmentMethodType === 'auto') {
-    return <Redirect to={currentStep.next} />
+    return <Navigate to={`../${currentStep.next}`} />
   }
   return (
     <>

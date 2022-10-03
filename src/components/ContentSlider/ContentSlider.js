@@ -9,6 +9,18 @@ const ContentSlider = ({ slider }) => {
   const { t } = useTranslation()
   let { eventHandlerForWSIWYG } = useUtilities()
 
+  const generateUrlString = (urlString) => {
+    if(urlString !== undefined && urlString.length > 0){
+      if(urlString.indexOf('http') === -1){
+        return '/' + urlString
+      } else {
+        return urlString;
+      }
+    } else {
+      return "/#"
+    }
+  }
+
   useEffect(() => {
     if (slider) {
       var carousel = new bootstrap.Carousel(document.getElementById('carousel'), {
@@ -42,7 +54,7 @@ const ContentSlider = ({ slider }) => {
                     <h2 className="display-3">{title}</h2>
                     <p onClick={eventHandlerForWSIWYG} dangerouslySetInnerHTML={{ __html: contentBody }} />
                     {linkLabel?.trim()?.length > 0 && (
-                      <a onClick={eventHandlerForWSIWYG} href={linkUrl ? `/${linkUrl}` : '/#'} className="btn btn-primary text-white px-4 rounded-pill">
+                      <a onClick={eventHandlerForWSIWYG} href={generateUrlString(linkUrl)} className="btn btn-primary text-white px-4 rounded-pill">
                         {linkLabel}
                       </a>
                     )}

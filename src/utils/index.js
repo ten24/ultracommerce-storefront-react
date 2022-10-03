@@ -102,7 +102,7 @@ export const augmentProductType = (parent, data) => {
   parents = organizeProductTypes(parents, data)
 
   if (parents.length > 0) {
-    parents = parents[0]
+    parents = parents?.at(0)
   }
   return parents
 }

@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { useLocation } from 'react-router'
-import { Link } from 'react-router-dom'
+import { useLocation, Link } from 'react-router-dom'
 import { orderItemsCountSelector } from '../../selectors'
 import { isAuthenticated } from '../../utils'
 

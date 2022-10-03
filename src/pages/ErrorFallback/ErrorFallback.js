@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router-dom'
 import { Button } from '../../components'
 
 const ErrorFallback = ({ error, resetErrorBoundary }) => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const { t } = useTranslation()
   const contentStore = useSelector(state => state.content['error']) || {}
 
@@ -17,7 +17,7 @@ const ErrorFallback = ({ error, resetErrorBoundary }) => {
           if (event.target.getAttribute('href').includes('http')) {
             window.location.href = event.target.getAttribute('href')
           } else {
-            history.push(event.target.getAttribute('href'))
+            navigate(event.target.getAttribute('href'))
           }
         }
       }}

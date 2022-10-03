@@ -1,5 +1,9 @@
-$primary: #027CBA; // ultra blue
-$brand-secondary: #CC122B; // ultra red
+//** Start UC Specific **
+$theme-name: default;
+//** End UC Specific **
+//** Start Boostrap Override **
+$primary: #027cba; // ultra blue
+$brand-secondary: #cc122b; // ultra red
 $link-color: #2478cc;
 $primary-blue: #146cda;
 $color-white: #f7f7f7;
@@ -21,6 +25,7 @@ $color-gray: #f3f3f3;
 $font-size: 16px;
 $line-height: 1.4;
 $lines-to-show: 4;
+//** End Boostrap Override **
 
 $step-count-size: 1.625rem !default;
 

@@ -50,6 +50,21 @@ export const getConfiguration = (siteCode = localStorage.getItem('siteCode'), re
           // retail and local routes not found on the server
           // const legacyRoutes = localRoutes.filter(localRoute => serverConfig.router.filter(route => route.URLKeyType === localRoute.URLKeyType).length === 0)
           // serverConfig.router = [...serverConfig.router, ...legacyRoutes]
+
+          let appConfiguration ={currentSite: process.env.REACT_APP_SITE_CODE, sites:[]}
+          const currentConfiguration = JSON.parse(localStorage.getItem('appConfiguration') || '{}')
+          // merge old settings with new only for sites that are still valid
+          appConfiguration.sites = serverConfig?.sites?.map(site => {
+            const cachedSite = currentConfiguration?.sites?.filter(cachedSite => cachedSite.siteCode === site.siteCode)?.at(0)
+            if(!!cachedSite) return {  siteCode : site.siteCode, currencyCode: site.currencyCode, locale : site.settings.siteDefaultCountry, settings: site?.settings, ...cachedSite}
+            return {  siteCode : site.siteCode, currencyCode: site.currencyCode, locale : site?.settings?.siteDefaultCountry || 'en', settings: site?.settings}
+          })
+          // if we have a current site bring it over
+          if (!!currentConfiguration.currentSite) appConfiguration.currentSite = currentConfiguration.currentSite
+          // validate currentSite is valid for list
+          if (!appConfiguration.sites.find(site => site.siteCode === appConfiguration.currentSite) && appConfiguration.sites.length) appConfiguration.currentSite = appConfiguration.sites.at(0).siteCode
+          localStorage.setItem('appConfiguration',JSON.stringify(appConfiguration))
+          
           dispatch(reciveConfiguration(serverConfig))
           dispatch(receiveUser(response.success().account))
           if (response.success()?.account?.accountID?.length) dispatch(getWishLists())

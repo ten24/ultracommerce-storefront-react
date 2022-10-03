@@ -9,7 +9,7 @@ import { SlatwalApiService } from '../../../services'
 import { getErrorMessage } from '../../../utils'
 import { toast } from 'react-toastify'
 import { receiveUser } from '../../../actions'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router-dom'
 import dayjs from 'dayjs'
 import { getDefaultCountry } from '../../../selectors'
 
@@ -34,7 +34,7 @@ const CreateOrEditAccountPaymentMethod = () => {
   let [redirectMethod, setRedirectMethod] = useState('')
   let [isFetching, setFetching] = useState(false)
   const dispatch = useDispatch()
-  const history = useHistory()
+  const navigate = useNavigate()
   const { t } = useTranslation()
   const { months, years } = useCheckoutUtilities()
   const [billingAddress, setBillingAddress] = useState({ ...initialBillingAddress, countryCode })
@@ -56,26 +56,22 @@ const CreateOrEditAccountPaymentMethod = () => {
     if (billingAccountAddressID.length) payload.billingAccountAddress.accountAddressID = billingAccountAddressID
     if (!billingAccountAddressID.length) payload.billingAddress = billingAddress
     SlatwalApiService.account.addPaymentMethod(payload).then(response => {
-      
-      if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length){
-            toast.error(getErrorMessage(response.success().errors))
-      }
-      else{
-      if (response.isSuccess()) {
-        if (response.success()?.redirectUrl?.length) {
-          setRedirectUrl(response.success().redirectUrl)
-          setRedirectPayload(response.success().redirectPayload)
-          setRedirectMethod(response.success().redirectMethod)
-        } else {
-         
-          toast.success(t('frontend.account.card.success'))
-          setTimeout(() => {
-            dispatch(receiveUser(response.success().account))
-            history.push('/my-account/cards')
-          }, 2000)
+      if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) {
+        toast.error(getErrorMessage(response.success().errors))
+      } else {
+        if (response.isSuccess()) {
+          if (response.success()?.redirectUrl?.length) {
+            setRedirectUrl(response.success().redirectUrl)
+            setRedirectPayload(response.success().redirectPayload)
+            setRedirectMethod(response.success().redirectMethod)
+          } else {
+            toast.success(t('frontend.account.card.success'))
+            setTimeout(() => {
+              dispatch(receiveUser(response.success().account))
+              navigate('/my-account/cards')
+            }, 2000)
+          }
         }
-        
-      }
       }
       setFetching(false)
     })
@@ -102,11 +98,18 @@ const CreateOrEditAccountPaymentMethod = () => {
       })
   }
   const verifyOnSubmit = () => {
+    // eslint-disable-next-line
+    const nameOnCreditCardValidation = "^[^\*\|\:\>\<\[\}\{\)\(\~\^\`\"\&\$\;\@\%\!\,\.\_\?\/\+\=0-9]+$"
     try {
       Yup.object()
         .shape({
           creditCardNumber: Yup.string().required('Required'),
-          nameOnCreditCard: Yup.string().required('Required'),
+          nameOnCreditCard: Yup.string()
+            .required('Required')
+            .matches(nameOnCreditCardValidation, {
+              excludeEmptyString: true,
+              message: t('frontend.account.nameOnCreditCardValidation'),
+            }),
           expirationMonth: Yup.string().required('Required'),
           expirationYear: Yup.string().required('Required'),
           securityCode: Yup.string().required('Required'),
@@ -114,8 +117,9 @@ const CreateOrEditAccountPaymentMethod = () => {
         })
         .validateSync(paymentMethod, { abortEarly: false })
     } catch (err) {
+      debugger;
       setPaymentMethodErrors(
-        err.inner.reduce((acc, { path, message }) => {
+        err?.inner?.reduce((acc, { path, message }) => {
           return {
             ...acc,
             [path]: { path, message },

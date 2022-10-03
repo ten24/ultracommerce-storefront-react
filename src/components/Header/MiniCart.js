@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import useFormatCurrency from '../../hooks/useFormatCurrency'
@@ -14,7 +14,7 @@ import { toast } from 'react-toastify'
 import { getErrorMessage } from '../../utils'
 
 const MiniCart = () => {
-  let history = useHistory()
+  const navigate = useNavigate()
   const { t } = useTranslation()
   const cart = useSelector(state => state.cart)
   const orderTemplateCart = useSelector(state => state.subscriptionCart)
@@ -27,6 +27,7 @@ const MiniCart = () => {
   const location = useLocation()
   const productRoute = useSelector(getProductRoute)
   const wrapperRef = useRef(null)
+  const cartItems = orderItems.filter(item => item.parentOrderItemID === '')
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -52,7 +53,7 @@ const MiniCart = () => {
         id="navbarDropdown"
         className={`cart position-relative nav-link text-center clickable ${show && 'show'} ${location?.pathname === '/shopping-cart' && `active`}`}
       >
-        {orderItems.length > 0 && <i className="fs-6 position-absolute top-1 start-100 translate-middle badge rounded-pill bg-primary">{orderItems.length}</i>}
+        {cartItems.length > 0 && <i className="fs-6 position-absolute top-1 start-100 translate-middle badge rounded-pill bg-primary">{cartItems.length}</i>}
         {orderItems.length === 0 && orderTemplateItems.length > 0 && <i className="fs-6 position-absolute top-1 start-100 translate-middle badge rounded-pill bg-primary">{orderTemplateItems.length}</i>}
         <i className="bi bi-bag fs-4"></i> <span className="d-block">{t('frontend.header.cart')}</span>
       </span>
@@ -73,7 +74,7 @@ const MiniCart = () => {
                   <span
                     onClick={e => {
                       e.preventDefault()
-                      history.push({ pathname: '/shopping-cart' })
+                      navigate({ pathname: '/shopping-cart' })
                       setShow(!show)
                       setMiniCartOpen(!miniCartOpen)
                     }}
@@ -83,13 +84,14 @@ const MiniCart = () => {
                   </span>
                 </div>
                 <div style={{ maxHeight: '50vh', overflowY: 'auto', paddingRight: '10px' }}>
-                  {orderItems.length > 0 &&
-                    orderItems.map(({ extendedUnitPriceAfterDiscount, sku, orderItemID, quantity }) => {
-                      const { skuID, product, images } = sku
+                  {cartItems.length > 0 &&
+                    cartItems.map(({ extendedUnitPriceAfterDiscount, sku, orderItemID, quantity }, key) => {
+                      const { product, images } = sku
                       const { productName, urlTitle } = product
+                      const childBundleItems = orderItems?.filter(filteritem => filteritem?.parentOrderItemID === orderItemID)
                       return (
-                        <div className="d-flex align-items-center py-3 justify-content-between border-bottom border-light" key={skuID}>
-                          {images && images?.length > 0 && <SimpleImage className="img-fluid mw-50px productImage" src={images[0]} alt={productName} type="product" />}
+                        <div key={orderItemID} className="d-flex align-items-center py-3 justify-content-between border-bottom border-light flex-wrap">
+                          {images && images?.length > 0 && <SimpleImage className="img-fluid mw-50px productImage" src={images?.at(0)} alt={productName} type="product" />}
                           <Link to={`/${productRoute}/${urlTitle}`} className="cart-product-name">
                             {productName}
                           </Link>
@@ -105,6 +107,34 @@ const MiniCart = () => {
                               role="button"
                             ></i>
                           </figure>
+                          {childBundleItems && childBundleItems.length > 0 && (
+                            <div className="accordion mt-3 w-100">
+                              <div className="accordion-item">
+                                <p className="accordion-header" id="headingOne">
+                                  <button className="accordion-button p-1 collapsed" type="button" data-bs-toggle="collapse" data-bs-target={`#collapse_${orderItemID}`} aria-expanded="false" aria-controls="collapseOne">
+                                    {t('frontend.cart.bundleProducts.child_items')}
+                                  </button>
+                                </p>
+                                <div id={`collapse_${orderItemID}`} className="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                                  <div className="accordion-body">
+                                    {childBundleItems.map(childBundleItem => {
+                                      return (
+                                        <div key={childBundleItem.orderItemID} className="d-flex align-items-center py-3 justify-content-between border-bottom border-light flex-wrap">
+                                          {childBundleItem.sku.images && childBundleItem.sku.images?.length > 0 && <SimpleImage className="img-fluid mw-50px productImage" src={childBundleItem.sku.images?.at(0)} alt={childBundleItem.sku.product.productName} type="product" />}
+                                          <Link to={`/${productRoute}/${urlTitle}`} className="cart-product-name">
+                                            {childBundleItem.sku.product.productName}
+                                          </Link>
+                                          <span className="text-muted small fw-bolder">
+                                            {childBundleItem.quantity} x <span className="text-black">{formatCurrency(childBundleItem.extendedUnitPriceAfterDiscount)}</span>
+                                          </span>
+                                        </div>
+                                      )
+                                    })}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )
                     })}
@@ -140,7 +170,7 @@ const MiniCart = () => {
                       <span
                         onClick={e => {
                           e.preventDefault()
-                          history.push({ pathname: '/scheduled-delivery-cart' })
+                          navigate({ pathname: '/scheduled-delivery-cart' })
                           setShow(!show)
                           setMiniCartOpen(!miniCartOpen)
                         }}
@@ -152,12 +182,12 @@ const MiniCart = () => {
                     <div style={{ maxHeight: '50vh', overflowY: 'auto', paddingRight: '10px' }}>
                       {orderTemplateItems &&
                         orderTemplateItems.length > 0 &&
-                        orderTemplateItems.map(({ calculatedTotal, sku, quantity, orderTemplateItemID }) => {
-                          const { skuID, product, images } = sku
+                        orderTemplateItems.map(({ calculatedTotal, sku, quantity, orderTemplateItemID }, key) => {
+                          const { product, images } = sku
                           const { productName, urlTitle } = product
                           return (
-                            <div className="d-flex align-items-center py-3 justify-content-between border-bottom border-light" key={skuID}>
-                              {images && images?.length > 0 && <SimpleImage className="img-fluid mw-50px productImage" src={images[0]} alt={productName} type="product" />}
+                            <div className="d-flex align-items-center py-3 justify-content-between border-bottom border-light" key={key}>
+                              {images && images?.length > 0 && <SimpleImage className="img-fluid mw-50px productImage" src={images?.at(0)} alt={productName} type="product" />}
                               <Link to={`/${productRoute}/${urlTitle}`} className="cart-product-name">
                                 {productName}
                               </Link>

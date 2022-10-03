@@ -4,20 +4,20 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { getBrandRoute, getProductRoute } from '../../selectors'
 
-const ProductCard = ({ productData, setBulkOrderList, bulkOrderList }) => {
+const BulkOrderProductCard = ({ productData, setBulkOrderList, bulkOrderList }) => {
   const { t } = useTranslation()
   const isCartFetching = useSelector(state => state.cart.isFetching)
   const brand = useSelector(getBrandRoute)
   const product = useSelector(getProductRoute)
   const productLink = `/${product}/${productData.urlTitle}` + (productData.skuID.length ? `?skuid=${productData.skuID}` : '')
   const useResizedImage = productData.images && productData.images?.length > 0
-  
+
   return (
     <div className="card p-3 pt-2 h-100">
       {productData.productClearance === true && <span className="badge">{t('frontend.core.special')}</span>}
       <HeartButton skuID={productData.skuID} />
       <Link to={`/${product}/${productData.urlTitle}?skuid=${productData.skuID}`}>
-        {useResizedImage && <SimpleImage className="img-fluid card-image-height productImage" src={productData.images[0]} alt={productData.product_productName} type="product" />}
+        {useResizedImage && <SimpleImage className="img-fluid card-image-height productImage" src={productData.images?.at(0)} alt={productData.product_productName} type="product" />}
         {!useResizedImage && productData.imagePath && <ProductImage customClass="img-fluid card-image-height" imageFile={productData.imagePath} skuID={productData.skuID} customPath="/" />}
         {!useResizedImage && productData.imageFile && <ProductImage customClass="img-fluid card-image-height" imageFile={productData.imageFile} skuID={productData.skuID} />}
       </Link>
@@ -40,20 +40,20 @@ const ProductCard = ({ productData, setBulkOrderList, bulkOrderList }) => {
             <input
               type="number"
               className="form-control"
-              min = {0}
+              min={0}
               value={bulkOrderList[productData.sku_skuID] ? bulkOrderList[productData?.sku_skuID].quantity : 0}
               disabled={isCartFetching}
               onChange={e => {
                 setBulkOrderList(currentlist => {
                   let qty = 1
-                  
+
                   if (bulkOrderList[productData.sku_skuID]?.quantity) qty = e.target.value
-                  
-                  if(parseInt(qty) === 0){
+
+                  if (parseInt(qty) === 0) {
                     delete currentlist[productData.sku_skuID]
-                    return { ...currentlist}
+                    return { ...currentlist }
                   }
-                  
+
                   return { ...currentlist, [productData.sku_skuID]: { quantity: qty, images: productData.images, skuDefinition: productData.skuDefinition, skuCode: productData.skuCode, salePrice: productData.salePrice, productName: productData.product_productName } }
                 })
               }}
@@ -79,4 +79,4 @@ const ProductCard = ({ productData, setBulkOrderList, bulkOrderList }) => {
   )
 }
 
-export { ProductCard }
+export { BulkOrderProductCard }

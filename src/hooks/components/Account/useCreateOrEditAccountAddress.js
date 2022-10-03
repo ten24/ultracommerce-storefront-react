@@ -28,7 +28,7 @@ const useCreateOrEditAccountAddress = path => {
   const stateCodeOptions = useSelector(state => state.content.stateCodeOptions)
   const filteredAddress = accountAddresses.filter(address => address.address.addressID === path)
   const isEdit = filteredAddress.length ? true : false
-  const { accountAddressID, accountAddressName, address } = filteredAddress.length ? filteredAddress[0] : {}
+  const { accountAddressID, accountAddressName, address } = filteredAddress.length ? filteredAddress?.at(0) : {}
   useDeepCompareEffect(() => {
     if (accountAddressID) {
       setBillingAddress({ accountAddressID, accountAddressName, ...address })
