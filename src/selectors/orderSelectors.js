@@ -9,7 +9,7 @@ export const getAllOrderFulfillments = state => {
 }
 const getAllAccountAddresses = state => state.userReducer.accountAddresses
 const getAllAccountPaymentMethods = state => state.userReducer.accountPaymentMethods
-export const getAllPickupLocations = state => state.cart.pickupLocations
+export const getAllPickupLocationsSelector = state => state.cart.pickupLocations
 export const getAllOrderPayments = state => state.cart.orderPayments?.filter(({ creditCardType, orderPaymentStatusType }) => creditCardType !== 'Invalid' && orderPaymentStatusType.systemCode !== 'opstRemoved')
 export const getAllEligiblePaymentMethodDetails = state => state.cart.eligiblePaymentMethodDetails
 export const getAllEligibleFulfillmentMethods = state => state.cart.eligibleFulfillmentMethods
@@ -86,7 +86,7 @@ export const accountAddressSelector = createSelector([getAllAccountAddresses, ge
   return selectedAccountID
 })
 
-export const pickupLocationOptions = createSelector(getAllPickupLocations, (locations = []) => {
+export const pickupLocationOptions = createSelector(getAllPickupLocationsSelector, (locations = []) => {
   return locations.map(location => {
     return { name: location['NAME'], value: location['VALUE'] }
   })
