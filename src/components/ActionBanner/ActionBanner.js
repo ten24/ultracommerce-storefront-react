@@ -10,7 +10,7 @@ const ActionBanner = ({ data }) => {
   }
 
   return (
-    <div className="bg-light-blue p-5">
+    <div className="bg-light-blue p-5 action-banner-sec">
       <div className="container">
         <div className="row">
           <div className="col-0 col-md-2" />

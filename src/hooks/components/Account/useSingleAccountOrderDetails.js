@@ -1,3 +1,5 @@
+import { CASH_PAYMENT_CODE, CHECK_PAYMENT_CODE, CREDIT_CARD_CODE, EXTERNAL_PAYMENT_CODE, GIFT_CARD_CODE, PICKUP_CODE, SHIPPING_CODE, TERM_PAYMENT_CODE } from '../Checkout/useCheckoutUtilities'
+
 const transformBillingAddressDetails = (orderInfo, orderPayment) => {
   return { billingAddress: { name: orderInfo.billingAddress_name || orderPayment.billingAddress_name, streetAddress: orderInfo.billingAddress_streetAddress || orderPayment.billingAddress_streetAddress, city: orderInfo.billingAddress_city || orderPayment.billingAddress_city, stateCode: orderInfo.billingAddress_stateCode || orderPayment.billingAddress_stateCode, postalCode: orderInfo.billingAddress_postalCode || orderPayment.billingAddress_postalCode, emailAddress: orderInfo.billingAddress_emailAddress || orderPayment.billingAddress_emailAddress } }
 }
@@ -34,23 +36,24 @@ const useSingleAccountOrderDetails = ({ orderInfo, orderFulfillments, orderPayme
   let creditCardPaymentDetails = {}
   let giftCardPaymentDetails = {}
   let cashPaymentDetails = {}
+  let checkPaymentDetails = {}
   let externalPaymentDetails = {}
 
-  if (fulfillmentMethodType === 'shipping') {
+  if (fulfillmentMethodType === SHIPPING_CODE) {
     shippingAddressDetails = { name: orderFulfillment_shippingAddress_name, streetAddress: orderFulfillment_shippingAddress_streetAddress, city: orderFulfillment_shippingAddress_city, emailAddress: orderFulfillment_shippingAddress_emailAddress, stateCode: orderFulfillment_shippingAddress_stateCode, postalCode: orderFulfillment_shippingAddress_postalCode, shippingMethod: orderFulfillment_shippingMethod_shippingMethodName }
   }
-  if (fulfillmentMethodType === 'pickup') {
+  if (fulfillmentMethodType === PICKUP_CODE) {
     pickupLocationDetails = { locationName: orderFulfillment_pickupLocation_locationName }
   }
-  if (paymentMethod_paymentMethodType === 'creditCard') {
+  if (paymentMethod_paymentMethodType === CREDIT_CARD_CODE) {
     creditCardPaymentDetails = { ...orderPayments, paymentMethod: { paymentMethodName: orderPayments.paymentMethod_paymentMethodName } }
   }
 
-  if (paymentMethod_paymentMethodType === 'giftCard') {
+  if (paymentMethod_paymentMethodType === GIFT_CARD_CODE) {
     giftCardPaymentDetails = {}
   }
 
-  if (paymentMethod_paymentMethodType === 'cash') {
+  if (paymentMethod_paymentMethodType === CASH_PAYMENT_CODE) {
     cashPaymentDetails = {
       paymentMethod: {
         paymentMethodName: 'Cash',
@@ -58,15 +61,23 @@ const useSingleAccountOrderDetails = ({ orderInfo, orderFulfillments, orderPayme
     }
   }
 
-  if (paymentMethod_paymentMethodType === 'termPayment') {
+  if (paymentMethod_paymentMethodType === CHECK_PAYMENT_CODE) {
+    checkPaymentDetails = {
+      paymentMethod: {
+        paymentMethodName: 'Check',
+      },
+    }
+  }
+
+  if (paymentMethod_paymentMethodType === TERM_PAYMENT_CODE) {
     termPaymentDetails = { purchaseOrderNumber: purchaseOrderNumber, paymentMethod: { paymentMethodName: paymentMethod_paymentMethodName } }
   }
 
-  if (paymentMethod_paymentMethodType === 'external') {
+  if (paymentMethod_paymentMethodType === EXTERNAL_PAYMENT_CODE) {
     externalPaymentDetails = { ...orderPayments, paymentMethod: { paymentMethodName: orderPayments.paymentMethod_paymentMethodName } }
   }
 
-  return { billingAddressDetails, shippingAddressDetails, pickupLocationDetails, termPaymentDetails, creditCardPaymentDetails, externalPaymentDetails, giftCardPaymentDetails, cashPaymentDetails, paymentMethodType: paymentMethod_paymentMethodType ? paymentMethod_paymentMethodType : '', fulfillmentMethodType }
+  return { billingAddressDetails, shippingAddressDetails, pickupLocationDetails, checkPaymentDetails, termPaymentDetails, creditCardPaymentDetails, externalPaymentDetails, giftCardPaymentDetails, cashPaymentDetails, paymentMethodType: paymentMethod_paymentMethodType ? paymentMethod_paymentMethodType : '', fulfillmentMethodType }
 }
 
 export { useSingleAccountOrderDetails, transformBillingAddressDetails, transformShipping, transformPickup, transformCreditCardPayment, transformGiftCardPayment, transformCashPayment, transformTermPayment, transformExternalPayment }

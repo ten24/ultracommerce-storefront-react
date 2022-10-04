@@ -1,5 +1,5 @@
 import { useDispatch } from 'react-redux'
-import { useLocation } from 'react-router'
+import { useLocation } from 'react-router-dom'
 import { useGetOrderDetails } from '../../hooks'
 import { useEffect } from 'react'
 import { confirmOrder } from '../../actions'

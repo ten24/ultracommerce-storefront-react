@@ -27,7 +27,7 @@ const ContactForm = () => {
       emailAddress: '',
       phoneNumber: '',
       subject: '',
-      contactMethod: '',
+      contactMethod: 'email',
       message: '',
     },
     initialStatus: { showForm: true, message: '' },
@@ -52,7 +52,7 @@ const ContactForm = () => {
             <div className="col-md-6">
               <div className="form-group">
                 <label htmlFor="firstName">{t('frontend.contact.firstName')}</label>
-                <input className="form-control" type="text" id="firstName" value={formik.values.firstName} onChange={formik.handleChange} />
+                <input className="form-control" type="text" id="firstName" value={formik.values.firstName} onChange={formik.handleChange}  />
               </div>
             </div>
             <div className="col-md-6">

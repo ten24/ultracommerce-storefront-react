@@ -1,10 +1,14 @@
-import { Switch, Route, useRouteMatch, useLocation, Redirect } from 'react-router-dom'
+import { Routes as RouterRoutes, Route, useLocation, useNavigate } from 'react-router-dom'
+import * as Sentry from '@sentry/react'
+
 import { isAuthenticated } from '../../utils'
 import queryString from 'query-string'
-import { Layout, CreateAccount, ForgotPassword, ForgotPasswordReset, AccountCarts, AccountLogin, AccountOverview, AccountProfile, AccountFavorites, AccountAddresses, CreateOrEditAccountAddress, AccountOrderDetail, AccountPaymentMethods, AccountOrderHistory, CreateOrEditAccountPaymentMethod, UpdatePassword, AccountSubscriptionOrders, AccountSubscriptionOrderDetail, AccountImpersonation, AccountQuotes, AccountQuoteDetail, GiftCardList, GiftCardView } from '../../components'
+import { Layout, CreateAccount, ForgotPassword, ForgotPasswordReset, AccountCarts, AccountLogin, AccountOverview, AccountProfile, AccountFavorites, AccountAddresses, CreateOrEditAccountAddress, AccountOrderDetail, AccountPaymentMethods, AccountOrderHistory, CreateOrEditAccountPaymentMethod, UpdatePassword, AccountSubscriptionOrders, AccountSubscriptionOrderDetail, AccountImpersonation, AccountQuotes, AccountQuoteDetail, GiftCardList, GiftCardView, RedirectWithReplace } from '../../components'
 import GuestOrderConfirmation from '../OrderConfirmation/GuestOrderConfirmation'
 import { useSelector } from 'react-redux'
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
+const Routes = Sentry.withSentryReactRouterV6Routing(RouterRoutes)
 
 // eslint-disable-next-line no-unused-vars
 const pageComponents = {
@@ -21,108 +25,60 @@ const pageComponents = {
   AccountCarts,
 }
 const MyAccount = () => {
-  let match = useRouteMatch()
   let loc = useLocation()
+  const { t } = useTranslation()
   const user = useSelector(state => state.userReducer)
-
+  const navigate = useNavigate()
   useEffect(() => {
     if (isAuthenticated() && loc.search.includes('redirect=')) {
       const params = queryString.parse(loc.search)
-      return <Redirect to={params.redirect} />
+      return navigate({
+        pathname: params.redirect,
+      })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.accountID])
 
   const path = loc.pathname.split('/').reverse()
-
   return (
     <Layout>
       {isAuthenticated() && (
-        <Switch>
-          <Route path={`/my-account/addresses/:id`}>
-            <CreateOrEditAccountAddress path={path[0]} />
-          </Route>
-          <Route path={`/my-account/addresses`}>
-            <AccountAddresses />
-          </Route>
-          <Route path={`/my-account/cards/:id`}>
-            <CreateOrEditAccountPaymentMethod path={path[0]} />
-          </Route>
-          <Route path={`/my-account/cards`}>
-            <AccountPaymentMethods />
-          </Route>
-          <Route path={`/my-account/carts`}>
-            <AccountCarts />
-          </Route>
-          <Route path={`/my-account/favorites`}>
-            <AccountFavorites />
-          </Route>
-          <Route path={`/my-account/orders/:id`}>
-            <AccountOrderDetail path={path[0]} />
-          </Route>
-          <Route path={`/my-account/orders`}>
-            <AccountOrderHistory />
-          </Route>
-          <Route path={`/my-account/profile`}>
-            <AccountProfile />
-          </Route>
-          <Route path={`/my-account/subscription-orders/:id`}>
-            <AccountSubscriptionOrderDetail path={path[0]} forwardState={loc.state} />
-          </Route>
-          <Route path={`/my-account/subscription-orders`}>
-            <AccountSubscriptionOrders />
-          </Route>
-          <Route path={`/my-account/quote/:id`}>
-            <AccountQuoteDetail path={path[0]} forwardState={loc.state} />
-          </Route>
-          <Route path={`/my-account/quotes`}>
-            <AccountQuotes />
-          </Route>
-          <Route path={`/my-account/updatePassword`}>
-            <UpdatePassword />
-          </Route>
-          <Route path={`/my-account/impersonation`}>
-            <AccountImpersonation />
-          </Route>
+        <Routes>
+          <Route path={`addresses/:id`} element={<CreateOrEditAccountAddress path={path?.at(0)} />} />
+          <Route path={`addresses`} element={<AccountAddresses />} />
+          <Route path={`cards/:id`} element={<CreateOrEditAccountPaymentMethod path={path?.at(0)} />} />
+          <Route path={`cards`} element={<AccountPaymentMethods />} />
 
-          <Route path={`/my-account/order-detail`}>
-            <GuestOrderConfirmation path={path[0]} />
-          </Route>
-          <Route path={`/my-account/gift-cards/:id`}>
-            <GiftCardView id={path[0]} />
-          </Route>
-          <Route path={`/my-account/gift-cards`}>
-            <GiftCardList />
-          </Route>
+          <Route path={`orders`} element={<AccountOrderHistory />} />
+          <Route path={`orders/:id`} element={<AccountOrderDetail path={path?.at(0)} />} />
+          <Route path={`subscription-orders/:id`} element={<AccountSubscriptionOrderDetail path={path?.at(0)} />} />
+          <Route path={`subscription-orders`} element={<AccountSubscriptionOrders />} />
+          <Route path={`quotes/:id`} element={<AccountQuoteDetail path={path?.at(0)} />} />
+          <Route path={`quotes`} element={<AccountQuotes />} />
+          <Route path={`gift-cards/:id`} element={<GiftCardView id={path?.at(0)} />} />
+          <Route path={`gift-cards`} element={<GiftCardList />} />
 
-          <Route path={`/my-account/overview`}>
-            <AccountOverview />
-          </Route>
-          <Route path={match.path}>{isAuthenticated() && <Redirect to={`/my-account/overview`} />}</Route>
-        </Switch>
+          <Route path={`profile`} element={<AccountProfile />} />
+          <Route path={`carts`} element={<AccountCarts />} />
+          <Route path={`favorites`} element={<AccountFavorites />} />
+          <Route path={`updatePassword`} element={<UpdatePassword />} />
+          <Route path={`impersonation`} element={<AccountImpersonation />} />
+          <Route path={`order-detail`} element={<GuestOrderConfirmation path={path?.at(0)} />} />
+          <Route path={`overview`} element={<AccountOverview />} />
+          <Route path={`*`} element={<RedirectWithReplace pathname={`/my-account/overview`} />} />
+        </Routes>
       )}
 
       {!isAuthenticated() && (
-        <Switch>
-          <Route path={`/my-account/createAccount`}>
-            <CreateAccount />
-          </Route>
-          <Route path={`/my-account/forgotPassword`}>
-            <ForgotPassword />
-          </Route>
-          <Route path={`/my-account/updateForgottenPassword`}>
-            <ForgotPasswordReset />
-          </Route>
-          <Route path={`/my-account/order-detail`}>
-            <GuestOrderConfirmation path={path[0]} />
-          </Route>
-          <Route path={`/my-account/login`}>
-            <AccountLogin />
-          </Route>
-          <Route path={match.path}>
-            <Redirect to={`/my-account/login`} />
-          </Route>
-        </Switch>
+        <Routes>
+          <Route path={`createAccount`} element={<CreateAccount />} />
+          <Route path={`forgotPassword`} element={<ForgotPassword />} />
+          <Route path={`updateForgottenPassword`} element={<ForgotPasswordReset />} />
+          <Route path={`claimGuestAccount`} element={<ForgotPasswordReset title={t('frontend.account.claim.heading')} />} />
+          <Route path={`order-detail`} element={<GuestOrderConfirmation path={path?.at(0)} />} />
+          <Route path={`login`} element={<AccountLogin />} />
+          <Route path={`*`} element={<RedirectWithReplace pathname={`/my-account/login`} />} />
+        </Routes>
       )}
     </Layout>
   )

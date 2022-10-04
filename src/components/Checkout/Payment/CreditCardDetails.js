@@ -369,6 +369,8 @@ const CreditCardDetails = ({ paymentMethodID, onSubmit, fulfillment, isQuote = f
                       statecode: values.stateCode,
                       postalcode: values.postalCode,
                       countrycode: values.countryCode,
+                      emailAddress: values.emailAddress,
+                      phoneNumber: values.phoneNumber,
                       returnJSONObjects: 'account',
                     }
 
@@ -402,6 +404,8 @@ const CreditCardDetails = ({ paymentMethodID, onSubmit, fulfillment, isQuote = f
                       statecode: values.stateCode,
                       postalcode: values.postalCode,
                       countrycode: values.countryCode,
+                      emailAddress: values.emailAddress,
+                      phoneNumber: values.phoneNumber,
                       returnJSONObjects: 'account',
                     }
 
@@ -434,6 +438,8 @@ const CreditCardDetails = ({ paymentMethodID, onSubmit, fulfillment, isQuote = f
                           statecode: values.stateCode,
                           postalcode: values.postalCode,
                           countrycode: values.countryCode,
+                          emailAddress: values.emailAddress,
+                          phoneNumber: values.phoneNumber,
                         },
                         nameOnCreditCard: paymentMethod.nameOnCreditCard,
                         creditCardNumber: paymentMethod.creditCardNumber,

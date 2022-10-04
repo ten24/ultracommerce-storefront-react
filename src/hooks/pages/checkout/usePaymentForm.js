@@ -8,10 +8,15 @@ import { getErrorMessage } from '../../../utils'
 import * as Yup from 'yup'
 import { useTranslation } from 'react-i18next'
 import dayjs from 'dayjs'
-
+const nameOnCreditCardValidation = "^[^\*\|\:\>\<\[\}\{\)\(\~\^\`\"\&\$\;\@\%\!\,\.\_\?\/\+\=0-9]+$"
 const validationSchema = Yup.object({
   creditCardNumber: Yup.string().required('Required'),
-  nameOnCreditCard: Yup.string().required('Required'),
+  nameOnCreditCard: Yup.string()
+    .required('Required')
+    .matches(nameOnCreditCardValidation, {
+      excludeEmptyString: true,
+      message: t('frontend.account.nameOnCreditCardValidation'),
+    }),
   billingAddress: Yup.object({
     postalCode: Yup.string().required('Required'),
     stateCode: Yup.string().required('Required'),

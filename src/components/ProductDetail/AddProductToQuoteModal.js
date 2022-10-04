@@ -4,13 +4,13 @@ import { SwSelect, Button } from '..'
 import { toast } from 'react-toastify'
 import { SlatwalApiService } from '../../services'
 import { getErrorMessage, isAuthenticated } from '../../utils'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { addToOrder } from '../../actions'
 
-const AddProductToQuoteModal = ({ sku, show, setQuoteModal }) => {
+const AddProductToQuoteModal = ({ sku, show, setQuoteModal, quantity }) => {
   const { t } = useTranslation()
-  const history = useHistory()
+  const navigate = useNavigate()
   const [isLoading, setLoading] = useState(false)
   const [existingQuotes, setExistingQuotes] = useState([])
   const [existingQuoteVal, setExistingQuoteVal] = useState({})
@@ -78,7 +78,7 @@ const AddProductToQuoteModal = ({ sku, show, setQuoteModal }) => {
                       if (!!existingQuoteVal) setExistingQuoteVal(existingQuoteVal)
                       if (!existingQuoteVal) return null
                       setLoadingForExistingQuote(true)
-                      const payload = { skuID: sku.skuID, orderID: existingQuoteVal }
+                      const payload = { skuID: sku.skuID, orderID: existingQuoteVal, quantity: quantity }
                       dispatch(addToOrder({ params: payload, returnQuote: true})).then(response => {
                         if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) {
                           toast.error(getErrorMessage(response.success().errors))
@@ -129,7 +129,7 @@ const AddProductToQuoteModal = ({ sku, show, setQuoteModal }) => {
                 onClick={() => {
                   if (!quoteName) return null
                   setLoading(true)
-                  dispatch(addToOrder({ params: { quoteName, skuID: sku.skuID }, returnQuote: true, isQuote: true })).then(response => {
+                  dispatch(addToOrder({ params: { quoteName, skuID: sku.skuID, quantity: quantity }, returnQuote: true, isQuote: true })).then(response => {
                     if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) {
                       toast.error(getErrorMessage(response.success().errors))
                     } else {
@@ -138,7 +138,7 @@ const AddProductToQuoteModal = ({ sku, show, setQuoteModal }) => {
                         setQuoteModal(false)
                         toast.success(t('frontend.quote.create.successMessage'))
                         setTimeout(() => {
-                          history.push('/my-account/quotes')
+                          navigate('/my-account/quotes')
                         }, 2000)
                       }
                     }

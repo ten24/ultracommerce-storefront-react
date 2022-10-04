@@ -1,21 +1,16 @@
 import { useEffect } from 'react'
-import { useHistory } from 'react-router'
+import { useLocation } from 'react-router-dom'
 
 const useScrollToTop = () => {
-  const history = useHistory()
+  const { pathname } = useLocation()
   useEffect(() => {
-    const unload = history.listen(location => {
-      if (!location.pathname.includes('/product/')) {
-        window.scrollTo({
-          top: 0,
-          behavior: 'smooth',
-        })
-      }
-    })
-    return () => {
-      unload()
+    if (!pathname.includes('/product/')) {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      })
     }
-  }, [history])
+  }, [pathname])
 
   return {}
 }

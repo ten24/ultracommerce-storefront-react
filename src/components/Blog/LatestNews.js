@@ -24,7 +24,7 @@ function LatestNews() {
   }
 
   return (
-    <section className="content-spacer">
+    <section className="content-spacer latest-news-sec">
       <div className="container">
         <header className="section-title">
           <h2>{t('frontend.home.latest_news')}</h2>

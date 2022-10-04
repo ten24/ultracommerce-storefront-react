@@ -11,7 +11,7 @@ import { receiveSubscriptionCart } from '../../actions'
 const AddProductToSubscriptionModal = ({ quantity, sku, show, setShow, orderTemplates, frequencyTermOptions }) => {
   const { t } = useTranslation()
   const dispatch = useDispatch()
-  const [frequencyTerm, setFrequencyTerm] = useState(frequencyTermOptions[0].value)
+  const [frequencyTerm, setFrequencyTerm] = useState(frequencyTermOptions?.at(0).value)
   const tomorrowDate = new Date()
   tomorrowDate.setDate(tomorrowDate.getDate() + 1)
   const [scheduleDateValue, setScheduleDateValue] = useState(tomorrowDate)
@@ -23,7 +23,7 @@ const AddProductToSubscriptionModal = ({ quantity, sku, show, setShow, orderTemp
   useEffect(() => {
     setExistingOrderTemplate(orderTemplates?.at(0)?.['orderTemplateID'])
     // eslint-disable-next-line
-  },[orderTemplates?.length])
+  }, [orderTemplates?.length])
 
   const saveOrderTemplateItem = () => {
     const payload = { quantity: quantity, skuID: sku.skuID, returnJsonObjects: 'orderTemplateCart' }
@@ -32,17 +32,17 @@ const AddProductToSubscriptionModal = ({ quantity, sku, show, setShow, orderTemp
         toast.error(getErrorMessage(response.success().errors))
       } else {
         if (response.isSuccess()) {
-            if (Object.keys(response.success().orderTemplateCart).length > 0) updateScheduleDate(response.success().orderTemplateCart.orderTemplateID)
-            updateFrequency(response.success().orderTemplateCart.orderTemplateID)
-            setShow(false)
-            setLoading(false)
+          if (Object.keys(response.success().orderTemplateCart).length > 0) updateScheduleDate(response.success().orderTemplateCart.orderTemplateID)
+          updateFrequency(response.success().orderTemplateCart.orderTemplateID)
+          setShow(false)
+          setLoading(false)
         }
       }
     })
   }
 
   const saveExistingOrderTemplateItem = templateID => {
-    if(!templateID) return null
+    if (!templateID) return null
     const payload = { orderTemplateID: templateID, quantity: quantity, skuID: sku.skuID, returnJsonObjects: 'orderTemplateCart' }
     setLoadingForExisting(true)
     SlatwalApiService.orderTemplate.addItem(payload).then(response => {
@@ -50,9 +50,9 @@ const AddProductToSubscriptionModal = ({ quantity, sku, show, setShow, orderTemp
         toast.error(getErrorMessage(response.success().errors))
       } else {
         if (response.isSuccess()) {
-            toast.success(t('frontend.account.scheduled.delivery.detail.toolbar.existingSubscription.successMessage'))
-            setShow(false)
-            setLoadingForExisting(false)
+          toast.success(t('frontend.account.scheduled.delivery.detail.toolbar.existingSubscription.successMessage'))
+          setShow(false)
+          setLoadingForExisting(false)
         }
       }
     })

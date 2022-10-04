@@ -58,7 +58,7 @@ export const getShopBy = createSelector(getAllContent, (content = {}) => {
         return content[key]
       })
   }
-  return shopBy[0]
+  return shopBy?.at(0)
 })
 
 export const getMyAccountMenu = createSelector(getAllContent, (content = {}) => {

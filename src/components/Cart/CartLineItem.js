@@ -6,19 +6,16 @@ import { useFormatCurrency } from '../../hooks/'
 import { useState } from 'react'
 import { getProductRoute } from '../../selectors'
 
-const CartLineItem = ({ orderItem, isDisabled = false, isFetching= false, setRemoveitem = () => {} , onUpdateQty, onRemoveItem }) => {
+const CartLineItem = ({ childBundleItems, orderItem, isDisabled = false, isFetching = false, setRemoveitem = () => {}, onUpdateQty, onRemoveItem }) => {
   const [formatCurrency] = useFormatCurrency({})
   const { t } = useTranslation()
   const productRouting = useSelector(getProductRoute)
   const isBackordered = false
   const [itemCount, setItemCount] = useState(orderItem.quantity)
+
   return (
     <div className="row border-bottom py-3">
-      <div className="col-sm-2 col-3">
-        <Link className="d-inline-block mx-auto mr-sm-4 image-width" to={`/${productRouting}/${orderItem.sku.product.urlTitle}`}>
-          {orderItem.sku.images && orderItem.sku.images?.length > 0 && <SimpleImage className="img-fluid  m-auto image_container productImage" src={orderItem.sku.images[0]} alt={orderItem.sku.product.productName} type="product" />}
-        </Link>
-      </div>
+      <div className="col-sm-2 col-3">{orderItem.sku.images && orderItem.sku.images?.length > 0 && <SimpleImage className="img-fluid  m-auto image_container productImage" src={orderItem.sku.images?.at(0)} alt={orderItem.sku.product.productName} type="product" />}</div>
       <div className="col-sm-4 col-9">
         <h5>
           <Link
@@ -61,10 +58,7 @@ const CartLineItem = ({ orderItem, isDisabled = false, isFetching= false, setRem
                     setItemCount(e.target.value)
                   }}
                 />
-                <button
-                  className="btn text-muted btn-link p-1 text-end"
-                  onClick={()=>onUpdateQty(itemCount)}
-                >
+                <button className="btn text-muted btn-link p-1 text-end" onClick={() => onUpdateQty(itemCount)}>
                   {t('frontend.account.cart.item.updateQuantity')}
                 </button>
               </div>
@@ -76,11 +70,7 @@ const CartLineItem = ({ orderItem, isDisabled = false, isFetching= false, setRem
                 </h6>
               </div>
               <div className="col-sm-1">
-                <span
-                  className="bi bi-trash clickable"
-                  disabled={isFetching}
-                  onClick= {(event)=>onRemoveItem(event)}
-                ></span>
+                <span className="bi bi-trash clickable" disabled={isFetching} onClick={event => onRemoveItem(event)}></span>
               </div>
             </>
           ) : (
@@ -98,6 +88,22 @@ const CartLineItem = ({ orderItem, isDisabled = false, isFetching= false, setRem
             </>
           )}
         </div>
+      </div>
+      <div className="row">
+        {childBundleItems &&
+          childBundleItems.length > 0 &&
+          childBundleItems.map((childBundleItem, key) => {
+            return (
+              <div className="col-3 d-flex" key={childBundleItem.orderItemID}>
+                {key !== 0 ? <i className="bi bi-plus-circle col-2 align-self-center"></i> : <div className="col-2"></div>}
+                <Link className="col-10" to={`/${productRouting}/${childBundleItem.sku.product.urlTitle}`}>
+                  <SimpleImage className="img-fluid  m-auto image_container productImage border border-light" src={childBundleItem.sku.images?.at(0)} alt={childBundleItem?.sku?.product?.productName} type="product" />
+                  <span className="text-dark"> {`${formatCurrency(childBundleItem.price)} x ${childBundleItem.quantity}`}</span>
+                  <p>{childBundleItem?.sku?.product?.productName}</p>
+                </Link>
+              </div>
+            )
+          })}
       </div>
     </div>
   )

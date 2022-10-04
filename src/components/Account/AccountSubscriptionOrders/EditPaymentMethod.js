@@ -6,24 +6,23 @@ import { useTranslation } from 'react-i18next'
 import { CCDetails, OrderTemplateCreditCardDetails } from '../..'
 import { useCheckoutUtilities } from '../../../hooks'
 
-const EditPaymentMethod = ({ orderInfo, paymentMethod, setPaymentMethod, updatePaymentMethod }) => {
+const EditPaymentMethod = ({ updateOrderTemplate, orderInfo, paymentMethod, setPaymentMethod, updatePaymentMethod }) => {
   const paymentMethods = useSelector(getSavedCreditCardMethods)
   const [newOrderPayment, setNewOrderPayment] = useState(false)
   const { t } = useTranslation()
   const [changeSelection, setChangeSelection] = useState(true)
   const { CREDIT_CARD_CODE } = useCheckoutUtilities()
-
   useEffect(() => {
     if (paymentMethods.length === 0) {
       // if there is no payment method found for the user , open new payment form
       setNewOrderPayment('new')
+      setChangeSelection(false)
+    } else {
+      setNewOrderPayment('')
     }
   }, [paymentMethods])
 
   const accountPaymentMethod = {
-    accountPaymentMethod: {
-      accountPaymentMethodID: orderInfo?.accountPaymentMethod_accountPaymentMethodID,
-    },
     paymentMethod: {
       paymentMethodID: orderInfo?.accountPaymentMethod_accountPaymentMethodID,
       paymentMethodName: orderInfo?.accountPaymentMethod_accountPaymentMethodName,
@@ -91,12 +90,14 @@ const EditPaymentMethod = ({ orderInfo, paymentMethod, setPaymentMethod, updateP
       </div>
       {newOrderPayment === 'new' && (
         <OrderTemplateCreditCardDetails
+          orderInfo={orderInfo}
           onSubmit={() => {
             setNewOrderPayment(false)
           }}
           onCancel={() => {
             setNewOrderPayment('')
           }}
+          updateOrderTemplate={updateOrderTemplate}
           setNewOrderPayment={setNewOrderPayment}
           setChangeSelection={setChangeSelection}
         />

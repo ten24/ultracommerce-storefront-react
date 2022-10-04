@@ -1,18 +1,18 @@
 import { useSelector } from 'react-redux'
-import { useFormatDateTime, useFormatCurrency, useSingleAccountOrderDetails } from '../../../hooks/'
-import { BillingAddressDetails, TermPaymentDetails, GiftCardDetails, CCDetails, ExternalPaymentDetails } from '../../'
+import { useFormatDateTime, useFormatCurrency, useSingleAccountOrderDetails, useCheckoutUtilities } from '../../../hooks/'
+import { BillingAddressDetails, TermPaymentDetails, GiftCardDetails, CCDetails, ExternalPaymentDetails, CashPaymentDetails, CheckPaymentDetails } from '../../'
 import { useTranslation } from 'react-i18next'
 import { isVatCountry } from '../../../selectors'
 import { Link } from 'react-router-dom'
-import { CashPaymentDetails } from '../../Checkout/Review/CashPaymentDetails'
 
 const OrderDetails = ({ orderInfo, orderFulfillments, orderPayments }) => {
   const [formateDate] = useFormatDateTime({})
   const [formatCurrency] = useFormatCurrency({})
   const showVat = useSelector(isVatCountry)
   const { t } = useTranslation()
+  const { CREDIT_CARD_CODE, CHECK_PAYMENT_CODE, GIFT_CARD_CODE, TERM_PAYMENT_CODE, CASH_PAYMENT_CODE, EXTERNAL_PAYMENT_CODE } = useCheckoutUtilities()
   const { calculatedGuestAccountFlag = false } = useSelector(state => state.userReducer)
-  const { billingAddressDetails, termPaymentDetails, externalPaymentDetails, creditCardPaymentDetails, paymentMethodType, cashPaymentDetails } = useSingleAccountOrderDetails({ orderInfo, orderFulfillments, orderPayments })
+  const { billingAddressDetails, termPaymentDetails, externalPaymentDetails, creditCardPaymentDetails, paymentMethodType, cashPaymentDetails, checkPaymentDetails } = useSingleAccountOrderDetails({ orderInfo, orderFulfillments, orderPayments })
   return (
     <div className="row align-items-start mb-5 mr-3">
       <div className="col-md-7">
@@ -23,11 +23,12 @@ const OrderDetails = ({ orderInfo, orderFulfillments, orderPayments }) => {
           </div>
           <div className="col-6">
             <BillingAddressDetails billingAddressNickname={''} orderPayment={billingAddressDetails} />
-            {paymentMethodType === 'termPayment' && <TermPaymentDetails termPayment={termPaymentDetails} />}
-            {paymentMethodType === 'giftCard' && <GiftCardDetails />}
-            {paymentMethodType === 'creditCard' && <CCDetails creditCardPayment={creditCardPaymentDetails} />}
-            {paymentMethodType === 'external' && <ExternalPaymentDetails payment={externalPaymentDetails} />}
-            {paymentMethodType === 'cash' && <CashPaymentDetails cashPayment={cashPaymentDetails} />}
+            {paymentMethodType === TERM_PAYMENT_CODE && <TermPaymentDetails termPayment={termPaymentDetails} />}
+            {paymentMethodType === GIFT_CARD_CODE && <GiftCardDetails />}
+            {paymentMethodType === CREDIT_CARD_CODE && <CCDetails creditCardPayment={creditCardPaymentDetails} />}
+            {paymentMethodType === EXTERNAL_PAYMENT_CODE && <ExternalPaymentDetails payment={externalPaymentDetails} />}
+            {paymentMethodType === CASH_PAYMENT_CODE && <CashPaymentDetails cashPayment={cashPaymentDetails} />}
+            {paymentMethodType === CHECK_PAYMENT_CODE && <CheckPaymentDetails payment={checkPaymentDetails} />}
           </div>
         </div>
         {calculatedGuestAccountFlag && (

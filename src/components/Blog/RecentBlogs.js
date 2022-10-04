@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useGetBlogPosts, useFormatDate } from '../../hooks'
 import { SimpleImage } from '..'
@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux'
 
 const RecentBlogs = () => {
   let [request, setRequest] = useGetBlogPosts()
-  let history = useHistory()
+  const navigate = useNavigate()
   const { t } = useTranslation()
   const [formateDate] = useFormatDate()
   const countOnPage = 3
@@ -32,7 +32,7 @@ const RecentBlogs = () => {
                   <div
                     className="link"
                     onClick={() =>
-                      history.push({
+                      navigate({
                         pathname: `/${blogPath}/${feed.slug}`,
                       })
                     }

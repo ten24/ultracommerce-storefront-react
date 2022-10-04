@@ -7,7 +7,7 @@ const OrderTemplateCheckoutSideBar = ({ placeOrder }) => {
   const cart = useSelector(state => state.subscriptionCart)
   const { orderTemplateID, accountPaymentMethod } = cart
   const loc = useLocation()
-  const path = loc.pathname.split('/').reverse()[0].toLowerCase()
+  const path = loc.pathname.split('/').reverse()?.at(0).toLowerCase()
   const currentStep = getCurrentStep(path)
   const { t } = useTranslation()
   return (

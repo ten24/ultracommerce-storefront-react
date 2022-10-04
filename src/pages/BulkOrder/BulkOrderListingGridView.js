@@ -1,5 +1,5 @@
 import { NoProductFound } from '../../components'
-import { ProductCard } from './ProductCard'
+import { BulkOrderProductCard } from './BulkOrderProductCard'
 import ContentLoader from 'react-content-loader'
 
 const ListingGridLoader = props => (
@@ -18,7 +18,7 @@ const ListingGridLoader = props => (
   </ContentLoader>
 )
 
-const ProductListingGridView = ({ isFetching, pageRecords, setBulkOrderList, bulkOrderList }) => {
+const BulkOrderListingGridView = ({ isFetching, pageRecords, setBulkOrderList, bulkOrderList }) => {
   return (
     <div className="col">
       {isFetching && (
@@ -28,11 +28,10 @@ const ProductListingGridView = ({ isFetching, pageRecords, setBulkOrderList, bul
       )}
       <div className="product-grid">
         {!isFetching &&
-          pageRecords.length > 0 &&
-          pageRecords.map((product, index) => {
+          pageRecords?.map((product, index) => {
             return (
               <div key={`${product.productName}${index}`} className="mb-4">
-                <ProductCard productData={product} setBulkOrderList={setBulkOrderList} bulkOrderList={bulkOrderList} />
+                <BulkOrderProductCard productData={product} setBulkOrderList={setBulkOrderList} bulkOrderList={bulkOrderList} />
               </div>
             )
           })}
@@ -41,4 +40,4 @@ const ProductListingGridView = ({ isFetching, pageRecords, setBulkOrderList, bul
     </div>
   )
 }
-export { ProductListingGridView }
+export { BulkOrderListingGridView }

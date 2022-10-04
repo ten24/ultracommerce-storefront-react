@@ -1,7 +1,8 @@
 import { useDispatch } from 'react-redux'
 import { useFormik } from 'formik'
 import { useTranslation } from 'react-i18next'
-
+import queryString from 'query-string'
+import { useLocation, useNavigate } from 'react-router'
 import * as Yup from 'yup'
 import { SlatwalApiService } from '../../../services'
 import { toast } from 'react-toastify'
@@ -12,6 +13,8 @@ import { receiveSubscriptionCart, requestSubscriptionCart } from '../../../actio
 const useLoginForm = () => {
   const dispatch = useDispatch()
   const { t } = useTranslation()
+  let loc = useLocation()
+  const navigate = useNavigate()
   const formik = useFormik({
     initialValues: {
       loginEmail: '',
@@ -43,6 +46,16 @@ const useLoginForm = () => {
           dispatch(receiveSubscriptionCart(response.success()?.orderTemplateCart))
           dispatch(getWishLists())
           toast.success(t('frontend.account.auth.success'))
+          if (loc.search.includes('redirect=')) {
+            const params = queryString.parse(loc.search)
+            navigate({
+              pathname: params.redirect,
+            })
+          } else {
+            navigate({
+              pathname: '/my-account/overview',
+            })
+          }
         } else {
           let errorMessage = response.isSuccess() && response.success() && Object.keys(response.success()?.errors || {}).length ? getErrorMessage(response.success().errors) : t('frontend.account.auth.failure')
           if (errorMessage) toast.error(errorMessage)

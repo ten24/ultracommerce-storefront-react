@@ -1,6 +1,8 @@
 import { t } from 'i18next'
-
-const redirectURL = process.env.REACT_APP_ADMIN_URL + '?slatAction=main.OAuthLoginStorefrontHandler&integrationName=googlelogin'
+//get site code
+const siteCode = localStorage.getItem('siteCode') ? localStorage.getItem('siteCode') : process.env.REACT_APP_SITE_CODE
+//set redirect url
+const redirectURL = process.env.REACT_APP_ADMIN_URL + '?slatAction=main.OAuthLoginStorefrontHandler&integrationName=googlelogin&siteCode=' + siteCode
 
 const OauthGoogleLogin = ({ buttonText }) => {
   return (

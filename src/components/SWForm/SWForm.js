@@ -1,7 +1,7 @@
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router-dom'
 
 const SWForm = ({ formik, children, title = '', subTitle = '', primaryButtontext = '', AdditionalFormButtons = () => null }) => {
-  let history = useHistory()
+  const navigate = useNavigate()
 
   return (
     <>
@@ -11,7 +11,7 @@ const SWForm = ({ formik, children, title = '', subTitle = '', primaryButtontext
         onClick={event => {
           event.preventDefault()
           if (event.target.getAttribute('href')) {
-            history.push(event.target.getAttribute('href'))
+            navigate(event.target.getAttribute('href'))
           }
         }}
         dangerouslySetInnerHTML={{

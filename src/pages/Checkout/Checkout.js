@@ -1,6 +1,7 @@
-import { PageHeader, Layout, CheckoutSideBar, StepsHeader, getCurrentStep, ShippingSlide, PaymentSlide, ReviewSlide, ThreeDSRedirect, AccountLogin, CreateGuestAccount } from '../../components'
+import { PageHeader, Layout, CheckoutSideBar, StepsHeader, getCurrentStep, ShippingSlide, PaymentSlide, ReviewSlide, ThreeDSRedirect, AccountLogin, CreateGuestAccount, RedirectWithReplace } from '../../components'
 import { useDispatch, useSelector } from 'react-redux'
-import { Redirect, Route, Switch, useHistory, useLocation, useRouteMatch } from 'react-router-dom'
+import { Navigate, Route, Routes as RouterRoutes, useNavigate, useLocation } from 'react-router-dom'
+import * as Sentry from '@sentry/react'
 import './checkout.css'
 import { getErrorMessage, isAuthenticated } from '../../utils'
 import { useEffect, useState } from 'react'
@@ -8,12 +9,13 @@ import { clearUser, receiveCart, receiveUser, requestCart, requestLogOut } from 
 import { SlatwalApiService } from '../../services'
 import { toast } from 'react-toastify'
 import { useTranslation } from 'react-i18next'
+const Routes = Sentry.withSentryReactRouterV6Routing(RouterRoutes)
 
 const Checkout = () => {
-  let match = useRouteMatch()
   const { pathname } = useLocation()
-  const history = useHistory()
-  const path = pathname.split('/').reverse()[0].toLowerCase()
+  const navigate = useNavigate()
+  const path = pathname.split('/').reverse()?.at(0).toLowerCase()
+
   const currentStep = getCurrentStep(path)
   const { verifiedAccountFlag, isFetching, accountID, calculatedGuestAccountFlag = false } = useSelector(state => state.userReducer)
   const enforceVerifiedAccountFlag = useSelector(state => state.configuration.enforceVerifiedAccountFlag)
@@ -42,9 +44,9 @@ const Checkout = () => {
             dispatch(receiveUser(placeOrderResp.account))
             // TODO: verify isGuest
             if (!!calculatedGuestAccountFlag) {
-              history.push(`/my-account/order-detail?token=${cartState.orderID}:${accountID}`)
+              navigate(`/my-account/order-detail?token=${cartState.orderID}:${accountID}`)
             } else {
-              history.push('/order-confirmation')
+              navigate('/order-confirmation')
             }
           }
         }
@@ -54,18 +56,15 @@ const Checkout = () => {
       }
     })
   }
-
   useEffect(() => {
-    
     if (!isAuthenticated()) {
       dispatch(clearUser())
       dispatch(requestLogOut())
-      if (pathname !== '/checkout/login' && pathname !== '/checkout/createGuestAccount' && pathname !== '/checkout/cart') history.replace(`/checkout/login?redirect=${pathname}`)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  if (enforceVerifiedAccountFlag && !verifiedAccountFlag && isAuthenticated() && !isFetching && accountID.length > 0) return <Redirect to="/account-verification" />
+  if (enforceVerifiedAccountFlag && !verifiedAccountFlag && isAuthenticated() && !isFetching && accountID.length > 0) return <Navigate to="/account-verification" />
 
   return (
     <Layout>
@@ -75,17 +74,11 @@ const Checkout = () => {
           <div className="row">
             <section className="col">
               {/* <!-- Steps--> */}
-              <Switch>
-                <Route path={`${match.path}/cart`}>
-                  <Redirect to={`/shopping-cart`} />
-                </Route>
-                <Route path={`${match.path}/login`}>
-                  <AccountLogin isCheckout={true} />
-                </Route>
-                <Route path={`${match.path}/createGuestAccount`}>
-                  <CreateGuestAccount />
-                </Route>
-              </Switch>
+              <Routes>
+                <Route path={`createGuestAccount`} element={<CreateGuestAccount />} />
+                <Route path={`cart`} element={<RedirectWithReplace pathname={`${pathname}/shopping-cart`} />} />
+                <Route path={`*`} element={<AccountLogin isCheckout={true} />} />
+              </Routes>
             </section>
             {/* <!-- Sidebar--> */}
           </div>
@@ -95,25 +88,13 @@ const Checkout = () => {
             <section className="col-lg-8">
               {/* <!-- Steps--> */}
               <StepsHeader />
-              <Route path={`${match.path}/cart`}>
-                <Redirect to="/cart" />
-              </Route>
-
-              <Switch>
-                <Route path={`${match.path}/shipping`}>
-                  <ShippingSlide currentStep={currentStep} />
-                </Route>
-
-                <Route path={`${match.path}/payment`}>
-                  <PaymentSlide currentStep={currentStep} cartState={cartState}/>
-                </Route>
-                <Route path={`${match.path}/review`}>
-                  <ReviewSlide currentStep={currentStep} />
-                </Route>
-                <Route path={match.path}>
-                  <Redirect to={`${match.path}/shipping`} />
-                </Route>
-              </Switch>
+              <Routes>
+                <Route path={`cart`} element={<RedirectWithReplace pathname={`../../shopping-cart`} />} />
+                <Route path={`shipping`} element={<ShippingSlide currentStep={currentStep} />} />
+                <Route path={`payment`} element={<PaymentSlide currentStep={currentStep} cartState={cartState} />} />
+                <Route path={`review`} element={<ReviewSlide currentStep={currentStep} />} />
+                <Route path={`*`} element={<RedirectWithReplace pathname={`shipping`} />} />
+              </Routes>
             </section>
             {/* <!-- Sidebar--> */}
             <CheckoutSideBar placeOrder={placeOrder} />

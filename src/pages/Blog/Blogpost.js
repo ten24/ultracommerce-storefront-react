@@ -1,28 +1,26 @@
 import React, { useEffect } from 'react'
-import { useHistory, useRouteMatch } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import { Layout, BlogSidebar, BlogPostBody, BlogPostHeader, RecentBlogs } from '../../components'
 import { useGetBlogPost } from '../../hooks'
 
 const BlogPost = () => {
   let [request, setRequest] = useGetBlogPost()
-  let loc = useRouteMatch()
-  let history = useHistory()
+  let { pathname } = useLocation()
+  let { id } = useParams()
 
   useEffect(() => {
     let didCancel = false
     if (!request.isFetching && !request.isLoaded && !didCancel) {
-      setRequest({ ...request, isFetching: true, isLoaded: false, params: { slug: loc.params.id }, makeRequest: true })
+      setRequest({ ...request, isFetching: true, isLoaded: false, params: { slug: id }, makeRequest: true })
     }
-    const unload = history.listen(location => {
-      let slug = location.pathname.split('/')
-      slug = slug[2]
-      setRequest({ ...request, isFetching: true, isLoaded: false, params: { slug }, makeRequest: true })
-    })
-    return () => {
-      unload()
-      didCancel = true
-    }
-  }, [request, history, loc, setRequest])
+  }, [request, id, setRequest])
+
+  useEffect(() => {
+    let slug = pathname.split('/')
+    slug = slug[2]
+    setRequest({ ...request, isFetching: true, isLoaded: false, params: { slug }, makeRequest: true })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname])
 
   return (
     <Layout>

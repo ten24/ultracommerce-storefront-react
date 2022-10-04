@@ -25,6 +25,9 @@ const MultiSitePicker = () => {
   const enableMultiSite = useSelector(getEnableMultiSite)
   const switchSite = siteCode => {
     localStorage.setItem('siteCode', siteCode)
+    let appConfiguration = JSON.parse(localStorage.getItem('appConfiguration') || '{}')
+    appConfiguration.currentSite = siteCode
+    localStorage.setItem('appConfiguration',JSON.stringify(appConfiguration))
     window.location.reload(true)
   }
   if (sites?.length < 2) return null

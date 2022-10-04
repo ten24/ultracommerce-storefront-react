@@ -40,12 +40,12 @@ const useBrand = () => {
         isFetching: true,
         isLoaded: false,
         entity: 'ProductType',
-        params: { brandUrlTitle: path[0], 'p:show': 250, includeSettingsInList: true, includeImages: true },
+        params: { brandUrlTitle: path?.at(0), 'p:show': 250, includeSettingsInList: true, includeImages: true },
         makeRequest: true,
       })
     }
     if (!brandResponse.isFetching && !brandResponse.isLoaded) {
-      setBrandRequest({ ...brandResponse, isFetching: true, isLoaded: false, entity: 'brand', params: { 'f:urlTitle': path[0], includeImages: true, includeSettings: true }, makeRequest: true })
+      setBrandRequest({ ...brandResponse, isFetching: true, isLoaded: false, entity: 'brand', params: { 'f:urlTitle': path?.at(0), includeImages: true, includeSettings: true }, makeRequest: true })
     }
   }, [productTypeUrl, setBrandRequest, brandResponse, path, setProductTypeRequest, productTypeRequest])
 
@@ -56,9 +56,9 @@ const useBrand = () => {
 
   const productTypeData = augmentProductType(productTypeUrl, productTypeRequest.data)
   const subHeading = productTypeData?.productTypeName?.toLowerCase() === productTypeBase?.toLowerCase() ? '' : productTypeData?.productTypeName
-  const urlTitle = `/${brandRoute}/${brandResponse?.data[0]?.urlTitle}`
-  const title = brandResponse?.data[0]?.brandName
-  const slug = brandResponse?.data[0]?.urlTitle
+  const urlTitle = `/${brandRoute}/${brandResponse?.data?.at(0)?.urlTitle}`
+  const title = brandResponse?.data?.at(0)?.brandName
+  const slug = brandResponse?.data?.at(0)?.urlTitle
   return { brandResponse, productTypeRequest, productTypeData, brandKey: params['key'], crumbCalculator, subHeading, slug, urlTitle, title, params, pathname: loc.pathname, isError, errorMessage }
 }
 export { useBrand }

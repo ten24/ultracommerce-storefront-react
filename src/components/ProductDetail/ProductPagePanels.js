@@ -21,11 +21,11 @@ const ProductPagePanels = ({ product = {}, attributeSets = [] }) => {
           return (
             <div key={set.attributeSetCode} className="accordion-item">
               <h2 className="accordion-header" id={set.attributeSetCode}>
-                <button className="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target={`#${set.attributeSetCode}panel`} aria-expanded="true" aria-controls={`${set.attributeSetCode}panel`}>
+                <button className="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target={`#panel${set.attributeSetCode}`} aria-expanded="true" aria-controls={`panel${set.attributeSetCode}`}>
                   {set.attributeSetName}
                 </button>
               </h2>
-              <div id={`${set.attributeSetCode}panel`} className="accordion-collapse collapse show" aria-labelledby={set.attributeSetCode}>
+              <div id={`panel${set.attributeSetCode}`} className="accordion-collapse collapse show" aria-labelledby={set.attributeSetCode}>
                 <div className="accordion-body">
                   <div className="row" style={{ fontSize: 15, letterSpacing: 0.3 }}>
                     {set?.attributes?.map(({ attributeName, attributeCode }, index) => {

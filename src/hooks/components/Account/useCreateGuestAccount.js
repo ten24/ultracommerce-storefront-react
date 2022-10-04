@@ -1,7 +1,7 @@
 import { useFormik } from 'formik'
 import { toast } from 'react-toastify'
 import { SlatwalApiService } from '../../../services'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import * as Yup from 'yup'
 import { getErrorMessage } from '../../../utils'
 import { useDispatch } from 'react-redux'
@@ -9,7 +9,7 @@ import { receiveCart, receiveUser } from '../../../actions'
 
 const useCreateGuestAccount = () => {
   const dispatch = useDispatch()
-  const history = useHistory()
+  const navigate = useNavigate()
   // eslint-disable-next-line no-unused-vars
   const signupSchema = Yup.object().shape({
     firstName: Yup.string().required('Required'),
@@ -35,7 +35,7 @@ const useCreateGuestAccount = () => {
             toast.success('Success')
             dispatch(receiveUser(response.success().account))
             dispatch(receiveCart(response.success().cart))
-            history.push('/checkout')
+            navigate('/checkout')
           }
         } else {
           toast.error('Error')

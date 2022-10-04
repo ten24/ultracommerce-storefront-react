@@ -1,11 +1,12 @@
 import React, { useRef, useEffect } from 'react'
-import { useHistory, useLocation } from 'react-router'
+import { useLocation } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import queryString from 'query-string'
 import { useTranslation } from 'react-i18next'
 
 const SearchBar = ({ redirectToSearchPage = false }) => {
   const textInput = useRef(null)
-  let history = useHistory()
+  const navigate = useNavigate()
   const { t } = useTranslation()
   const location = useLocation()
 
@@ -24,13 +25,13 @@ const SearchBar = ({ redirectToSearchPage = false }) => {
 
   const makeSearch = searchValue => {
     if (redirectToSearchPage) {
-      history.push({
+      navigate({
         pathname: '/shop',
         search: queryString.stringify({ keyword: searchValue }, { arrayFormat: 'comma' }),
       })
       return
     }
-    history.push({
+    navigate({
       search: queryString.stringify({ ...queryString.parse(location.search), keyword: searchValue }, { arrayFormat: 'comma' }),
     })
     textInput.current.value = ''

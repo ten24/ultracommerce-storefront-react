@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { SlatwalApiService, axios } from '../services'
-import { useHistory, useLocation } from 'react-router'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { getErrorMessage } from '../utils'
 import { useSelector } from 'react-redux'
@@ -44,7 +44,7 @@ export const useGetProductsByEntityModified = () => {
         if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
         if (response.isSuccess()) {
           const products = response.success().data.pageRecords.map(product => {
-            return { ...product, brandName: product.brand_brandName, brandUrlTitle: product.brand_urlTitle, imageFile: product.defaultSku_imageFile, skuCode: product.defaultSku_skuCode, product: product.defaultSku_imageFile, skuID: product.defaultSku_skuID }
+            return { ...product, showInput: false, showInputLabel: false, brandName: product.brand_brandName, brandUrlTitle: product.brand_urlTitle, imageFile: product.defaultSku_imageFile, skuCode: product.defaultSku_skuCode, product: product.defaultSku_imageFile, skuID: product.defaultSku_skuID }
           })
           setRequest({ data: products, attributeSets: response.success().attributeSets, isFetching: false, isLoaded: true, makeRequest: false, params: {} })
         } else {
@@ -121,7 +121,7 @@ export const useGetProductDetails = () => {
       const payload = request.params
       SlatwalApiService.products.list(payload, headers, source).then(response => {
         if (response.isSuccess() && response.success().pageRecords && response.success().pageRecords.length) {
-          setRequest({ data: response.success().pageRecords[0], isFetching: false, isLoaded: true, makeRequest: false, params: {} })
+          setRequest({ data: response.success().pageRecords?.at(0), isFetching: false, isLoaded: true, makeRequest: false, params: {} })
         } else {
           setRequest({ data: {}, isFetching: false, makeRequest: false, isLoaded: true, params: {}, error: 'Something was wrong' })
         }
@@ -154,7 +154,10 @@ export const useGetEntityByUrlTitleAdvanced = (urlTitle, params = {}) => {
         if (data.product?.defaultSku_skuID?.length && data.product?.skus?.length) {
           const defaultSku = data.product?.skus.filter(sku => sku.skuID === data.product?.defaultSku_skuID)
           if (defaultSku.length) {
-            data.product.defaultSku_slug = defaultSku[0].options.map(opt => `${opt.optionGroupCode}=${opt.optionCode}`).join('&')
+            data.product.defaultSku_slug = defaultSku
+              ?.at(0)
+              .options.map(opt => `${opt.optionGroupCode}=${opt.optionCode}`)
+              .join('&')
           }
         }
         setData(data)
@@ -170,7 +173,7 @@ export const useGetEntityByUrlTitleAdvanced = (urlTitle, params = {}) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlTitle])
-  return { isFetching, product: data.product, attributeSets: data.attributeSets, productOptions: data?.product?.optionGroups, skus: data?.product?.skus, error }
+  return { isFetching, product: data.product, attributeSets: data.attributeSets, productOptions: data?.product?.optionGroups, skus: data?.product?.skus, productBundle: data?.productBundle, productBundleBuildOnAccount: data?.productBundleBuildOnAccount, error }
 }
 export const useGetEntityWithPagination = (entity, currentPage, maxCount, orderBy, filters = '{}') => {
   let [isFetching, setFetching] = useState(true)
@@ -203,6 +206,8 @@ export const useGetEntityWithPagination = (entity, currentPage, maxCount, orderB
 }
 export const useGetProducts = params => {
   const propertyIdentifierList = useSelector(state => state.configuration.listings.productListing.params)
+  const returnFacetList = useSelector(state => state.configuration.listings.productListing.returnFacetList)
+  const returnFacetListWithFilter = useSelector(state => state.configuration.listings.productListing.returnFacetListWithFilter)
   let [request, setRequest] = useState({
     isFetching: false,
     isLoaded: false,
@@ -225,15 +230,16 @@ export const useGetProducts = params => {
     },
   })
   if (!!params['brand_slug'] || !!params['productType_slug']) {
-    params['returnFacetList'] = 'brand,option,category,attribute,sorting,priceRange,productType' // if hide we should correct
+    params['returnFacetList'] = returnFacetListWithFilter // if hide we should correct
   } else {
-    params['returnFacetList'] = 'brand,sorting,productType'
+    params['returnFacetList'] = returnFacetList
   }
 
   useEffect(() => {
     let source = axios.CancelToken.source()
     if (request.makeRequest) {
-      const payload = { ...propertyIdentifierList, ...request.params, includePagination: true }
+      const selectedLocale = { lang: localStorage.getItem('i18nextLng') }
+      const payload = { ...propertyIdentifierList, ...request.params, ...selectedLocale }
 
       SlatwalApiService.products.search(payload, headers, source).then(response => {
         if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
@@ -241,7 +247,7 @@ export const useGetProducts = params => {
           const { currentPage, pageSize, potentialFilters, total } = response.success().data
           const totalPages = Math.ceil(total / pageSize)
           const products = response.success().data.products.map(sku => {
-            return { ...sku, salePrice: sku.skuPrice, productName: sku.product_productName, urlTitle: sku.product_urlTitle, productCode: sku.product_productCode, imageFile: sku.sku_imageFile, skuID: sku.sku_skuID, skuCode: sku.sku_skuCode }
+            return { ...sku, showInput: false, showInputLabel: false, salePrice: sku.skuPrice, productName: sku.product_productName, urlTitle: sku.product_urlTitle, productCode: sku.product_productCode, imageFile: sku.sku_imageFile, skuID: sku.sku_skuID, skuCode: sku.sku_skuCode }
           })
 
           setRequest({
@@ -291,7 +297,7 @@ export const useGetAvailableShippingMethods = () => {
       SlatwalApiService.cart.availableShippingMethods(payload, headers, source).then(response => {
         if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
         if (response.isSuccess() && response.success().pageRecords && response.success().pageRecords.length) {
-          setRequest({ data: response.success().pageRecords[0], isFetching: false, isLoaded: true, makeRequest: false, params: {} })
+          setRequest({ data: response.success().pageRecords?.at(0), isFetching: false, isLoaded: true, makeRequest: false, params: {} })
         } else {
           setRequest({ data: {}, isFetching: false, makeRequest: false, isLoaded: true, params: {}, error: 'Something was wrong' })
         }
@@ -314,7 +320,7 @@ export const useGetAvailablePaymentMethods = () => {
       SlatwalApiService.cart.availablePaymentMethods(payload, headers, source).then(response => {
         if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
         if (response.isSuccess() && response.success().pageRecords && response.success().pageRecords.length) {
-          setRequest({ data: response.success().pageRecords[0], isFetching: false, isLoaded: true, makeRequest: false, params: {} })
+          setRequest({ data: response.success().pageRecords?.at(0), isFetching: false, isLoaded: true, makeRequest: false, params: {} })
         } else {
           setRequest({ data: {}, isFetching: false, makeRequest: false, isLoaded: true, params: {}, error: 'Something was wrong' })
         }
@@ -503,7 +509,7 @@ export const useAddOrderShippingAddress = () => {
 export const useGetProductAvailableSkuOptions = () => {
   let [request, setRequest] = useState({ isFetching: false, isLoaded: false, makeRequest: false, data: { sku: {} }, error: '', params: {} })
   const loc = useLocation()
-  const history = useHistory()
+  const navigate = useNavigate()
   useEffect(() => {
     let source = axios.CancelToken.source()
     if (request.makeRequest) {
@@ -521,7 +527,7 @@ export const useGetProductAvailableSkuOptions = () => {
     return () => {
       source.cancel()
     }
-  }, [request, setRequest, loc, history])
+  }, [request, setRequest, loc, navigate])
 
   return [request, setRequest]
 }

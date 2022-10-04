@@ -14,17 +14,19 @@ import { useCheckoutUtilities } from '../../../hooks'
 const OrderTemplatePaymentSlide = ({ currentStep }) => {
   const paymentMethods = useSelector(getSavedCreditCardMethods)
   const dispatch = useDispatch()
-  const { isFetching, orderTemplateID, accountPaymentMethod } = useSelector(state => state.subscriptionCart)
+  const { isFetching, orderTemplateID, accountPaymentMethod, shippingAccountAddress, billingAccountAddress } = useSelector(state => state.subscriptionCart)
   const [newOrderPayment, setNewOrderPayment] = useState(accountPaymentMethod ? accountPaymentMethod.accountPaymentMethodID : false)
   const { t } = useTranslation()
   const [changeSelection, setChangeSelection] = useState(true)
   const { CREDIT_CARD_CODE } = useCheckoutUtilities()
-
   const updatePaymentMethod = accountPaymentMethodID => {
     dispatch(requestSubscriptionCart())
     return SlatwalApiService.orderTemplate
       .updateOrderTemplateBilling({
         orderTemplateID: orderTemplateID,
+        billingAccountAddress:{
+          value:shippingAccountAddress?.accountAddressID,
+        },
         accountPaymentMethod: {
           value: accountPaymentMethodID,
         },
@@ -39,10 +41,12 @@ const OrderTemplatePaymentSlide = ({ currentStep }) => {
         dispatch(receiveSubscriptionCart({}))
       })
   }
+
   useEffect(() => {
     if (paymentMethods.length === 0) {
       // if there is no payment method found for the user , open new payment form
       setNewOrderPayment('new')
+      setChangeSelection(false)
     } else {
       setNewOrderPayment('')
     }
@@ -54,7 +58,7 @@ const OrderTemplatePaymentSlide = ({ currentStep }) => {
           <div className="col-sm-12">
             <hr />
             {newOrderPayment === 'new' ? (
-              <label className="w-100 h4">{t('frontend.checkout.cardInfo')}</label>
+                <label className="w-100 h4">{t('frontend.checkout.cardInfo')}</label>
             ) : changeSelection && accountPaymentMethod ? (
               <>
                 <p className="h4">{t('frontend.checkout.payments')}:</p>
@@ -92,11 +96,12 @@ const OrderTemplatePaymentSlide = ({ currentStep }) => {
               />
             )}
 
-            {!changeSelection && newOrderPayment !== 'new' && (
+            {newOrderPayment !== 'new' && (
               <button
                 className="btn btn-secondary mt-2"
                 onClick={() => {
                   setNewOrderPayment('new')
+                  setChangeSelection(false)
                 }}
               >
                 {t('frontend.checkout.payment.add')}
@@ -118,7 +123,7 @@ const OrderTemplatePaymentSlide = ({ currentStep }) => {
         )}
       </>
 
-      <SlideNavigation currentStep={currentStep} nextActive={accountPaymentMethod?.accountPaymentMethodID?.length > 0} />
+      <SlideNavigation currentStep={currentStep} nextActive={accountPaymentMethod?.accountPaymentMethodID?.length > 0 && !!billingAccountAddress} />
     </Overlay>
   )
 }

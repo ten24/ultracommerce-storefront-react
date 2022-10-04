@@ -5,14 +5,13 @@ import { EditSubscriptionModal, EditSubscriptionScheduleDateModal, EditSubscript
 import { toast } from 'react-toastify'
 import { SlatwalApiService } from '../../../services'
 import { useFormik } from 'formik'
-import { useHistory } from 'react-router'
-import { Link } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { getErrorMessage, getFailureMessageOnSuccess } from '../../../utils'
 import { useFormatDate } from '../../../hooks'
 
 const OrderTemplateToolbar = ({ templateID, orderTemplateInfo, updateOrderTemplate }) => {
   const { t } = useTranslation()
-  const history = useHistory()
+  const navigate = useNavigate()
   const [formateDate] = useFormatDate()
 
   const [showModal, setModal] = useState(false)
@@ -149,7 +148,7 @@ const OrderTemplateToolbar = ({ templateID, orderTemplateInfo, updateOrderTempla
   }
 
   const formikCancel = useFormik({
-    enableReinitialize: false,
+    enableReinitialize: true,
     initialValues: {
       cancellationReason: '',
     },
@@ -157,7 +156,7 @@ const OrderTemplateToolbar = ({ templateID, orderTemplateInfo, updateOrderTempla
       cancelOrderTemplate(values)
     },
   })
-  const [cancellationType, setCancellationType] = useState()
+  const [cancellationType, setCancellationType] = useState('')
   const cancelOrderTemplate = async values => {
     if (!cancellationType || !formikCancel?.values?.cancellationReason) return null
     SlatwalApiService.orderTemplate
@@ -173,7 +172,7 @@ const OrderTemplateToolbar = ({ templateID, orderTemplateInfo, updateOrderTempla
           setCancelSubscriptionModal(false)
           toast.success(t('frontend.account.scheduled.delivery.detail.toolbar.cancelModal.successMessage'))
           setTimeout(() => {
-            history.push('/my-account/subscription-orders')
+            navigate('/my-account/subscription-orders')
           }, 2000)
         }
       })
@@ -427,7 +426,7 @@ const OrderTemplateToolbar = ({ templateID, orderTemplateInfo, updateOrderTempla
       {showPaymentMethodModal && (
         <Modal show={showPaymentMethodModal} setShow={setPaymentMethodModal} title={t('frontend.account.scheduled.delivery.detail.toolbar.paymentModal.text')} modalClass="orderTemplateModal" size="large">
           <div className="container">
-            <EditPaymentMethod orderInfo={orderTemplateInfo} updatePaymentMethod={updatePaymentMethod} paymentMethod={paymentMethod} setPaymentMethod={setPaymentMethod} />
+            <EditPaymentMethod updateOrderTemplate={updateOrderTemplate} orderInfo={orderTemplateInfo} updatePaymentMethod={updatePaymentMethod} paymentMethod={paymentMethod} setPaymentMethod={setPaymentMethod} />
           </div>
         </Modal>
       )}

@@ -1,14 +1,14 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { useLocation, useHistory } from 'react-router'
+import { useLocation } from 'react-router-dom'
 import queryString from 'query-string'
 import { SearchBar } from '../Header/SearchBar'
 
 function NoProductFound() {
   const { t } = useTranslation()
   const { search, pathname } = useLocation()
-  const history = useHistory()
+  const navigate = useNavigate()
   const query = queryString.parse(search)
 
   const isFilterApplied = Object.keys(query).find(filter => {
@@ -34,7 +34,7 @@ function NoProductFound() {
         <button
           className="btn btn-primary btn-sm "
           onClick={() => {
-            history.push(pathname)
+            navigate(pathname)
           }}
         >
           {t('frontend.product.removeFilter')}

@@ -3,12 +3,12 @@ import { toast } from 'react-toastify'
 import { useTranslation } from 'react-i18next'
 import { SlatwalApiService } from '../../../services'
 import { PromptLayout, SWForm, SWInput } from '../../'
-import { Link, useHistory } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { getErrorMessage } from '../../../utils'
 
 const ForgotPassword = () => {
   const { t } = useTranslation()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const formik = useFormik({
     initialValues: {
@@ -18,7 +18,7 @@ const ForgotPassword = () => {
       SlatwalApiService.account.forgotPassword(values).then(response => {
         if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
         if (response.isSuccess()) {
-          history.push(`/my-account/login`)
+          navigate(`/my-account/login`)
           toast.success('Success')
         } else {
           toast.error('Failure')

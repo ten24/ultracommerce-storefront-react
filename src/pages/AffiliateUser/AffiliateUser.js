@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Redirect } from 'react-router'
-import { useLocation } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useCookies } from 'react-cookie'
 import queryString from 'query-string'
@@ -47,9 +46,9 @@ const AffiliateUser = () => {
   }, [params.affiliateCode, params.product, siteAffiliateCookieExpDays])
 
   if (params.product !== undefined && shouldRedirect) {
-    return <Redirect to="/shopping-cart" />
+    return <Navigate to="/shopping-cart" />
   } else if (shouldRedirect) {
-    return <Redirect to="/affiliate-landing" />
+    return <Navigate to="/affiliate-landing" />
   }
 
   return null

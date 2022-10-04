@@ -33,7 +33,7 @@ const OrderTemplateCartLineItem = ({ orderTemplateID, orderTemplateItemID, isDis
     <div className="row border-bottom py-3">
       <div className="col-sm-2 col-3">
         <Link className="d-inline-block mx-auto mr-sm-4 image-width" to={`/${productRouting}/${orderTemplateItem.sku.product.urlTitle}`}>
-          {orderTemplateItem.sku.images && orderTemplateItem.sku.images?.length > 0 && <SimpleImage className="img-fluid  m-auto image_container productImage" src={orderTemplateItem.sku.images[0]} alt={orderTemplateItem.sku.product.productName} type="product" />}
+          {orderTemplateItem.sku.images && orderTemplateItem.sku.images?.length > 0 && <SimpleImage className="img-fluid  m-auto image_container productImage" src={orderTemplateItem.sku.images?.at(0)} alt={orderTemplateItem.sku.product.productName} type="product" />}
         </Link>
       </div>
       <div className="col-sm-4 col-9">

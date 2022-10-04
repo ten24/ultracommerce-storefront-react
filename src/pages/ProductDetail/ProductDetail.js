@@ -1,10 +1,12 @@
-import { RedirectWithReplace, BreadCrumb, SkuSelector, Layout, RelatedProductsSlider, ProductReview, ProductPageHeader, ProductDetailGallery, ProductAdditionalInformation, ProductDetails, ProductPagePanels, SkuOptions, HeartButton, ProductForm, Spinner, ProductTypeRadioList, ProductTypeQuote } from '../../components'
+import { RedirectWithReplace, BreadCrumb, SkuSelector, Layout, RelatedProductsSlider, ProductReview, ProductPageHeader, ProductDetailGallery, ProductAdditionalInformation, ProductDetails, ProductPagePanels, SkuOptions, HeartButton, ProductForm, Spinner, ProductTypeRadioList, ProductBundle, ProductTypeQuote } from '../../components'
 import { useGetEntityByUrlTitleAdvanced, useProductDetail, useReview } from '../../hooks'
 import { Helmet } from 'react-helmet'
 import { useSelector } from 'react-redux'
 import { disableInteractionSelector, getProductTypeRoute } from '../../selectors'
 import queryString from 'query-string'
 import { useLocation } from 'react-router'
+import { ProductOutOfStock, validateProductOutOfStock } from '../../components'
+import { useState } from 'react'
 
 const ProductDetail = () => {
   let location = useLocation()
@@ -20,8 +22,9 @@ const ProductDetail = () => {
     .split('&')
     .filter(param => param.length)
   const urlTitle = location.pathname.split('/').reverse()
-  const ratingData = useReview(urlTitle[0])
-  let { isFetching, product, productOptions, skus, error, attributeSets } = useGetEntityByUrlTitleAdvanced(urlTitle[0])
+  const ratingData = useReview(urlTitle?.at(0))
+  const [quantity, setQuantity] = useState(1)
+  let { isFetching, product, productOptions, skus, error, attributeSets, productBundle, productBundleBuildOnAccount } = useGetEntityByUrlTitleAdvanced(urlTitle?.at(0))
   if (error.isError) return null
 
   let selectedSKu = selectionToSku(product, skus, optionGroupPairs, productOptions)
@@ -31,19 +34,19 @@ const ProductDetail = () => {
     const found = skus?.filter(sku => sku.skuID === params.skuid)
     if (!found?.length) return <ProductDetailLoading />
     if (found.length) {
-      console.log('Redirect based on found sku')
-      return <RedirectWithReplace pathname={location.pathname} search={found[0].slug} />
+      return <RedirectWithReplace pathname={location.pathname} search={found?.at(0).slug} />
     }
   }
   if (!product) return <RedirectWithReplace pathname="/404" />
   if (optionGroupPairs.length === 0 && product.defaultSku_slug) {
     // This check is for no optionGroupPairs passed
     console.log('<------- product.defaultSku_slug', optionGroupPairs, product)
+
     return <RedirectWithReplace pathname={location.pathname} search={product.defaultSku_slug} />
   }
   //http://localhost:3006/product/demo-product
 
-  const crumbs = product?.data?.breadcrumbs
+  const crumbs = product?.breadcrumbs
     ?.map(crumb => {
       return { title: crumb.productTypeName, urlTitle: `/${productTypeRoute}/${crumb.urlTitle}` }
     })
@@ -56,11 +59,13 @@ const ProductDetail = () => {
   if (updateParams.length) {
     // http://localhost:3006/product/test-product?soccerBallSize=5 ==>  soccerBallColor=green is added
     console.log('Add additional optionGroupPairs because of option matrix')
+
     return <RedirectWithReplace pathname={location.pathname} search={[...optionGroupPairs, updateParams].join('&')} />
   }
   let isDisabled = isFetching || cart.isFetching || !selectedSKu?.skuID
   if (productOptions?.length === 0 && product.skus.length > 0) {
     console.log('This is a product with skus without option groups')
+
     if (params?.skuid) {
       selectedSKu = skus?.filter(sku => sku.skuID === params.skuid)?.at(0)
     } else {
@@ -70,6 +75,10 @@ const ProductDetail = () => {
   }
 
   if (!product?.productID) return <ProductDetailLoading />
+
+  //set out of stock flag if loading is completed and calculatedQATS of selected sku is not valid
+  const isOutOfStock = !isFetching && !cart.isFetching && validateProductOutOfStock(selectedSKu)
+
   return (
     <Layout>
       {product?.productID && (
@@ -87,16 +96,22 @@ const ProductDetail = () => {
         )}
         <div className="row">
           <div className="col-sm-6 col-md-4 mb-4 mb-md-0">
-            <ProductDetailGallery productUrlTitle={urlTitle[0]} skuID={selectedSKu?.skuID} />
+            <ProductDetailGallery productUrlTitle={urlTitle?.at(0)} skuID={selectedSKu?.skuID} />
             {product?.productID && <ProductAdditionalInformation additionalInformation={product.additionalInformation} />}
           </div>
           <div className="col-sm-6 col-md-6 offset-md-1">
             {product?.productID && <ProductDetails sku={selectedSKu} product={product} {...ratingData} />}
-            {!isFetching && <SkuOptions sku={selectedSKu} selection={params} productOptions={updatedProductOptions} skus={skus} />}
-            {!isFetching && product.skus.length > 1 && <SkuSelector sku={selectedSKu} selection={params} productOptions={updatedProductOptions} skus={skus} />}
-            <ProductForm sku={selectedSKu} isDisabled={isDisabled} isLoading={isFetching || cart.isFetching} />
-            <ProductTypeRadioList selectedSKu={selectedSKu} product={product} isDisabled={isDisabled} isLoading={isFetching || cart.isFetching} />
-            <ProductTypeQuote selectedSKu={selectedSKu} product={product} />
+
+            <ProductOutOfStock isFetching={isFetching} sku={selectedSKu} />
+            {!isOutOfStock && (
+              <>
+                {!isFetching && <SkuOptions sku={selectedSKu} selection={params} productOptions={updatedProductOptions} skus={skus} />}
+                {!isFetching && product.skus.length > 1 && <SkuSelector sku={selectedSKu} selection={params} productOptions={updatedProductOptions} skus={skus} />}
+                <ProductForm sku={selectedSKu} quantity={quantity} setQuantity={setQuantity} isDisabled={isDisabled} isLoading={isFetching || cart.isFetching} />
+                <ProductTypeRadioList selectedSKu={selectedSKu} product={product} isDisabled={isDisabled} isLoading={isFetching || cart.isFetching} />
+                <ProductTypeQuote selectedSKu={selectedSKu} product={product} quantity={quantity} />
+              </>
+            )}
             {product?.productID && (
               <div className="row mb-4">
                 <div className="col-md-12">
@@ -106,9 +121,10 @@ const ProductDetail = () => {
             )}
           </div>
         </div>
+        <ProductBundle productBundle={productBundle} productBundleBuildOnAccount={productBundleBuildOnAccount} productID={product?.productID} />
       </div>
-      <RelatedProductsSlider productUrlTitle={urlTitle[0]} />
-      <ProductReview productUrlTitle={urlTitle[0]} {...ratingData} />
+      <RelatedProductsSlider productUrlTitle={urlTitle?.at(0)} />
+      <ProductReview productUrlTitle={urlTitle?.at(0)} {...ratingData} />
     </Layout>
   )
 }

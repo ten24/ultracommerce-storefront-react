@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router-dom'
 
 export default function NotFound() {
   const contentStore = useSelector(state => state.content['404']) || {}
-  const history = useHistory()
+  const navigate = useNavigate()
   const [isLoaded, setIsLoaded] = useState(false)
 
   useEffect(() => {
@@ -23,7 +23,7 @@ export default function NotFound() {
           if (event.target.getAttribute('href').includes('http')) {
             window.location.href = event.target.getAttribute('href')
           } else {
-            history.push(event.target.getAttribute('href'))
+            navigate(event.target.getAttribute('href'))
           }
         }
       }}

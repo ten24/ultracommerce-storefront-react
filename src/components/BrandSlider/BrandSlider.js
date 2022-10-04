@@ -14,7 +14,7 @@ const BandSlide = ({ images, urlTitle = '', title }) => {
     <div className="repeater">
       <div className="card-body">
         <Link to={`/${brand}/${urlTitle}`} className="brand-rounded-img shadow-sm">
-          <SimpleImage src={!!images ? images[0] : ''} alt={title} type="brand" />
+          <SimpleImage src={!!images ? images?.at(0) : ''} alt={title} type="brand" />
         </Link>
       </div>
     </div>
@@ -70,7 +70,7 @@ const BrandSlider = ({ params }) => {
     return null
   }
   return (
-    <section className="content-spacer bg-light-blue">
+    <section className="content-spacer bg-light-blue brand-slider-sec">
       <div className="container">
         <header className="section-title">
           <h2>{t('frontend.home.shop_brands')}</h2>
