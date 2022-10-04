@@ -1,17 +1,23 @@
-import React, { Suspense } from 'react'
-import { Routes as RouterRoutes, Route, useLocation } from 'react-router-dom'
+import React, { Suspense, useEffect } from 'react'
 import * as Sentry from '@sentry/react'
-import { useSelector } from 'react-redux'
+import { Routes, useLocation } from 'react-router-dom'
+import { Route } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
 import { ErrorBoundary } from 'react-error-boundary'
-import { useScrollToTop, Loading, getBlogRoute, useContentContext, DynamicPage, AffiliateUser, Blog, Cart, MyAccount, Search, ProductSearch, Checkout, ThreeDSHandover, Brand, Product, ProductType, Category, OrderConfirmation, GuestOrderConfirmation, BlogPost, Manufacturer, ErrorFallback, Contact, BulkOrder, OrderTemplateCart, OrderTemplateCheckout } from '@ultracommerce/ultracommerce-storefront-react/global'
-const Routes = Sentry.withSentryReactRouterV6Routing(RouterRoutes)
-
+import { Loading, Footer, Header } from '@ultracommerce/ultracommerce-storefront-react/components'
+import { getConfiguration } from '@ultracommerce/ultracommerce-storefront-react/actions'
+import { AffiliateUser, Blog, NotFound, Cart, MyAccount, Search, Checkout, ThreeDSHandover, Brand, ContentPage, Product, ProductType, Category, OrderConfirmation, GuestOrderConfirmation, BlogPost, Manufacturer, ErrorFallback, Contact, BulkOrder, OrderTemplateCart, OrderTemplateCheckout, ProductSearch } from '@ultracommerce/ultracommerce-storefront-react/pages'
+import { useCMSWrapper, useScrollToTop } from '@ultracommerce/ultracommerce-storefront-react/hooks'
+import { getBlogRoute } from '@ultracommerce/ultracommerce-storefront-react/selectors'
+import logo from './assets/images/logo.svg'
+import Home from './pages/Home/Home'
 const pageComponents = {
   Product: <Product />,
   ProductType: <ProductType />,
   Category: <Category />,
   Brand: <Brand />,
 }
+const SentryRoutes = Sentry.withSentryReactRouterV6Routing(Routes)
 
 //https://itnext.io/react-router-transitions-with-lazy-loading-2faa7a1d24a
 export default function App() {
@@ -19,14 +25,20 @@ export default function App() {
   const blogUrlTitle = useSelector(getBlogRoute)
   const loc = useLocation()
   const shopByManufacturer = useSelector(state => state.configuration.shopByManufacturer)
-  const pageData = useContentContext()
   // eslint-disable-next-line no-unused-vars
-  // const cms = useCMSWrapper()
+  const cms = useCMSWrapper()
   // eslint-disable-next-line no-unused-vars
   const scroll = useScrollToTop()
-  if (!pageData?.title) return null
+
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(getConfiguration())
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   return (
     <Suspense fallback={<Loading />}>
+      <Header logo={logo} mobileLogo={logo} />
       <ErrorBoundary
         key={loc.pathname}
         FallbackComponent={ErrorFallback}
@@ -35,36 +47,37 @@ export default function App() {
         }}
       >
         {/* <SEO /> */}
-
-        <Routes>
-          <Route path="/404" element={<DynamicPage />} />
+        <SentryRoutes>
+          <Route path="/404" element={<NotFound />} />
+          <Route path="/Error" element={<ErrorFallback />} />
           <Route path="/contact" element={<Contact />} />
           <Route path={`/${blogUrlTitle}`}>
             <Route index element={<Blog />} />
             <Route path={`*`} element={<BlogPost />} />
           </Route>
-          <Route path={shopByManufacturer.slug} element={<Manufacturer />} />
-          {routing?.map(({ URLKey, URLKeyType }, index) => {
-            return !!pageComponents[URLKeyType] && <Route key={index} path={`/${URLKey}/:id`} element={pageComponents[URLKeyType]} />
-          })}
-
-          <Route path="/affiliate" element={<AffiliateUser />} />
-          <Route path="/shop" element={<Search />} />
-          <Route path="/productSearch" element={<ProductSearch />} />
-          <Route path="/bulkorder" element={<BulkOrder />} />
-          <Route path="/my-account/*" element={<MyAccount />} />
-          <Route path="/shopping-cart" element={<Cart />} />
-          <Route path="/checkout/*" element={<Checkout />} />
-          <Route path="/threeDSHandover" element={<ThreeDSHandover />} />
+          {routing.length &&
+            routing.map(({ URLKey, URLKeyType }, index) => {
+              return !!pageComponents[URLKeyType] && <Route key={index} path={`/${URLKey}/:id`} element={pageComponents[URLKeyType]} />
+            })}
           <Route path="/order-confirmation" element={<OrderConfirmation />} />
           <Route path="/guest-order-confirmation" element={<GuestOrderConfirmation />} />
-
+          <Route path={shopByManufacturer.slug} element={<Manufacturer />} />
+          <Route path="/shop" element={<Search />} />
+          <Route path="/productSearch" element={<ProductSearch />} />
+          <Route path="/product-type/:id" element={<ProductType />} />
+          <Route path="/my-account/*" element={<MyAccount />} />
+          <Route path="/checkout/*" element={<Checkout />} />
+          <Route path="/threeDSHandover" element={<ThreeDSHandover />} />
+          <Route path="/shopping-cart" element={<Cart />} />
           <Route path="/scheduled-delivery-cart" element={<OrderTemplateCart />} />
           <Route path="/scheduled-delivery-checkout/*" element={<OrderTemplateCheckout />} />
-          <Route path={'*'} element={<DynamicPage />} />
-          <Route index element={<DynamicPage />} />
-        </Routes>
+          <Route path="/bulkorder" element={<BulkOrder />} />
+          <Route path="/affiliate" element={<AffiliateUser />} />
+          <Route path={'*'} element={<ContentPage />} />
+          <Route index element={<Home />} />
+        </SentryRoutes>
       </ErrorBoundary>
+      <Footer />
     </Suspense>
   )
 }
