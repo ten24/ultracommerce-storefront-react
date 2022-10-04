@@ -1,6 +1,6 @@
 {
   "name": "@ultracommerce/ultracommerce-storefront-react",
-  "version": "2.0.0",
+  "version": "2.2.0",
   "description": "Ultra Commerce Storefront component library.",
   "author": "Ultra Commerce <contact@ultracommerce.co> (https://www.ultracommerce.co)",
   "license": "MIT",
@@ -22,7 +22,7 @@
     "@redux-devtools/extension": "^3.2.2",
     "@sentry/react": "^7.9.0",
     "@sentry/tracing": "^7.9.0",
-    "@ultracommerce/ultracommerce-sdk": "1.4.1",
+    "@ultracommerce/ultracommerce-sdk": "1.5.0",
     "bootstrap": "5.1.3",
     "bootstrap-icons": "^1.8.1",
     "braintree-web": "^3.85.5",
