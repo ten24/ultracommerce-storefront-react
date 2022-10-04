@@ -1,19 +1,24 @@
 import { default as preload } from '@ultracommerce/ultracommerce-storefront-react/src/preload'
+
 const data = {
   ...preload,
-  site: {
-    ...preload.site,
-    siteName: process.env.REACT_APP_NAME,
-    siteCode: process.env.REACT_APP_SITE_CODE,
+  site: { ...preload.site, hibachiInstanceApplicationScopeKey: '', siteName: process.env.REACT_APP_NAME, siteID: '', defaultCountry: 'US', siteCode: process.env.REACT_APP_SITE_CODE },
+  cmsProvider: 'slatwallCMS',
+  products: {
+    fallbackImageCall: false,
+    loginRequiredForPrice: false,
   },
-  footer: {
-    formLink: '',
+  sku: {
+    ...preload.sku,
+    allowOrderTemplate: true,
   },
   seo: {
     title: 'Storefront',
     titleMeta: '',
   },
-  cmsProvider: 'slatwallCMS',
+  footer: {
+    formLink: '',
+  },
   theme: {
     ...preload.theme,
     host: process.env.REACT_APP_HOST_URL,
@@ -36,5 +41,6 @@ const data = {
     //   settings: {},
     // },
   ],
+  enableMultiSite: true,
 }
 export default data

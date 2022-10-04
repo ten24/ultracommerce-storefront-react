@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
-import { useLocation, useHistory } from 'react-router-dom'
-import { evictAllPages, getUser, getWishLists } from '@ultracommerce/ultracommerce-storefront-react/actions'
+import { useDispatch, useSelector } from 'react-redux'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { useTranslation } from 'react-i18next'
+import { evictAllPages, getConfiguration, getUser, getWishLists, ContentContextProvider, ComponentContextProvider, ElementContextProvider, Theme } from '@ultracommerce/ultracommerce-storefront-react/global'
 import App from './App'
 
 const AppSwitcher = () => {
   const { t } = useTranslation()
   const { pathname, search } = useLocation()
+  const themeKey = useSelector(state => state.configuration.theme.themeKey)
   const [safeToLoad, setSafeToLoad] = useState(false)
-  const history = useHistory()
+  const [configurationLoaded, setConfigurationLoaded] = useState(false)
+  const navigate = useNavigate()
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -21,7 +23,7 @@ const AppSwitcher = () => {
       dispatch(evictAllPages())
       dispatch(getUser()).then(() => {
         dispatch(getWishLists())
-        history.push(redirect)
+        navigate(redirect)
         toast.success(t('frontend.account.auth.success'))
         setSafeToLoad(true)
       })
@@ -30,8 +32,30 @@ const AppSwitcher = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+  useEffect(() => {
+    if (safeToLoad) {
+      dispatch(getConfiguration()).then(response => {
+        setConfigurationLoaded(true)
+      })
+    }
 
-  if (safeToLoad) return <App />
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [safeToLoad])
+
+  if (safeToLoad && configurationLoaded)
+    return (
+      <ElementContextProvider>
+        <ComponentContextProvider>
+          <ContentContextProvider>
+            <div className={`${themeKey}`}>
+              <Theme>
+                <App />
+              </Theme>
+            </div>
+          </ContentContextProvider>
+        </ComponentContextProvider>
+      </ElementContextProvider>
+    )
   return null
 }
 

@@ -3,10 +3,12 @@
 
 //Custom variable
 @import '@ultracommerce/ultracommerce-storefront-react/src/assets/components/variables.scss';
-@import './custom/custom-colors';
 
 //Bootstrap icon
 @import 'bootstrap-icons/font/bootstrap-icons.css';
+
+// Custom Colors
+@import './custom/custom-colors';
 
 // Bootstrap-5
 @import 'bootstrap/scss/bootstrap';
@@ -15,20 +17,6 @@
 @import 'slick-carousel/slick/slick.css';
 @import 'slick-carousel/slick/slick-theme.css';
 
-// Custom Styles
-
-@import '@ultracommerce/ultracommerce-storefront-react/src/assets/components/header.scss';
-@import '@ultracommerce/ultracommerce-storefront-react/src/assets/components/footer.scss';
-@import '@ultracommerce/ultracommerce-storefront-react/src/assets/components/productListing.scss';
-
-@import '@ultracommerce/ultracommerce-storefront-react/src/assets/components/home.scss';
-@import '@ultracommerce/ultracommerce-storefront-react/src/assets/components/blog.scss';
-@import '@ultracommerce/ultracommerce-storefront-react/src/assets/components/button';
-@import '@ultracommerce/ultracommerce-storefront-react/src/assets/components/common.scss';
-@import '@ultracommerce/ultracommerce-storefront-react/src/assets/components/about.scss';
-@import '@ultracommerce/ultracommerce-storefront-react/src/assets/components/checkout.scss';
-@import '@ultracommerce/ultracommerce-storefront-react/src/assets/components/dropdown';
-@import '@ultracommerce/ultracommerce-storefront-react/src/assets/components/spinner';
-@import '@ultracommerce/ultracommerce-storefront-react/src/assets/components/productReview.scss';
+@import '@ultracommerce/ultracommerce-storefront-react/src/assets/components.scss';
 
 @import './custom/custom-client.scss';
