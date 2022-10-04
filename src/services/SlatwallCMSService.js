@@ -1,5 +1,5 @@
 import { axios } from './AxiosService'
-import { getContentByType, getContentPages, groupBy } from '../utils'
+import { getContentByTypeCode, getContentPages, groupBy } from '../utils'
 import { SlatwalApiService, sdkURL } from './SlatwalApiService'
 const generateMegaMenu = content => {
   let menu = Object.keys(content)
@@ -132,10 +132,10 @@ const getHeaderBySlug = async (content = {}) => {
         hydrated.mega_menu = { menu_items }
       }
       if (response?.utility_menu?.length) {
-        hydrated.utility_menu = { menu_items: response.utility_menu[0].contentBody }
+        hydrated.utility_menu = { menu_items: response.utility_menu?.at(0).contentBody }
       }
       if (response?.social_menu?.length) {
-        const social_items = response.social_menu[0].children.map(menuItem => {
+        const social_items = response.social_menu?.at(0).children.map(menuItem => {
           return processForMenuItem(menuItem)
         })
         hydrated.social_menu = { social_items }
@@ -179,10 +179,10 @@ const getFooterBySlug = async (content = {}, slug = '') => {
     .then(response => {
       let hydrated = {}
       const nestedFooter = nestContentByKey(response, 'footer')
-      if (nestedFooter[0]?.children?.length) {
-        nestedFooter[0].children = nestedFooter[0]?.children?.filter(child => child?.contentElementType_systemCode?.trim()?.length === 0 || child?.contentElementType_systemCode === 'cetBlock')
-        nestedFooter[0].raw = response
-        hydrated = { footer: nestedFooter[0] }
+      if (nestedFooter?.at(0)?.children?.length) {
+        nestedFooter.at(0).children = nestedFooter?.at(0)?.children?.filter(child => child?.contentElementType_systemCode?.trim()?.length === 0 || child?.contentElementType_systemCode === 'cetBlock')
+        nestedFooter.at(0).raw = response
+        hydrated = { footer: nestedFooter?.at(0) }
       }
       return hydrated
     })
@@ -193,10 +193,11 @@ This will retrive content by a specifc slug
 */
 
 const getEntryBySlug = (payload = {}) => {
+  const selectedLocale = localStorage.getItem('i18nextLng') ? localStorage.getItem('i18nextLng') : 'en_us'
   return axios({
     method: 'POST',
     withCredentials: true,
-    url: `${sdkURL}api/scope/getContentByPage`,
+    url: `${sdkURL}api/scope/getContentByPage?lang=` + selectedLocale,
     headers: {
       'Content-Type': 'application/json',
     },
@@ -213,7 +214,7 @@ const getEntryBySlug = (payload = {}) => {
       let hydrated = {}
       // now all the others
       const globalProduct = response?.filter(item => item.urlTitlePath === 'product' || item.urlTitlePath.startsWith('product/'))
-      const globalProductType = response?.filter(item => item.urlTitlePath === 'products' || item.urlTitlePath.startsWith('products/'))
+      const globalProductType = response?.filter(item => item.urlTitlePath === 'product-type' || item.urlTitlePath.startsWith('product-type/'))
       const globalBrand = response?.filter(item => item.urlTitlePath === 'brand' || item.urlTitlePath.startsWith('brand/'))
       const globalCategory = response?.filter(item => item.urlTitlePath === 'category' || item.urlTitlePath.startsWith('category/'))
       const globalconfig = response?.filter(item => item.urlTitlePath === 'globalconfig' || item.urlTitlePath.startsWith('globalconfig/'))
@@ -236,7 +237,7 @@ const getEntryBySlug = (payload = {}) => {
         const productSlug = `${payload?.productRoute}/${payload?.productUrlTitle}`
         const nestedProducContent = nestContentByKey(response, productSlug)
         if (nestedProducContent?.length) {
-          hydrated[productSlug] = nestedProducContent[0]
+          hydrated[productSlug] = nestedProducContent?.at(0)
         } else {
           hydrated[productSlug] = {}
         }
@@ -263,7 +264,7 @@ const getEntryBySlug = (payload = {}) => {
           hydtratedHeader.mega_menu = { menu_items }
         }
         if (hydtratedHeader?.utility_menu?.length) {
-          hydtratedHeader.utility_menu = { menu_items: hydtratedHeader.utility_menu[0].contentBody }
+          hydtratedHeader.utility_menu = { menu_items: hydtratedHeader.utility_menu?.at(0).contentBody }
         }
         hydrated = { ...hydrated, header: hydtratedHeader }
       }
@@ -293,9 +294,9 @@ const getEntryBySlug = (payload = {}) => {
           delete hydrated['footer/contact-us']
         }
         const nestedFooter = nestContentByKey(footerContent, 'footer')
-        if (nestedFooter[0]?.children?.length) {
-          nestedFooter[0].children = nestedFooter[0]?.children?.filter(child => child?.contentElementType_systemCode?.trim()?.length === 0 || child?.contentElementType_systemCode === 'cetBlock')
-          hydtratedFooter = nestedFooter[0]
+        if (nestedFooter?.at(0)?.children?.length) {
+          nestedFooter.at(0).children = nestedFooter?.at(0)?.children?.filter(child => child?.contentElementType_systemCode?.trim()?.length === 0 || child?.contentElementType_systemCode === 'cetBlock')
+          hydtratedFooter = nestedFooter?.at(0)
         }
 
         hydrated = { ...hydrated, footer: hydtratedFooter }
@@ -317,17 +318,17 @@ const processForPage = (page, content) => {
   let hydrated = {}
   hydrated.permissions = { accessFlag: true }
   const descendants = getDescendants(content, page.contentID)
-  hydrated.tabs = getContentByType(descendants, 'cetTab')
+  hydrated.tabs = getContentByTypeCode(descendants, 'cetTab')
   hydrated.slider = processForSlider(descendants)
   hydrated.contentColumns = processForContentColumn(descendants)
   hydrated.callToAction = processForCTA(descendants)
   hydrated.sidebar = processForSidebar(descendants)
   hydrated.tabs = processForTabs(descendants)
-  const listItems = getContentByType(descendants, 'cetListItem,cetListItemWithImage')
+  const listItems = getContentByTypeCode(descendants, 'cetListItem,cetListItemWithImage')
   hydrated.listItems = listItems.map(item => {
     return processListItem(item, descendants)
   })
-  const blocks = getContentByType(descendants, 'cetBlock,cetProfile')
+  const blocks = getContentByTypeCode(descendants, 'cetBlock,cetProfile')
   hydrated.blocks = blocks.map(item => {
     return processForBlock(item, descendants)
   })
@@ -340,10 +341,10 @@ const getParent = (content = [], parentContentID) => content.filter(item => item
 const getChildren = (content = [], contentID) => content.filter(item => item.parentContent_contentID === contentID).sort((a, b) => a.sortOrder - b.sortOrder)
 const getDescendants = (content = [], contentID) => content.filter(item => item.contentIDPath.includes(contentID) && item.contentID !== contentID).sort((a, b) => a.sortOrder - b.sortOrder)
 const processForCTA = content => {
-  let cta = getContentByType(content, 'cetCallToCaction')
+  let cta = getContentByTypeCode(content, 'cetCallToCaction')
   let response = {}
   if (cta?.length) {
-    cta = cta[0]
+    cta = cta?.at(0)
     response.title = cta.title
     response.linkLabel = cta.linkLabel
     response.linkUrl = cta.linkUrl
@@ -370,14 +371,14 @@ const processForSlide = slide => {
   return response
 }
 const processForSlider = content => {
-  const slides = getContentByType(content, 'cetContentSlide')
+  const slides = getContentByTypeCode(content, 'cetContentSlide')
   let response = {}
   if (slides?.length) {
-    const parentId = slides[0].parentContent_contentID
+    const parentId = slides?.at(0).parentContent_contentID
     const parent = getParent(content, parentId)
-    response.contentTitle = parent[0].title
-    response.contentBody = parent[0].contentBody
-    response.contentID = parent[0].contentID
+    response.contentTitle = parent?.at(0).title
+    response.contentBody = parent?.at(0).contentBody
+    response.contentID = parent?.at(0).contentID
     response.slides = slides.map(slide => {
       return processForSlide(slide)
     })
@@ -386,15 +387,15 @@ const processForSlider = content => {
   return response
 }
 const processForContentColumn = content => {
-  const column = getContentByType(content, 'cetColumns')
-  const columns = getContentByType(content, 'cetColumn')
+  const column = getContentByTypeCode(content, 'cetColumns')
+  const columns = getContentByTypeCode(content, 'cetColumn')
   let response = {}
   if (column?.length) {
-    response.title = column[0].title
-    response.contentTitle = column[0].title
-    response.contentBody = column[0].contentBody
-    response.contentID = column[0].contentID
-    response.elementType = column[0].contentElementType_systemCode
+    response.title = column?.at(0).title
+    response.contentTitle = column?.at(0).title
+    response.contentBody = column?.at(0).contentBody
+    response.contentID = column?.at(0).contentID
+    response.elementType = column?.at(0).contentElementType_systemCode
     response.columns = columns.map(c => {
       return processForBlock(c)
     })
@@ -403,7 +404,7 @@ const processForContentColumn = content => {
   return response
 }
 const processForTabs = content => {
-  const tabs = getContentByType(content, 'cetTab')
+  const tabs = getContentByTypeCode(content, 'cetTab')
   return tabs.map(tab => {
     let hydrated = {}
     hydrated.title = tab.title
@@ -452,7 +453,7 @@ const processGeneral = (item, content) => {
   }
   return response
 }
-const processForSidebar = content => getContentByType(content, 'cetSidebar')
+const processForSidebar = content => getContentByTypeCode(content, 'cetSidebar')
 
 const processForPost = post => {
   const response = { ...post }
@@ -478,7 +479,7 @@ const processForPost = post => {
   return response
 }
 const getBlogPosts = ({ limit = 12, currentPage = 1, category = [], blogKey = 'blog' }) => {
-  let payload = { 'f:urlTitlePath:like': `${blogKey}/%`, 'p:show': limit, 'p:current': currentPage, includeImages: true, includeCategories: true }
+  let payload = { 'f:urlTitlePath:like': `${blogKey}/%`, 'p:show': limit, 'p:current': currentPage, includeImages: true, includeCategories: true, lang: localStorage.getItem('i18nextLng') }
   if (category.length) {
     payload['f:categories.urlTitle:in'] = category.join()
   }
@@ -496,7 +497,7 @@ const getBlogPosts = ({ limit = 12, currentPage = 1, category = [], blogKey = 'b
   })
 }
 const getBlogPostData = ({ slug }) => {
-  return SlatwalApiService.content.get({ 'f:urlTitle': slug, includeImages: true, includeSettings: true, includeCategories: true }).then(response => {
+  return SlatwalApiService.content.get({ 'f:urlTitle': slug, includeImages: true, includeSettings: true, includeCategories: true, lang: localStorage.getItem('i18nextLng') }).then(response => {
     let hydrated = {}
     if (response.isSuccess()) {
       response.success().data.pageRecords.forEach(post => {

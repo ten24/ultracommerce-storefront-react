@@ -5,11 +5,17 @@ const useOrderTemplateCartLineItem = orderItemID => {
   const { isFetching, orderTemplateItems } = useSelector(state => state.subscriptionCart)
   const productRouting = useSelector(getProductRoute)
 
-  const orderTemplateItem = orderTemplateItems.filter(orderTemplateItem => {
-    return orderTemplateItem.orderTemplateItemID === orderItemID
-  })[0]
+  const orderTemplateItem = orderTemplateItems
+    .filter(orderTemplateItem => {
+      return orderTemplateItem.orderTemplateItemID === orderItemID
+    })
+    ?.at(0)
   const { skuPrices = [] } = orderTemplateItem.sku
-  const listPrice = skuPrices.map(price => price.listPrice).sort((a, b) => a - b)[0] || 0
+  const listPrice =
+    skuPrices
+      .map(price => price.listPrice)
+      .sort((a, b) => a - b)
+      ?.at(0) || 0
 
   const isBackordered = false
   return { orderTemplateItem, listPrice, productRouting, isFetching, isBackordered }

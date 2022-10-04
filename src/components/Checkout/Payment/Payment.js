@@ -20,9 +20,9 @@ const PaymentSlide = ({ currentStep, cartState }) => {
   const { isFetching } = useSelector(state => state.cart)
   const { t } = useTranslation()
   const dispatch = useDispatch()
-  const { EXTERNAL_PAYMENT_CODE, CREDIT_CARD_CODE, GIFT_CARD_CODE, TERM_PAYMENT_CODE, PAYPAL_PAYMENT_CODE, CASH_PAYMENT_CODE, PAYPAL_COMMERCE_CODE, getPaymentMethodByIDFromList } = useCheckoutUtilities()
+  const { EXTERNAL_PAYMENT_CODE, CREDIT_CARD_CODE, GIFT_CARD_CODE, TERM_PAYMENT_CODE, PAYPAL_PAYMENT_CODE, CASH_PAYMENT_CODE, CHECK_PAYMENT_CODE, PAYPAL_COMMERCE_CODE, getPaymentMethodByIDFromList } = useCheckoutUtilities()
 
-  const processCashPayment = value => {
+  const processSimplePayment = value => {
     dispatch(
       addPayment({
         newOrderPayment: {
@@ -74,8 +74,8 @@ const PaymentSlide = ({ currentStep, cartState }) => {
                   onChange={value => {
                     const foundPaymentMethod = getPaymentMethodByIDFromList(eligiblePaymentMethodDetails, value)
                     setSelectedPaymentMethod(foundPaymentMethod)
-                    if (foundPaymentMethod.paymentMethodType === CASH_PAYMENT_CODE) {
-                      processCashPayment(value)
+                    if (foundPaymentMethod.paymentMethodType === CASH_PAYMENT_CODE || foundPaymentMethod.paymentMethodType === CHECK_PAYMENT_CODE) {
+                      processSimplePayment(value)
                     }
                   }}
                   selectedValue={selectedPaymentMethod?.paymentMethodID?.length ? selectedPaymentMethod.paymentMethodID : paymentMethodOnOrder}

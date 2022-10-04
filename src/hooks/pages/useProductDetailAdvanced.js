@@ -49,7 +49,7 @@ const calculateAdditionalParamters = (currentOptionGroupPairs, productOptions) =
   const paramCandidates = productOptions
     .map(optGrp => {
       const validOptions = optGrp.options.filter(opt => opt.available)
-      if (validOptions.length === 1 && optGrp.options.length === 1) return generateOptionGroupPair(optGrp.optionGroupCode, validOptions[0].optionCode)
+      if (validOptions.length === 1 && optGrp.options.length === 1) return generateOptionGroupPair(optGrp.optionGroupCode, validOptions?.at(0).optionCode)
       return null
     })
     .filter(data => data)
@@ -79,7 +79,7 @@ const selectionToSku = (product, skus = [], params = [], options = []) => {
     found = skus.filter(sku => sku.skuID === product.defaultSku_skuID)
   }
 
-  return found.length === 1 ? found[0] : null
+  return found.length === 1 ? found?.at(0) : null
 }
 
 const useFindAllProductOptions = (product = {}, productOptions = [], skus = []) => {
@@ -107,7 +107,7 @@ const useFindAllProductOptions = (product = {}, productOptions = [], skus = []) 
       if (found.length) {
         searchParameter = {
           pathname: `-/${product.urlTitle}?`,
-          search: found[0].slug,
+          search: found?.at(0).slug,
         }
       }
     } else if (searchOptionGroupPairs.length === 0 && product.defaultSku_slug) {
@@ -167,7 +167,7 @@ const useFindSelectedOption = (skus = [], selection, criteria, setCriteria) => {
       //console.log('Single Matching sku')
       selectedCriteria = {
         pathname: criteria.pathname,
-        search: matchingSkus[0].slug,
+        search: matchingSkus?.at(0).slug,
       }
     } else if (matchingSkus.length === 0) {
       const possibleSKus = filterSkusBySelectedOptions(skus, [singlePair])
@@ -176,7 +176,7 @@ const useFindSelectedOption = (skus = [], selection, criteria, setCriteria) => {
         // http://localhost:3006/product/test-product?soccerBallColor=orange&colors=global-red&soccerBallSize=3  select 4
         selectedCriteria = {
           pathname: criteria.pathname,
-          search: possibleSKus[0].slug,
+          search: possibleSKus?.at(0).slug,
         }
       } else if (possibleSKus.length > 1) {
         console.log('The selection was not valid so we will reset option selection to current selection')

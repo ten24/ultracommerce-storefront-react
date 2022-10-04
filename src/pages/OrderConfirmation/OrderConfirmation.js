@@ -1,13 +1,13 @@
 import { useDispatch, useSelector } from 'react-redux'
-import { Layout } from '../../components'
-
-import { Redirect, useHistory, useLocation } from 'react-router'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useGetAllOrders } from '../../hooks'
 import { useEffect } from 'react'
 import { confirmOrder } from '../../actions'
 import { isAuthenticated } from '../../utils'
 import { useCookies } from 'react-cookie'
+import DynamicPage from '../DynamicPage/DynamicPage'
 
 const OrderConfirmation = () => {
   let [orders, setRequest] = useGetAllOrders()
@@ -15,7 +15,7 @@ const OrderConfirmation = () => {
   const { t } = useTranslation()
   let dispatch = useDispatch()
   let loc = useLocation()
-  let history = useHistory()
+  const navigate = useNavigate()
   const { contentBody = '' } = useSelector(state => state.content[loc.pathname.substring(1)]) || {}
 
   useEffect(() => {
@@ -34,18 +34,18 @@ const OrderConfirmation = () => {
   }, [orders, setRequest, removeCookie, dispatch])
 
   if (!isAuthenticated()) {
-    return <Redirect to={'/my-account/login'} />
+    return <Navigate to={'/my-account/login'} />
   }
 
   return (
-    <Layout>
+    <DynamicPage ignoreLayout={true}>
       <div className="bg-light p-0">
         <div className="page-title-overlap bg-lightgray pt-4">
           <div className="container d-lg-flex justify-content-between py-2 py-lg-3">
             <div className="order-lg-1 pr-lg-4 text-center"></div>
           </div>
         </div>
-        {orders.isLoaded && orders.data.ordersOnAccount[0] && (
+        {orders.isLoaded && orders.data.ordersOnAccount?.at(0) && (
           <div>
             <div className="bg-light p-4 text-center">
               <h1 className="display-4">{t('frontend.order.thank_you')}</h1>
@@ -56,10 +56,11 @@ const OrderConfirmation = () => {
                     className="btn btn-link p-0 m-0 align-center link-btn"
                     onClick={e => {
                       e.preventDefault()
-                      history.push(`/my-account/orders/${orders.data.ordersOnAccount[0].orderID}`)
+
+                      navigate(`/my-account/orders/${orders.data.ordersOnAccount?.at(0)?.orderID}`)
                     }}
                   >
-                    <h2>{`#${orders.data.ordersOnAccount[0].orderNumber}`} </h2>
+                    <h2>{`#${orders.data.ordersOnAccount?.at(0).orderNumber}`} </h2>
                   </button>
                 </h1>
               )}
@@ -76,7 +77,7 @@ const OrderConfirmation = () => {
                     className="btn btn-link w-100 mb-3 align-center link-btn"
                     onClick={e => {
                       e.preventDefault()
-                      history.push('/my-account/overview')
+                      navigate('/my-account/overview')
                     }}
                   >
                     {t('frontend.header.myAccount')}
@@ -87,7 +88,7 @@ const OrderConfirmation = () => {
           </div>
         )}
       </div>
-    </Layout>
+    </DynamicPage>
   )
 }
 

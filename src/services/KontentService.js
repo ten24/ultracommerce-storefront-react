@@ -1,4 +1,4 @@
-import { DeliveryClient } from '@kentico/kontent-delivery'
+import { DeliveryClient } from '@kontent-ai/delivery-sdk'
 
 const projectId = process.env.REACT_APP_KONTENT_PROJECT_ID
 const getContentID = () => {
@@ -8,12 +8,12 @@ const getContentID = () => {
 const deliveryClient = new DeliveryClient({ projectId })
 const processForProductPicker = productList => {
   let response = {}
-  response.title = productList.title.value
-  response.body = productList.body.value
-  response.contentBody = productList.body.value
+  response.title = productList.elements.title.value
+  response.body = productList.elements.body.value
+  response.contentBody = productList.elements.body.value
   response.settings = {}
-  if (productList.products.value.length) {
-    response.products = productList.products.value.split(',')
+  if (productList.elements.products.value.length) {
+    response.products = productList.elements.products.value.split(',')
   }
   return response
 }
@@ -37,30 +37,29 @@ const processForEnhancedMenu = (enhancedMenu, depth) => {
 }
 const processForPage = (item, depth) => {
   let hydrated = {}
-
-  if (item.slider.value.length) {
-    hydrated.slider = processForSlider(item.slider.value[0])
+  if (item.elements.slider.linkedItems.length) {
+    hydrated.slider = processForSlider(item.elements.slider.linkedItems?.at(0))
   }
-  if (item.content_columns.value.length) {
-    hydrated.contentColumns = processForContentColumn(item.content_columns.value[0])
+  if (item.elements.content_columns.linkedItems.length) {
+    hydrated.contentColumns = processForContentColumn(item.elements.content_columns.linkedItems?.at(0))
   }
-  if (item.call_to_action.value.length) {
-    hydrated.callToAction = processForCTA(item.call_to_action.value[0])
+  if (item.elements.call_to_action.linkedItems.length) {
+    hydrated.callToAction = processForCTA(item.elements.call_to_action.linkedItems?.at(0))
   }
-  if (item.product_listing.value.length) {
-    hydrated.product = processForProductPicker(item.product_listing.value[0])
+  if (item.elements.product_listing.linkedItems.length) {
+    hydrated.product = processForProductPicker(item.elements.product_listing.linkedItems?.at(0))
     hydrated.productListingPageFlag = true
   }
   // Dont process the enhanced Menu again because it will be an infinate loop
-  if (item.enhanced_menu.value.length) {
-    hydrated.menu = processForEnhancedMenu(item.enhanced_menu.value[0], depth + 1)
+  if (item.elements.enhanced_menu.value.length) {
+    hydrated.menu = processForEnhancedMenu(item.elements.enhanced_menu.value?.at(0), depth + 1)
   }
   hydrated.contentID = getContentID()
-  hydrated.slug = item.slug.value
+  hydrated.slug = item.elements.slug.value
   hydrated.permissions = { accessFlag: true, nonRestrictedFlag: true }
-  hydrated.title = item.title.value
-  hydrated.body = item.body.value
-  hydrated.contentBody = item.body.value
+  hydrated.title = item.elements.title.value
+  hydrated.body = item.elements.body.value
+  hydrated.contentBody = item.elements.body.value
   hydrated.contentPageType = 'BasicPage'
   return hydrated
 }
@@ -77,13 +76,12 @@ const getEntryBySlug = async (content = {}, slug = '') => {
     .toPromise()
     .then(response => {
       let hydrated = {}
-      if (response.items.length) {
-        const item = response.items[0]
+      if (response.data.items.length) {
+        const item = response.data.items?.at(0)
         hydrated = processForPage(item, 1)
       } else {
         return
       }
-      // console.log('hydrated ', hydrated)
       return hydrated
     })
     .then(response => {
@@ -98,8 +96,6 @@ const getEntryBySlug = async (content = {}, slug = '') => {
         }
         augmentedResponse[slug] = response
       }
-
-      // console.log('final ', augmentedResponse)
       return augmentedResponse
     })
 }
@@ -116,18 +112,17 @@ const getHeaderBySlug = async (content = {}, slug = '') => {
     .toPromise()
     .then(response => {
       let hydrated = {}
-      if (response.items.length) {
-        const item = response.items[0]
-        if (item.utility_menu.value.length) {
-          hydrated.utility_menu = processForMenu(item.utility_menu.value[0])
+      if (response.data.items.length) {
+        const item = response.data.items?.at(0)
+        if (item.elements.utility_menu.linkedItems.length) {
+          hydrated.utility_menu = processForMenu(item.elements.utility_menu.linkedItems?.at(0))
         }
-        if (item.mega_menu.value.length) {
-          hydrated.mega_menu = processForMenu(item.mega_menu.value[0])
+        if (item.elements.mega_menu.linkedItems.length) {
+          hydrated.mega_menu = processForMenu(item.elements.mega_menu.linkedItems?.at(0))
         }
-        hydrated.title = item.contenttitle.value
+        hydrated.title = item.elements.contenttitle.value
         hydrated.settings = {}
       }
-      // console.log('hydrated ', hydrated)
       return { header: hydrated }
     })
 }
@@ -135,7 +130,6 @@ const getHeaderBySlug = async (content = {}, slug = '') => {
 This will retrive content by a specifc slug
 */
 const getFooterBySlug = async (content = {}, slug = '') => {
-  // console.log('slug', slug)
   return deliveryClient
     .items()
     .type('footer')
@@ -144,17 +138,16 @@ const getFooterBySlug = async (content = {}, slug = '') => {
     .toPromise()
     .then(response => {
       let hydrated = {}
-      if (response.items.length) {
-        const item = response.items[0]
-        //   console.log('getFooterBySlug', response)
-        if (item.blocks.value.length) {
-          hydrated.children = item.blocks.value.map(block => {
+      if (response.data.items.length) {
+        const item = response.data.items?.at(0)
+        if (item.elements.blocks.linkedItems.length) {
+          hydrated.children = item.elements.blocks.linkedItems.map(block => {
             return processForBlock(block)
           })
         }
-        hydrated.title = item.heading.value
+        hydrated.title = item.elements.heading.value
         hydrated.key = getContentID()
-        hydrated.contentBody = item.custombody.value
+        hydrated.contentBody = item.elements.custombody.value
       }
       return { footer: hydrated }
     })
@@ -177,8 +170,8 @@ const getBlogPostData = ({ slug }) => {
     .toPromise()
     .then(response => {
       let hydrated = {}
-      if (response.items.length) {
-        hydrated = processForPost(response.items[0])
+      if (response.data.items.length) {
+        hydrated = processForPost(response.data.items?.at(0))
       }
       return hydrated
     })
@@ -193,13 +186,12 @@ const getBlogPosts = ({ limit = 12, skip = 0, category = [] }) => {
   }
   return prom.then(response => {
     let hydrated = {}
-    if (response.items.length) {
-      hydrated.items = response.items.map(post => {
+    if (response.data.items.length) {
+      hydrated.items = response.data.items.map(post => {
         return processForPost(post)
       })
     }
-
-    hydrated.total = response.pagination.totalCount
+    hydrated.total = response.data.pagination.totalCount
     return hydrated
   })
 }
@@ -233,66 +225,66 @@ const processForCatagory = ({ codename, name }) => {
 }
 const processForSlide = slide => {
   let response = {}
-  response.title = slide.contenttitle.value
-  response.contentBody = slide.contentbody.value
-  response.contentImage = processForAsset(slide.contentimage.value[0])
+  response.title = slide.elements.contenttitle.value
+  response.contentBody = slide.elements.contentbody.value
+  response.contentImage = processForAsset(slide.elements.contentimage.value?.at(0))
   response.imagePath = response.contentImage.url
-  response.linkUrl = slide.contentlink.value
-  response.linkLabel = slide.contentlinktitle.value
+  response.linkUrl = slide.elements.contentlink.value
+  response.linkLabel = slide.elements.contentlinktitle.value
   response.contentID = getContentID()
   return response
 }
 const processForSlider = slider => {
   let response = {}
-  response.contentTitle = slider.contenttitle.value
-  response.contentBody = slider.contentbody.value
+  response.contentTitle = slider.elements.contenttitle.value
+  response.contentBody = slider.elements.contentbody.value
   response.contentID = getContentID()
-  response.slides = slider.slider.value.map(slide => {
+  response.slides = slider.elements.slider.linkedItems.map(slide => {
     return processForSlide(slide)
   })
   return response
 }
 const processForBlock = block => {
   let response = {}
-  response.title = block.title.value
-  response.contentBody = block.body.value
+  response.title = block.elements.title.value
+  response.contentBody = block.elements.body.value
   response.urlTitle = block.system.codename.replaceAll('_', '-')
   response.key = `${getContentID()}/${block.system.codename.replaceAll('_', '-')}`
-  if (block.image.value.length) {
-    response.image = processForAsset(block.image.value[0])
+  if (block.elements.image.value.length) {
+    response.image = processForAsset(block.elements.image.value?.at(0))
     response.imagePath = response.image.url
   }
   return response
 }
 const processForCTA = cta => {
   let response = {}
-  response.title = cta.title.value
-  response.linkLabel = cta.link_title.value
-  response.linkUrl = cta.link_url.value
-  response.body = cta.body.value
-  response.summary = cta.summary.value
-  response.contentBody = cta.body.value
-  if (cta.image.value.length) {
-    response.image = processForAsset(cta.image.value[0])
+  response.title = cta.elements.title.value
+  response.linkLabel = cta.elements.link_title.value
+  response.linkUrl = cta.elements.link_url.value
+  response.body = cta.elements.body.value
+  response.summary = cta.elements.summary.value
+  response.contentBody = cta.elements.body.value
+  if (cta.elements.image.value.length) {
+    response.image = processForAsset(cta.elements.image.value?.at(0))
   }
   response.settings = {}
   return response
 }
 const processForContentColumn = item => {
   let response = {}
-  response.title = item.title.value
-  response.body = item.body.value
-  response.columns = item.content_blocks.value.map(block => {
+  response.title = item.elements.title.value
+  response.body = item.elements.body.value
+  response.columns = item.elements.content_blocks.linkedItems.map(block => {
     return processForBlock(block)
   })
   return response
 }
 const processForMenuItem = menuItem => {
   let response = {}
-  response.linkTitle = menuItem.link_title.value
-  response.linkUrl = menuItem.link_url.value
-  response.bootstrapIconClass = menuItem.bootstrapiconclass.value
-  response.columns = menuItem.blocks.value.map(block => {
+  response.linkTitle = menuItem.elements.link_title.value
+  response.linkUrl = menuItem.elements.link_url.value
+  response.bootstrapIconClass = menuItem.elements.bootstrapiconclass.value
+  response.columns = menuItem.elements.blocks.linkedItems.map(block => {
     return processForBlock(block)
   })
   return response
@@ -300,13 +292,13 @@ const processForMenuItem = menuItem => {
 
 const processForMenu = menu => {
   let response = {}
-  response.title = menu.title.value
-  response.body = menu.body.value
-  response.summary = menu.summary.value
-  if (menu.image.value.length) {
-    response.image = processForAsset(menu.image.value[0])
+  response.title = menu.elements.title.value
+  response.body = menu.elements.body.value
+  response.summary = menu.elements.summary.value
+  if (menu.elements.image.value.length) {
+    response.image = processForAsset(menu.elements.image.value?.at(0))
   }
-  response.menu_items = menu.menu_items.value.map(block => {
+  response.menu_items = menu.elements.menu_items.linkedItems.map(block => {
     return processForMenuItem(block)
   })
   return response
@@ -317,20 +309,21 @@ const processForAuthor = author => {
 }
 const processForPost = post => {
   const response = {}
-  response.seo = { title: post.page_title.value }
-  response.postTitle = post.posttitle.value
-  if (post.postimage.value.length) {
-    response.postImage = processForAsset(post.postimage.value[0])
+  response.seo = { title: post.elements.page_title.value }
+  response.postTitle = post.elements.posttitle.value
+
+  if (post.elements.postimage.value.length) {
+    response.postImage = processForAsset(post.elements.postimage.value?.at(0))
   }
-  if (post.author.value.length) {
-    response.authorName = processForAuthor(post.author.value[0])
+  if (post.elements.author.name.value) {
+    response.authorName = processForAuthor(post.elements.author.name.value?.at(0))
   }
   response.publicationDate = post.system.lastModified
-  response.postSummary = post.summary.value
-  response.postContent = post.postcontent.value
-  response.slug = post.slug.value
-  if (post.blog_categories.value.length) {
-    response.blogcategory = post.blog_categories.value.map(post => {
+  response.postSummary = post.elements.summary.value
+  response.postContent = post.elements.postcontent.value
+  response.slug = post.elements.slug.value
+  if (post.elements.blog_categories.value.length) {
+    response.blogcategory = post.elements.blog_categories.value.map(post => {
       return processForCatagory(post)
     })
   }

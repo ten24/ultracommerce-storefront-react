@@ -1,14 +1,14 @@
-import { Layout } from '../../components'
 import BasicPageWithSidebar from '../BasicPageWithSidebar/BasicPageWithSidebar'
+import DynamicPage from '../DynamicPage/DynamicPage'
 import ContactForm from './ContactForm'
 
 const Contact = () => {
   return (
-    <Layout>
+    <DynamicPage ignoreLayout={true}>
       <BasicPageWithSidebar>
         <ContactForm />
       </BasicPageWithSidebar>
-    </Layout>
+    </DynamicPage>
   )
 }
 

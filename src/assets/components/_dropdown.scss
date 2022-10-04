@@ -29,13 +29,7 @@
   left: 0;
   right: 0;
   a {
-    color: $link-color;
-  }
-  @include media-breakpoint-down(lg) {
-    background-color: $gray-900;
-    a {
-      color: $white;
-    }
+    color: var(--uc-textlinkcolor);
   }
 }
 
@@ -72,10 +66,10 @@
   a {
     display: block;
     transition: width 2s, height 4s;
-    color: $link-color;
+    color: var(--uc-textlinkcolor);
     text-decoration: none;
     &:hover {
-      color: $color-orange;
+      color: var(--uc-primarycolor);
     }
     @include media-breakpoint-down(md) {
       color: $color-red;

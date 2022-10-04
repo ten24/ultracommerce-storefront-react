@@ -1,11 +1,11 @@
 import React from 'react'
 import { Helmet } from 'react-helmet'
 import { useSelector } from 'react-redux'
-import { useLocation } from 'react-router'
+import { useLocation } from 'react-router-dom'
 
 const SEO = () => {
   let loc = useLocation()
-  const path = loc.pathname.split('/').reverse()[0].toLowerCase()
+  const path = loc.pathname.split('/').reverse()?.at(0).toLowerCase()
   const configuration = useSelector(state => state.configuration)
   const content = useSelector(state => state.content[path])
   const { site = {}, seo = {} } = configuration

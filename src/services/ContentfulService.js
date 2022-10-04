@@ -214,7 +214,7 @@ const getFooterBySlug = async (content = {}, slug = '') => {
 
     let hydrated = {}
     if (footerItems.total) {
-      const item = footerItems.items[0]
+      const item = footerItems.items?.at(0)
       if (item.blocksCollection.total) {
         hydrated.children = item.blocksCollection.items.map(block => {
           return processForBlock(block)
@@ -251,7 +251,7 @@ const getHeaderBySlug = async (content = {}, slug = '') => {
 
     let hydrated = {}
     if (headerItems.total) {
-      const item = headerItems.items[0]
+      const item = headerItems.items?.at(0)
       if (item.megaMenu) {
         hydrated.mega_menu = processForMenu(item.megaMenu)
       }
@@ -326,7 +326,7 @@ const getBlogPostData = params => {
     const blogItems = response.data.data.blogCollection
     let hydrated = {}
     if (blogItems.total) {
-      const item = blogItems.items[0]
+      const item = blogItems.items?.at(0)
       hydrated = processForPost(item)
     }
     return hydrated
@@ -342,7 +342,7 @@ const getBlogPosts = params => {
       let hydrated = { total: 0, items: [] }
       // console.log('categoryItems', categoryItems)
       if (categoryItems.total) {
-        const cat = categoryItems.items[0]
+        const cat = categoryItems.items?.at(0)
         // console.log('cat', cat)
         if (cat.linkedFrom.blogCollection.total) {
           hydrated.total = cat.linkedFrom.blogCollection.total

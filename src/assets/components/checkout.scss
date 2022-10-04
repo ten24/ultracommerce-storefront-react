@@ -63,7 +63,7 @@
 // Dark skin
 .steps-dark {
   .step-item {
-    color: $link-color;
+    color: var(--uc-textlinkcolor);
   }
   .step-count,
   .step-progress {
@@ -75,13 +75,13 @@
   // }
   .step-item.active {
     &.current {
-      color: $link-color;
+      color: var(--uc-textlinkcolor);
       pointer-events: none;
     }
     .step-count,
     .step-progress {
       color: $color-white;
-      background-color: $link-color;
+      background-color: var(--uc-textlinkcolor);
     }
   }
 }

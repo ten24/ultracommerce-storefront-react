@@ -1,5 +1,5 @@
 import { useDispatch } from 'react-redux'
-import { useLocation } from 'react-router'
+import { useLocation } from 'react-router-dom'
 import { useGetOrderDetails } from '../../hooks'
 import { useEffect } from 'react'
 import { confirmOrder } from '../../actions'
@@ -7,6 +7,7 @@ import { useCookies } from 'react-cookie'
 import queryString from 'query-string'
 import { AccountLayout, OrderDetails, OrderFulfilments, OrderToolbar } from '../../components'
 import { isAuthenticated } from '../../utils'
+import DynamicPage from '../DynamicPage/DynamicPage'
 
 const GuestOrderConfirmation = () => {
   let [order, setRequest, formatOrderDetails] = useGetOrderDetails()
@@ -34,23 +35,27 @@ const GuestOrderConfirmation = () => {
 
   if (isAuthenticated()) {
     return (
-      <AccountLayout title={`Order: ${(order.isLoaded && order.data.orderInfo?.at(0).orderNumber) || ''}`}>
-        {order.isLoaded && <OrderToolbar delivered={order.data.orderInfo?.at(0)} orderPayments={order.data.orderPayments?.at(0)} />}
-        {order.isLoaded && <OrderDetails orderInfo={order.data.orderInfo?.at(0)} orderFulfillments={orderFulfillmentGroups} orderPayments={order.data.orderPayments?.at(0)} />}
-        {order.isLoaded && <OrderFulfilments fulfilments={orderFulfillmentGroups} files={order.data?.files} />}
-      </AccountLayout>
+      <DynamicPage ignoreLayout={true}>
+        <AccountLayout title={`Order: ${(order.isLoaded && order.data.orderInfo?.at(0).orderNumber) || ''}`}>
+          {order.isLoaded && <OrderToolbar delivered={order.data.orderInfo?.at(0)} orderPayments={order.data.orderPayments?.at(0)} />}
+          {order.isLoaded && <OrderDetails orderInfo={order.data.orderInfo?.at(0)} orderFulfillments={orderFulfillmentGroups} orderPayments={order.data.orderPayments?.at(0)} />}
+          {order.isLoaded && <OrderFulfilments fulfilments={orderFulfillmentGroups} files={order.data?.files} />}
+        </AccountLayout>
+      </DynamicPage>
     )
   }
   return (
-    <div className="container py-5 mb-2 mb-md-3">
-      <div className="row">
-        <section className="col-lg-12">
-          {order.isLoaded && <OrderToolbar delivered={order.data.orderInfo?.at(0)} orderPayments={order.data.orderPayments?.at(0)} />}
-          {order.isLoaded && <OrderDetails orderInfo={order.data.orderInfo?.at(0)} orderFulfillments={order.data.orderFulfillments.at(0)} orderPayments={order.data.orderPayments.at(0)} />}
-          {order.isLoaded && <OrderFulfilments fulfilments={orderFulfillmentGroups} files={order.data?.files} />}
-        </section>
+    <DynamicPage ignoreLayout={true}>
+      <div className="container py-5 mb-2 mb-md-3">
+        <div className="row">
+          <section className="col-lg-12">
+            {order.isLoaded && <OrderToolbar delivered={order.data.orderInfo?.at(0)} orderPayments={order.data.orderPayments?.at(0)} />}
+            {order.isLoaded && <OrderDetails orderInfo={order.data.orderInfo?.at(0)} orderFulfillments={order.data.orderFulfillments.at(0)} orderPayments={order.data.orderPayments.at(0)} />}
+            {order.isLoaded && <OrderFulfilments fulfilments={orderFulfillmentGroups} files={order.data?.files} />}
+          </section>
+        </div>
       </div>
-    </div>
+    </DynamicPage>
   )
 }
 

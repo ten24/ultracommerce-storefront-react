@@ -10,4 +10,4 @@ const useFormatCurrency = ({ minimumFractionDigits = 2 }) => {
   }
   return [format]
 }
-export default useFormatCurrency
+export { useFormatCurrency }

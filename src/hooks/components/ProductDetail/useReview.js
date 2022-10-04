@@ -33,7 +33,7 @@ const useReview = productUrlTitle => {
           })
           .map(reviewItem => {
             const actualReview = reviewStack.filter(canReview => reviewItem.rating === canReview.rating)
-            return actualReview.length ? actualReview[0] : reviewItem
+            return actualReview.length ? actualReview?.at(0) : reviewItem
           })
 
         reviewStack = reviewStack.map(reviewData => {

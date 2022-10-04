@@ -1,30 +1,34 @@
 import { Helmet } from 'react-helmet'
-import { Layout, BrandBanner, ListingToolBar, ListingSidebar, ListingGrid, ListingPagination } from '../../components'
+import { ListingBanner, ListingToolBar, ListingSidebar, ListingGrid, ListingListView, ListingPagination, ListingViewToggle, LISTING, GRID } from '../../components'
 import { useBrand, useListing } from '../../hooks'
 import { useState } from 'react'
-import { useLocation } from 'react-router'
+import { useLocation } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import DynamicPage from '../DynamicPage/DynamicPage'
+import { useElementContext } from '../../contexts'
 
 const Brand = () => {
   const { brandResponse, slug, subHeading } = useBrand()
   return (
-    <Layout>
-      {!!brandResponse.data[0]?.settings?.brandHTMLTitleString && <Helmet title={brandResponse.data[0]?.settings?.brandHTMLTitleString} />}
-      <BrandBanner subHeading={subHeading} brandName={brandResponse?.data[0]?.brandName} images={brandResponse?.data[0]?.images} brandDescription={brandResponse?.data[0]?.brandDescription} />
+    <DynamicPage ignoreLayout={true}>
+      {!!brandResponse.data?.at(0)?.settings?.brandHTMLTitleString && <Helmet title={brandResponse.data?.at(0)?.settings?.brandHTMLTitleString} />}
+      <ListingBanner subHeading={subHeading} heading={brandResponse?.data?.at(0)?.brandName} images={brandResponse?.data?.at(0)?.images} description={brandResponse?.data?.at(0)?.brandDescription} />
 
       {brandResponse.isLoaded && brandResponse.data.length > 0 && <BrandSearchListing brandSlug={slug} />}
-    </Layout>
+    </DynamicPage>
   )
 }
 
 const BrandSearchListing = ({ brandSlug }) => {
-  const [hide] = useState('brands')
+  const { SkuCard, ProductCard, ProductRow, SkuRow } = useElementContext()
   const [preFilter] = useState({
     brand_slug: brandSlug,
   })
+  const [hide] = useState('brands')
   const loc = useLocation()
   const content = useSelector(state => state.content[loc.pathname.substring(1)])
-  const { records, isFetching, potentialFilters, total, totalPages, setSort, updateAttribute, setPage, setKeyword, params } = useListing(preFilter)
+  const { records, isFetching, potentialFilters, total, totalPages, setSort, updateAttribute, setPage, setKeyword, params, config } = useListing(preFilter)
+  const [viewMode, setViewMode] = useState(config.viewMode || LISTING)
 
   return (
     <>
@@ -36,10 +40,12 @@ const BrandSearchListing = ({ brandSlug }) => {
         </div>
       </div>
       <div className="container product-listing mb-5">
-        {records.length > 0 && <ListingToolBar hide={hide} {...potentialFilters} removeFilter={updateAttribute} setSort={setSort} />}
+        <ListingToolBar hide={hide} {...potentialFilters} removeFilter={updateAttribute} setSort={setSort} />
+        <ListingViewToggle config={config} viewMode={viewMode} setViewMode={setViewMode} />
         <div className="row mt-3">
           <ListingSidebar isFetching={isFetching} hide={hide} filtering={potentialFilters} recordsCount={total} keyword={params['keyword']} setKeyword={setKeyword} updateAttribute={updateAttribute} />
-          <ListingGrid isFetching={isFetching} pageRecords={records} />
+          {viewMode === LISTING && <ListingListView Card={config?.params?.productsListingFlag ? ProductRow : SkuRow} config={config} isFetching={isFetching} pageRecords={records} />}
+          {viewMode === GRID && <ListingGrid Card={config?.params?.productsListingFlag ? ProductCard : SkuCard} config={config} isFetching={isFetching} pageRecords={records} />}
         </div>
         <ListingPagination recordsCount={total} currentPage={params['currentPage']} totalPages={totalPages} setPage={setPage} />
       </div>

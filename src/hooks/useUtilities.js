@@ -1,9 +1,9 @@
 import { useSelector } from 'react-redux'
-import { useHistory } from 'react-router'
-import { cleanHTML, renameKeys, renameKeysInArrayOfObjects, isAuthenticated, containsHTML, isString, isBoolean, booleanToString, skuIdsToSkuCodes, parseErrorMessages, organizeProductTypes, augmentProductType, groupBy, processQueryParameters, getContentByType } from '../utils'
+import { useNavigate } from 'react-router-dom'
+import { cleanHTML, renameKeys, renameKeysInArrayOfObjects, isAuthenticated, containsHTML, isString, isBoolean, booleanToString, skuIdsToSkuCodes, parseErrorMessages, organizeProductTypes, augmentProductType, groupBy, processQueryParameters, getContentByTypeCode } from '../utils'
 
 const useUtilities = () => {
-  let history = useHistory()
+  const navigate = useNavigate()
   const { basePath, host } = useSelector(state => state.configuration.theme)
 
   const nestDataByKey = (data = [], parentKey = '', childKey = '') => {
@@ -28,6 +28,7 @@ const useUtilities = () => {
       return host + basePath + file
     }
   }
+  const checkLinkForNew = target => target?.getAttribute('target')?.includes('blank') || target?.getAttribute('target')?.includes('tab') || target?.getAttribute('target')?.includes('new')
 
   const eventHandlerForWSIWYG = event => {
     if (event.target.getAttribute('href')) {
@@ -36,12 +37,16 @@ const useUtilities = () => {
       }
       event.preventDefault()
       if (event.target.getAttribute('href').includes('http') || event.target.getAttribute('href').includes('.pdf')) {
-        window.open(event.target.getAttribute('href'), '_blank')
+        if (checkLinkForNew(event.target)) {
+          window.open(event.target.getAttribute('href'), '_blank')
+        } else {
+          window.location = event.target.getAttribute('href')
+        }
         return
       }
       event.preventDefault()
-      
-      if (event.target.getAttribute('target') && (event.target.getAttribute('target').includes('blank') || event.target.getAttribute('target').includes('tab') || event.target.getAttribute('target').includes('new'))) {
+
+      if (event.target.getAttribute('target') && checkLinkForNew(event.target)) {
         window.open(event.target.getAttribute('href'), '_blank')
         return
       }
@@ -49,23 +54,26 @@ const useUtilities = () => {
         window.open(event.target.getAttribute('href'), '_blank')
         return
       } else {
-        history.push(event.target.getAttribute('href'))
+        navigate(event.target.getAttribute('href'))
       }
     } else {
       event.preventDefault()
 
       if (event.target.closest('a')) {
         if (event.target.closest('a').getAttribute('href').includes('http')) {
-        window.open(event.target.closest('a').getAttribute('href'), '_blank')
-        return
+          if (checkLinkForNew(event.target)) {
+            window.open(event.target.closest('a').getAttribute('href'), '_blank')
+          } else {
+            window.location = event.target.closest('a').getAttribute('href')
+          }
+          return
         } else {
-        history.push(event.target.closest('a').getAttribute('href'))
+          navigate(event.target.closest('a').getAttribute('href'))
         }
       }
-    } 
+    }
   }
-  
 
-  return { convertToFullPath, nestDataByKey, eventHandlerForWSIWYG, cleanHTML, renameKeys, renameKeysInArrayOfObjects, isAuthenticated, containsHTML, isString, isBoolean, booleanToString, skuIdsToSkuCodes, parseErrorMessages, organizeProductTypes, augmentProductType, groupBy, processQueryParameters, getContentByType }
+  return { convertToFullPath, nestDataByKey, eventHandlerForWSIWYG, cleanHTML, renameKeys, renameKeysInArrayOfObjects, isAuthenticated, containsHTML, isString, isBoolean, booleanToString, skuIdsToSkuCodes, parseErrorMessages, organizeProductTypes, augmentProductType, groupBy, processQueryParameters, getContentByTypeCode }
 }
 export { useUtilities }

@@ -3,10 +3,10 @@ import { useState } from 'react'
 import { SimpleImage, Modal } from '../..'
 import { useUtilities } from '../../../hooks'
 
-const Block = ({ contentBody, title }) => {
+const Block = ({ contentBody, title, systemCode }) => {
   let { eventHandlerForWSIWYG } = useUtilities()
   return (
-    <div className="col col-lg-3 d-flex my-3">
+    <div className={`d-flex my-3 ${systemCode}`}>
       <div className="card w-100">
         <div className="card-body d-flex flex-column text-center bg-light">
           <h2 className="card-title h6">{title}</h2>
@@ -27,7 +27,7 @@ const BlockProfile = ({ contentBody, imagePath, contentSummary, title, profilePh
   let { eventHandlerForWSIWYG } = useUtilities()
   const [showModal, setModal] = useState(false)
   return (
-    <div className="col col-md-6 col-lg-4 col-xl-3 blockProfile d-flex px-3">
+    <div className="blockProfile d-flex px-3">
       <div
         className="card w-100 my-3"
         onClick={event => {
@@ -77,21 +77,24 @@ const BlockProfile = ({ contentBody, imagePath, contentSummary, title, profilePh
               <p>
                 {positionName.length > 1 && (
                   <>
-                    <span className="positionName">{positionName}</span><br />
+                    <span className="positionName">{positionName}</span>
+                    <br />
                   </>
                 )}
                 {profilePhoneNumber.length > 1 && (
                   <>
                     <a className="profilePhoneNumber text-underline" href={`tel:${profilePhoneNumber}`}>
                       {profilePhoneNumber}
-                    </a><br />
+                    </a>
+                    <br />
                   </>
                 )}
                 {profileEmailAddress.length > 1 && (
                   <>
                     <a className="btn btn-primary text-white px-4 mt-2 border-0 profileEmailAddress" href={`mailto:${profileEmailAddress}`}>
                       {t('frontend.core.contact')}
-                    </a><br />
+                    </a>
+                    <br />
                   </>
                 )}
               </p>
@@ -114,7 +117,7 @@ const BlockProfile = ({ contentBody, imagePath, contentSummary, title, profilePh
 const Blocks = ({ blocks = [] }) => {
   return (
     <div className="container block-list mt-2">
-      <div className="row">
+      <div className="uc-grid">
         {blocks.map((item, index) => {
           if (item.elementType === 'cetProfile') {
             return <BlockProfile {...item} key={index} />

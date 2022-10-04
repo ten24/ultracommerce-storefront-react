@@ -131,7 +131,6 @@ const BillingAddress = ({ onSave, onCancel }) => {
                   street2Address: value,
                 })
               }}
-              onBlur={value => requiredValidation({ value, name: 'street2Address', msg: t('frontend.core.required') })}
             />
           </div>
         </div>

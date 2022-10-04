@@ -1,14 +1,14 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { Link, useHistory } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { SimpleImage } from '..'
 
 import { useFormatDate, useUtilities } from '../../hooks'
 import { getBlogRoute } from '../../selectors/configurationSelectors'
 
 function BlogListBody({ blog }) {
-  const route = useHistory()
+  const route = useNavigate()
   const [formateDate] = useFormatDate()
   const { t } = useTranslation() // Translate
   let { eventHandlerForWSIWYG } = useUtilities()

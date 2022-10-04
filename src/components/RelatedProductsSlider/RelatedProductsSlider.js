@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { SlatwalApiService } from '../../services'
 import { useTranslation } from 'react-i18next'
 import Slider from 'react-slick'
-import { ProductCard } from '..'
+import { SkuCard } from '..'
 
 const RelatedProductsSlider = ({ productUrlTitle, slidesToShow = 4 }) => {
   const { t } = useTranslation()
@@ -79,7 +79,7 @@ const RelatedProductsSlider = ({ productUrlTitle, slidesToShow = 4 }) => {
               relatedProducts.products.map(product => {
                 return (
                   <div className="repeater" key={product.productCode}>
-                    <ProductCard {...product} />
+                    <SkuCard {...product} />
                   </div>
                 )
               })}

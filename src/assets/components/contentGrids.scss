@@ -1,0 +1,57 @@
+.content-grid {
+    background: #f2f2f2;
+    padding: 5rem 0 8rem;
+    .image {
+        height: 200px;
+        background-position: top center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-blend-mode: multiply;
+        display: block;
+        -webkit-transition: all 350ms;
+        -moz-transition: all 350ms;
+        -ms-transition: all 350ms;
+        -o-transition: all 350ms;
+        transition: all 350ms;
+    }
+    h4 {
+        padding: 15px 20px;
+        margin: 0;
+    }
+    .text {
+        background: #fff;
+        padding: 25px 20px;
+        flex: 1;
+    }
+    @include media-breakpoint-up(md) { 
+        .vertical {
+            border-right: 1px solid #E5E5E5;
+            &:nth-of-type(3),
+            &:nth-of-type(4) {
+                border-right: 0;
+            }
+        }
+        .horizontal {
+            .text {
+                border-top: 1px solid #E5E5E5;
+            }
+            .image {
+                height: 100%;
+            }
+        }
+    }
+    .link-carrot{
+        position: relative;
+        &:after {
+            content: ">";
+            position: absolute;
+            top: -2px;
+            right: -15px;
+        }
+    }
+    .image-text {
+        position: absolute;
+        left: 30px;
+        bottom: 30px;
+    }
+}

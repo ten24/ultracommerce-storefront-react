@@ -1,6 +1,8 @@
-import { PageHeader, Layout, OrderTemplateCheckoutSideBar, OrderTemplateCheckoutStepsHeader, getOrderTemplateCurrentStep, OrderTemplateShippingSlide, OrderTemplatePaymentSlide, OrderTemplateReviewSlide, ThreeDSRedirect, AccountLogin, CreateGuestAccount, OrderTemplateConfig } from '../../components'
+import * as Sentry from '@sentry/react'
+import { Navigate, Route, Routes as RouterRoutes, useNavigate, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { Redirect, Route, Switch, useHistory, useLocation, useRouteMatch } from 'react-router-dom'
+import { PageHeader, OrderTemplateCheckoutSideBar, OrderTemplateCheckoutStepsHeader, getOrderTemplateCurrentStep, OrderTemplateShippingSlide, OrderTemplatePaymentSlide, OrderTemplateReviewSlide, ThreeDSRedirect, AccountLogin, CreateGuestAccount, OrderTemplateConfig, RedirectWithReplace } from '../../components'
+
 import './checkout.css'
 import { isAuthenticated, getErrorMessage } from '../../utils'
 import { useEffect, useState } from 'react'
@@ -10,12 +12,15 @@ import { axios, sdkURL } from '../../services'
 
 import { toast } from 'react-toastify'
 import { clearSubscriptionCart } from '../../actions/subscriptionCartActions'
+import DynamicPage from '../DynamicPage/DynamicPage'
+
+const Routes = Sentry.withSentryReactRouterV6Routing(RouterRoutes)
 
 const OrderTemplateCheckout = () => {
-  let match = useRouteMatch()
   const { pathname } = useLocation()
-  const history = useHistory()
-  const path = pathname.split('/').reverse()[0].toLowerCase()
+  const navigate = useNavigate()
+  const path = pathname.split('/').reverse()?.at(0).toLowerCase()
+
   const currentStep = getOrderTemplateCurrentStep(path)
   const { verifiedAccountFlag, isFetching, accountID = false } = useSelector(state => state.userReducer)
   const enforceVerifiedAccountFlag = useSelector(state => state.configuration.enforceVerifiedAccountFlag)
@@ -41,7 +46,7 @@ const OrderTemplateCheckout = () => {
         dispatch(receiveSubscriptionCart(response.data.orderTemplateCart))
         toast.success(t('frontend.order.placed'))
         setTimeout(() => {
-          history.push('/my-account/subscription-orders')
+          navigate('/my-account/subscription-orders')
         }, 2000)
       } else {
         toast.error(getErrorMessage(response.data.messages))
@@ -53,32 +58,25 @@ const OrderTemplateCheckout = () => {
     if (!isAuthenticated()) {
       dispatch(clearUser())
       dispatch(requestLogOut())
-      if (pathname !== '/scheduled-delivery-checkout/login' && pathname !== '/scheduled-delivery-checkout/createGuestAccount' && pathname !== '/scheduled-delivery-checkout/cart') history.replace(`/scheduled-delivery-checkout/login?redirect=${pathname}`)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  if (enforceVerifiedAccountFlag && !verifiedAccountFlag && isAuthenticated() && !isFetching && accountID.length > 0) return <Redirect to="/account-verification" />
+  if (enforceVerifiedAccountFlag && !verifiedAccountFlag && isAuthenticated() && !isFetching && accountID.length > 0) return <Navigate to="/account-verification" />
 
   return (
-    <Layout>
+    <DynamicPage ignoreLayout={true}>
       <PageHeader />
       <div className="container pb-5 mb-2 mb-md-4">
         {!isAuthenticated() && (
           <div className="row">
             <section className="col">
               {/* <!-- Steps--> */}
-              <Switch>
-                <Route path={`${match.path}/cart`}>
-                  <Redirect to={`/scheduled-delivery-cart`} />
-                </Route>
-                <Route path={`${match.path}/login`}>
-                  <AccountLogin isCheckout={true} />
-                </Route>
-                <Route path={`${match.path}/createGuestAccount`}>
-                  <CreateGuestAccount />
-                </Route>
-              </Switch>
+              <Routes>
+                <Route path={`createGuestAccount`} element={<CreateGuestAccount />} />
+                <Route path={`cart`} element={<RedirectWithReplace pathname={`/scheduled-delivery-cart`} />} />
+                <Route path={`*`} element={<AccountLogin isCheckout={true} />} />
+              </Routes>
             </section>
             {/* <!-- Sidebar--> */}
           </div>
@@ -88,27 +86,15 @@ const OrderTemplateCheckout = () => {
             <section className="col-lg-8">
               {/* <!-- Steps--> */}
               <OrderTemplateCheckoutStepsHeader />
-              <Route path={`${match.path}/scheduled-delivery-cart`}>
-                <Redirect to="/scheduled-delivery-cart" />
-              </Route>
 
-              <Switch>
-                <Route path={`${match.path}/scheduled-delivery-info`}>
-                  <OrderTemplateConfig currentStep={currentStep} />
-                </Route>
-                <Route path={`${match.path}/shipping`}>
-                  <OrderTemplateShippingSlide currentStep={currentStep} />
-                </Route>
-                <Route path={`${match.path}/payment`}>
-                  <OrderTemplatePaymentSlide currentStep={currentStep} />
-                </Route>
-                <Route path={`${match.path}/review`}>
-                  <OrderTemplateReviewSlide currentStep={currentStep} />
-                </Route>
-                <Route path={match.path}>
-                  <Redirect to={`${match.path}/scheduled-delivery-info`} />
-                </Route>
-              </Switch>
+              <Routes>
+                <Route path={`scheduled-delivery-cart`} element={<RedirectWithReplace pathname={`/scheduled-delivery-cart`} />} />
+                <Route path={`scheduled-delivery-info`} element={<OrderTemplateConfig currentStep={currentStep} />} />
+                <Route path={`shipping`} element={<OrderTemplateShippingSlide currentStep={currentStep} />} />
+                <Route path={`payment`} element={<OrderTemplatePaymentSlide currentStep={currentStep} />} />
+                <Route path={`review`} element={<OrderTemplateReviewSlide currentStep={currentStep} />} />
+                <Route path={`*`} element={<RedirectWithReplace pathname={`${pathname}/scheduled-delivery-info`} />} />
+              </Routes>
             </section>
             {/* <!-- Sidebar--> */}
             <OrderTemplateCheckoutSideBar placeOrder={placeOrder} />
@@ -116,7 +102,7 @@ const OrderTemplateCheckout = () => {
           </div>
         )}
       </div>
-    </Layout>
+    </DynamicPage>
   )
 }
 

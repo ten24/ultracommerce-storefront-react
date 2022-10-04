@@ -1,12 +1,13 @@
 import { useTranslation } from 'react-i18next'
-import { Layout, ListingPagination, BlogSidebar, BlogListBody } from '../../components'
+import { ListingPagination, BlogSidebar, BlogListBody } from '../../components'
 import { useBlogPage } from '../../hooks'
+import DynamicPage from '../DynamicPage/DynamicPage'
 
 const Blog = () => {
   const { request, currentPage, countOnPage, setPage } = useBlogPage()
   const { t } = useTranslation()
   return (
-    <Layout>
+    <DynamicPage ignoreLayout={true}>
       <div className="bg-light p-5 mb-4 text-center">
         <h1 className="display-4">{t('frontend.blog.title')}</h1>
       </div>
@@ -30,7 +31,7 @@ const Blog = () => {
           <BlogSidebar />
         </div>
       </div>
-    </Layout>
+    </DynamicPage>
   )
 }
 

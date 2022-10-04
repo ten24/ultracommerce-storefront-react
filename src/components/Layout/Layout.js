@@ -8,7 +8,7 @@ const Layout = ({ classNameList = '', children }) => {
   return (
     <>
       <Helmet title={siteName} />
-      <ToastContainer />
+      <ToastContainer position="bottom-right" autoClose={3000} />
       <div style={{ minHeight: '800px' }} className={`${classNameList} footer-height`}>
         {children}
       </div>

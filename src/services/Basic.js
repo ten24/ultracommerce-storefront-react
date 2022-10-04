@@ -65,7 +65,7 @@ const processForSlide = slide => {
   let response = {}
   response.contentTitle = slide.contenttitle.value
   response.contentBody = slide.contentbody.value
-  response.contentImage = processForAsset(slide.contentimage.value[0])
+  response.contentImage = processForAsset(slide.contentimage.value?.at(0))
   response.contentLink = slide.contentlink.value
   response.contentLinkTitle = slide.contentlinktitle.value
   return response
@@ -88,7 +88,7 @@ const processForBlock = block => {
   response.key = block.system.codename.replaceAll('_', '-')
   response.settings = {}
   if (block.image.value.length) {
-    response.image = processForAsset(block.image.value[0])
+    response.image = processForAsset(block.image.value?.at(0))
   }
   return response
 }
@@ -101,7 +101,7 @@ const processForCTA = cta => {
   response.summary = cta.summary.value
   response.contentBody = cta.body.value
   if (cta.image.value.length) {
-    response.image = processForAsset(cta.image.value[0])
+    response.image = processForAsset(cta.image.value?.at(0))
   }
   response.settings = {}
   return response
@@ -131,7 +131,7 @@ const processForMenu = menu => {
   response.body = menu.body.value
   response.summary = menu.summary.value
   if (menu.image.value.length) {
-    response.image = processForAsset(menu.image.value[0])
+    response.image = processForAsset(menu.image.value?.at(0))
   }
   response.menu_items = menu.menu_items.value.map(block => {
     return processForMenuItem(block)
@@ -146,10 +146,10 @@ const processForPost = post => {
   response.seo = { title: post.page_title.value }
   response.postTitle = post.posttitle.value
   if (post.postimage.value.length) {
-    response.postImage = processForAsset(post.postimage.value[0])
+    response.postImage = processForAsset(post.postimage.value?.at(0))
   }
   if (post.author.value.length) {
-    response.authorName = processForAuthor(post.author.value[0])
+    response.authorName = processForAuthor(post.author.value?.at(0))
   }
   response.publicationDate = post.system.lastModified
   response.postSummary = post.summary.value

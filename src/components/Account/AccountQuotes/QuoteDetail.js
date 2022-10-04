@@ -9,7 +9,7 @@ import { clearCart, getEligibleOrderFulfillmentMethods, getAllPickupLocations, s
 import { AddressCard } from '../../Checkout/Fulfilment/AddressCard'
 import { OrderItem } from '../AccountOrderDetail/OrderShipments'
 import { useDispatch } from 'react-redux'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router-dom'
 
 const QuoteDetail = ({ quoteDetail, updateQuote }) => {
   return (
@@ -27,8 +27,8 @@ const QuoteDetailDraft = ({ quoteDetail, updateQuote }) => {
   const [eligibleFulfillmentMethods, setEligibleMethods] = useState({})
   const [pickupLocations, setPickupLocations] = useState([])
   let selectedFulfillmentMethod = { fulfillmentMethodID: '' }
-  if (quoteDetail.orderFulfillments[0] && quoteDetail.orderFulfillments[0].fulfillmentMethod) {
-    selectedFulfillmentMethod = quoteDetail.orderFulfillments[0].fulfillmentMethod
+  if (quoteDetail.orderFulfillments?.at(0) && quoteDetail.orderFulfillments?.at(0).fulfillmentMethod) {
+    selectedFulfillmentMethod = quoteDetail.orderFulfillments?.at(0).fulfillmentMethod
   }
   useEffect(() => {
     dispatch(
@@ -40,14 +40,18 @@ const QuoteDetailDraft = ({ quoteDetail, updateQuote }) => {
         isQuote: true,
       })
     ).then(response => {
-      setEligibleMethods(response?.success()?.eligibleFulfillmentMethods)
+      if (response.isSuccess()) {
+        setEligibleMethods(response?.success()?.eligibleFulfillmentMethods)
+      }
     })
     dispatch(getAllPickupLocations({ isQuote: true })).then(response => {
-      setPickupLocations(
-        response?.success()?.locations.map(location => {
-          return { name: location['NAME'], value: location['VALUE'] }
-        })
-      )
+      if (response.isSuccess()) {
+        setPickupLocations(
+          response?.success()?.locations.map(location => {
+            return { name: location['NAME'], value: location['VALUE'] }
+          })
+        )
+      }
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quoteDetail.orderID])
@@ -573,7 +577,7 @@ const QuoteSidebar = ({ quoteDetail, updateQuote }) => {
 const QuoteActions = ({ quoteDetail }) => {
   const { t } = useTranslation()
   const dispatch = useDispatch()
-  const history = useHistory()
+  const navigate = useNavigate()
   return (
     <>
       {quoteDetail.orderStatusType.typeCode === 'qstApproved' && (
@@ -597,7 +601,7 @@ const QuoteActions = ({ quoteDetail }) => {
                   if (response.isSuccess() && response.success()?.successfulActions.length > 0) {
                     toast.success(t('frontend.order.placed'))
                     setTimeout(() => {
-                      history.push('/my-account/quotes')
+                      navigate('/my-account/quotes')
                     }, 2000)
                   }
                 })

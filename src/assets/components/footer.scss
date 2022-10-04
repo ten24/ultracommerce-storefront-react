@@ -1,5 +1,6 @@
 footer {
-  background: #D8D8D8;
+  background: var(--uc-footerbackgroundcolor);
+  color: var(--uc-footertextcolor);
 
   ul {
     padding: 0;
@@ -7,13 +8,19 @@ footer {
   }
   
   a {
-    color: #231f20;
+    color: var(--uc-footertextcolor);
     &:hover {
-      color: $color-orange;
+      color: var(--uc-footertextcolor);
+      text-decoration: underline;
     }
   }
 
   .input-group {
     background: #FFF;
+  }
+  
+  .nav-link:hover {
+    color: var(--uc-footertextcolor);
+    text-decoration: underline;
   }
 }

@@ -1,13 +1,15 @@
 import { getCurrentStep } from '../../../components'
 import { useSelector } from 'react-redux'
-import { Redirect, useHistory, useLocation } from 'react-router-dom'
+import { Navigate, useNavigate, useLocation } from 'react-router-dom'
 import { isAuthenticated } from '../../../utils'
 import { useEffect } from 'react'
 
 const useCheckout = () => {
   const loc = useLocation()
-  const history = useHistory()
-  const path = loc.pathname.split('/').reverse()[0].toLowerCase()
+
+  const navigate = useNavigate()
+  const path = loc.pathname.split('/').reverse()?.at(0).toLowerCase()
+
   const currentStep = getCurrentStep(path)
   const { verifiedAccountFlag, isFetching, accountID } = useSelector(state => state.userReducer)
   const enforceVerifiedAccountFlag = useSelector(state => state.configuration.enforceVerifiedAccountFlag)
@@ -16,12 +18,12 @@ const useCheckout = () => {
 
   useEffect(() => {
     if (!isAuthenticated()) {
-      history.replace(`/my-account/login?redirect=${loc.pathname}`)
+      navigate(`/my-account/login?redirect=${loc.pathname}`, { replace: true })
     }
-  }, [history, loc, cartState])
+  }, [navigate, loc, cartState])
 
   if (enforceVerifiedAccountFlag && !verifiedAccountFlag && isAuthenticated() && !isFetching && accountID.length > 0) {
-    return <Redirect to="/account-verification" />
+    return <Navigate to="/account-verification" />
   }
   return { currentStep }
 }

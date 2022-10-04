@@ -7,8 +7,8 @@ export const getAllOrderFulfillments = state => {
   }
   return state.cart.orderFulfillments
 }
-export const getAllAccountAddresses = state => state.userReducer.accountAddresses
-export const getAllAccountPaymentMethods = state => state.userReducer.accountPaymentMethods
+const getAllAccountAddresses = state => state.userReducer.accountAddresses
+const getAllAccountPaymentMethods = state => state.userReducer.accountPaymentMethods
 export const getAllPickupLocations = state => state.cart.pickupLocations
 export const getAllOrderPayments = state => state.cart.orderPayments?.filter(({ creditCardType, orderPaymentStatusType }) => creditCardType !== 'Invalid' && orderPaymentStatusType.systemCode !== 'opstRemoved')
 export const getAllEligiblePaymentMethodDetails = state => state.cart.eligiblePaymentMethodDetails
@@ -44,16 +44,16 @@ export const disableInteractionForOrderTemplateCheckoutSelector = createSelector
 
 export const fulfillmentMethodSelector = createSelector(getAllOrderFulfillments, orderFulfillments => {
   let selectedFulfillmentMethod = { fulfillmentMethodID: '' }
-  if (orderFulfillments[0] && orderFulfillments[0].fulfillmentMethod) {
-    selectedFulfillmentMethod = orderFulfillments[0].fulfillmentMethod
+  if (orderFulfillments?.at(0) && orderFulfillments?.at(0).fulfillmentMethod) {
+    selectedFulfillmentMethod = orderFulfillments?.at(0).fulfillmentMethod
   }
   return selectedFulfillmentMethod
 })
 
 export const fulfillmentSelector = createSelector(getAllOrderFulfillments, orderFulfillments => {
   let selectedFulfillment = { fulfillmentMethodID: '', fulfillmentMethod: { fulfillmentMethodType: '' } }
-  if (orderFulfillments[0]) {
-    selectedFulfillment = orderFulfillments[0]
+  if (orderFulfillments?.at(0)) {
+    selectedFulfillment = orderFulfillments?.at(0)
   }
   return selectedFulfillment
 })
@@ -64,23 +64,23 @@ export const shippingAddressSelector = createSelector(fulfillmentSelector, order
 
 export const shippingMethodSelector = createSelector(getAllOrderFulfillments, orderFulfillments => {
   let selectedFulfillmentMethod = { shippingMethodID: '' }
-  if (orderFulfillments[0] && orderFulfillments[0].shippingMethod) {
-    selectedFulfillmentMethod = orderFulfillments[0].shippingMethod
+  if (orderFulfillments?.at(0) && orderFulfillments?.at(0).shippingMethod) {
+    selectedFulfillmentMethod = orderFulfillments?.at(0).shippingMethod
   }
   return selectedFulfillmentMethod
 })
 
 export const accountAddressSelector = createSelector([getAllAccountAddresses, getAllOrderFulfillments], (accountAddresses, orderFulfillments) => {
   let selectedAccountID = ''
-  if (orderFulfillments.length && accountAddresses.length && orderFulfillments[0].accountAddress) {
+  if (orderFulfillments.length && accountAddresses.length && orderFulfillments?.at(0).accountAddress) {
     const selectAccount = accountAddresses
       .filter(({ accountAddressID }) => {
-        return accountAddressID === orderFulfillments[0].accountAddress.accountAddressID
+        return accountAddressID === orderFulfillments?.at(0).accountAddress.accountAddressID
       })
       .map(({ accountAddressID }) => {
         return accountAddressID
       })
-    selectedAccountID = selectAccount.length ? selectAccount[0] : ''
+    selectedAccountID = selectAccount.length ? selectAccount?.at(0) : ''
   }
 
   return selectedAccountID
@@ -103,7 +103,7 @@ export const pickupLocationSelector = createSelector(fulfillmentSelector, fulfil
 export const orderPayment = createSelector(getAllOrderPayments, orderPayments => {
   let orderPayment = { paymentMethod: { paymentMethodID: '' }, accountPaymentMethod: { accountPaymentMethodID: '' } }
   if (orderPayments.length) {
-    orderPayment = orderPayments[0]
+    orderPayment = orderPayments?.at(0)
   }
   return orderPayment
 })
@@ -124,7 +124,7 @@ export const billingAccountAddressSelector = createSelector([getAllAccountAddres
       .map(({ accountAddressID }) => {
         return accountAddressID
       })
-    selectedAccountID = selectAccount.length ? selectAccount[0] : ''
+    selectedAccountID = selectAccount.length ? selectAccount?.at(0) : ''
   }
 
   return selectedAccountID
@@ -140,7 +140,7 @@ export const billingAddressNickname = createSelector([getAllAccountPaymentMethod
       .map(({ accountPaymentMethodName }) => {
         return accountPaymentMethodName
       })
-    billingAddressNickname = billingAddressNickname.length ? billingAddressNickname[0] : ''
+    billingAddressNickname = billingAddressNickname.length ? billingAddressNickname?.at(0) : ''
   }
   return billingAddressNickname
 })
@@ -152,7 +152,7 @@ export const shippingAddressNicknameSelector = createSelector([fulfillmentSelect
     .map(({ accountAddressName }) => {
       return accountAddressName
     })
-  shippingAddressNickname = shippingAddressNickname.length ? shippingAddressNickname[0] : ''
+  shippingAddressNickname = shippingAddressNickname.length ? shippingAddressNickname?.at(0) : ''
 
   return shippingAddressNickname
 })

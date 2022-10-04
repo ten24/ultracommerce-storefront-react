@@ -1,10 +1,10 @@
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 const SlideNavigation = ({ currentStep, nextActive = true }) => {
-  let history = useHistory()
+  const navigate = useNavigate()
   const { t } = useTranslation()
-
+  
   return (
     <>
       {currentStep.next.length > 0 && <hr />}
@@ -17,7 +17,7 @@ const SlideNavigation = ({ currentStep, nextActive = true }) => {
                 disabled={!nextActive}
                 onClick={e => {
                   e.preventDefault()
-                  history.push(currentStep.next)
+                  navigate({ pathname: `/checkout/${currentStep.next}`})
                 }}
               >
                 <span className=" d-sm-inline">{t('frontend.pagination.continue')}</span>

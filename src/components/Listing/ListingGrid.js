@@ -1,4 +1,4 @@
-import { ProductCard, NoProductFound } from '../'
+import { SkuCard, NoProductFound } from '../'
 import ContentLoader from 'react-content-loader'
 
 const ListingGridLoader = props => (
@@ -17,7 +17,7 @@ const ListingGridLoader = props => (
   </ContentLoader>
 )
 
-const ListingGrid = ({ isFetching, pageRecords }) => {
+const ListingGrid = ({ isFetching, pageRecords, Card = SkuCard, config }) => {
   return (
     <div className="col">
       {isFetching && (
@@ -27,11 +27,10 @@ const ListingGrid = ({ isFetching, pageRecords }) => {
       )}
       <div className="product-grid">
         {!isFetching &&
-          pageRecords.length > 0 &&
-          pageRecords.map((product, index) => {
+          pageRecords?.map((product, index) => {
             return (
               <div key={`${product.productName}${index}`} className="mb-4">
-                <ProductCard {...product} />
+                <Card config={config} showInputLabel={false} showInput={config?.showInput} {...product} />
               </div>
             )
           })}

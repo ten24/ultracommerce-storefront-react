@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { getEnableMultiSite, getSites } from '../../selectors'
+import { getCurrentSiteCode } from '../../utils'
 
 const MultiSitePicker = () => {
   const { t } = useTranslation()
@@ -21,10 +22,12 @@ const MultiSitePicker = () => {
     }
   }, [wrapperRef, show])
   const sites = useSelector(getSites)
-  const currentSiteCode = localStorage.getItem('siteCode')
+  const currentSiteCode = getCurrentSiteCode()
   const enableMultiSite = useSelector(getEnableMultiSite)
   const switchSite = siteCode => {
-    localStorage.setItem('siteCode', siteCode)
+    let appConfiguration = JSON.parse(localStorage.getItem('appConfiguration') || '{}')
+    appConfiguration.currentSite = siteCode
+    localStorage.setItem('appConfiguration', JSON.stringify(appConfiguration))
     window.location.reload(true)
   }
   if (sites?.length < 2) return null

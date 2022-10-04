@@ -33,7 +33,7 @@
 .filter-block .filter-list-container .form-check-input:hover,
 .filter-block .filter-list-container .form-check-label:hover {
   cursor: pointer;
-  color: $primary-blue;
+  color: var(--uc-textlinkcolor);
 }
 .product-brand {
   font-size: 11px;
@@ -60,7 +60,7 @@
 }
 
 .product-name:hover {
-  color: $orange;
+  color: var(--uc-textlinkcolor);
 }
 
 .product-card {
@@ -136,7 +136,6 @@
   border-color: #ced4da !important;
 }
 .qtyLabel {
-  font-family: 'Jost', sans-serif;
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.5;

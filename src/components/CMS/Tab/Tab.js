@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { ContentBlock, ContentColumns, ListItem, ListItemWithImage } from '../..'
 import { useUtilities } from '../../../hooks'
 
 const TabHeading = ({ name = '', loc, isActive = false, setActiveTab }) => {
@@ -25,52 +24,19 @@ const TabHeading = ({ name = '', loc, isActive = false, setActiveTab }) => {
   )
 }
 
-const TabPanel = ({ panel, isActive }) => {
+const TabPanel = props => {
+  const { title, contentBody, isActive, children } = props
   let { eventHandlerForWSIWYG } = useUtilities()
-  const generateChildren = panel.children
-    .map(child => {
-      if (child.elementType === 'cetListItem') {
-        return <ListItem {...child} />
-      }
-      if (child.elementType === 'cetColumns' && child?.columns?.length > 0) {
-        return (
-          <ContentColumns title={child.title}>
-            <div className="row justify-content-center">
-              {child.columns.map((column, index) => {
-                return (
-                  <div key={`${column.title}-${index}`} className={`col-lg-${12 / child.columns.length} pr-4-lg`}>
-                    <ContentBlock {...column} />
-                  </div>
-                )
-              })}
-            </div>
-          </ContentColumns>
-        )
-      }
-      if (child.elementType === 'cetListItemWithImage') {
-        return <ListItemWithImage {...child} />
-      }
-      return null
-    })
-    .filter(item => item)
   return (
-    <div className={`tab-pane fade ${isActive ? 'show active' : ''}`} id={panel.name?.replace(/\s/g, '')} role="tabpanel" aria-labelledby={`${panel.name?.replace(/\s/g, '')}-tab`}>
+    <div className={`tab-pane fade ${isActive ? 'show active' : ''}`} id={title?.replace(/\s/g, '')} role="tabpanel" aria-labelledby={`${title?.replace(/\s/g, '')}-tab`}>
       <div
         className="content-body"
         onClick={eventHandlerForWSIWYG}
         dangerouslySetInnerHTML={{
-          __html: panel.contentBody || '',
+          __html: contentBody || '',
         }}
       />
-      <div className="tab-panel-children">
-        {generateChildren.map((child, index) => {
-          return (
-            <div key={index}>
-              {child} {index < generateChildren.length - 1 && <hr />}
-            </div>
-          )
-        })}
-      </div>
+      <div className="tab-panel-children">{children}</div>
     </div>
   )
 }
@@ -88,15 +54,28 @@ const Tabs = ({ headings, panels }) => {
   )
 }
 
-const SimpleTabs = ({ data }) => {
+const SimpleTabs = props => {
+  const { children } = props
   const [activeTab, setActiveTab] = useState(0)
-  const headings = data?.map(({ title, key }, index) => {
-    return <TabHeading name={title} key={index} isActive={activeTab === index} setActiveTab={setActiveTab} loc={index} />
+  const headings = children?.map((childTab, index) => {
+    return <TabHeading name={childTab.props.el.title} key={index} isActive={activeTab === index} setActiveTab={setActiveTab} loc={index} />
   })
-  const panels = data?.map((tab, index) => {
-    return <TabPanel key={index} panel={tab} isActive={activeTab === index} />
-  })
-  return <Tabs headings={headings} panels={panels} />
+  // I feel weird about this but I think it is okay...
+  if (!!children?.at(activeTab)?.props?.el) {
+    children.at(activeTab).props.el.isActive = true
+  }
+
+  return (
+    <div className="Tabs shadow">
+      <ul className="nav nav-tabs nav-justified border-0" id="myTab" role="tablist">
+        {headings}
+      </ul>
+      <div className="tab-content p-2 p-md-5" id="myTabContent">
+        {children}
+      </div>
+    </div>
+  )
+  // return null
 }
 
 export { TabHeading, TabPanel, SimpleTabs, Tabs }

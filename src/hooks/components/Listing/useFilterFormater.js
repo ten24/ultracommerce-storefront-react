@@ -27,7 +27,7 @@ const useFilterFormater = ({ option, brand, attribute, category, priceRange, pro
       if (ranges.length !== 2) {
         return { ...option, displayName: option.name }
       }
-      const name = formatCurrency(parseFloat(ranges[0])) + ' - ' + formatCurrency(parseFloat(ranges[1]))
+      const name = formatCurrency(parseFloat(ranges?.at(0))) + ' - ' + formatCurrency(parseFloat(ranges[1]))
       return { displayName: name, name: option.name, value: option.value, legacyName: option.name }
     })
   }

@@ -1,12 +1,12 @@
-import { useHistory, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { orderTemplateCheckOutSteps, getOrderTemplateCurrentStep } from '../'
 
 const OrderTemplateCheckoutStepsHeader = () => {
   const { t } = useTranslation()
   const loc = useLocation()
-  let history = useHistory()
-  const path = loc.pathname.split('/').reverse()[0].toLowerCase()
+  const navigate = useNavigate()
+  const path = loc.pathname.split('/').reverse()?.at(0).toLowerCase()
   const current = getOrderTemplateCurrentStep(path)
   return (
     <ul className="nav nav-pills border nav-fill mb-4 p-2 rounded">
@@ -25,7 +25,7 @@ const OrderTemplateCheckoutStepsHeader = () => {
               className={`nav-link link text-decoration-none ${progressSate}`}
               key={step.progress}
               onClick={e => {
-                history.push(step.link)
+                navigate(step.link)
               }}
             >
               {t(step.name)}

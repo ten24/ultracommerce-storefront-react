@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Button, Modal } from '../'
 import { toBoolean,isAuthenticated } from '../../utils'
 
-const ProductTypeQuote = ({ selectedSKu, product, isFetching }) => {
+const ProductTypeQuote = ({ selectedSKu, product, isFetching, quantity }) => {
   
   const { t } = useTranslation()
   const [quoteModal, setQuoteModal] = useState(false)
@@ -35,7 +35,7 @@ const ProductTypeQuote = ({ selectedSKu, product, isFetching }) => {
         </form>
       </div>
       <Modal show={quoteModal} setShow={setQuoteModal} title={t('frontend.quote.addToQuote')} size="large">
-        <div className="container">{quoteModal && <AddProductToQuoteModal sku={selectedSKu} show={quoteModal} setQuoteModal={setQuoteModal} />}</div>
+        <div className="container">{quoteModal && <AddProductToQuoteModal sku={selectedSKu} show={quoteModal} setQuoteModal={setQuoteModal} quantity={quantity} />}</div>
       </Modal>
      </>
       )}

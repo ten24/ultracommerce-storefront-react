@@ -9,43 +9,45 @@ import { getErrorMessage } from '../../utils'
 import { useSelector } from 'react-redux'
 
 const possibleRates = [1, 2, 3, 4, 5]
-const AddReview = ({ selectedRate , setSelectedRate, hoveredRate, setHoveredRate, sku_product_productID, sku_product_productName, sku_product_urlTitle, sku_skuID, images ,showModal ,setModal}) => {
+const AddReview = ({ selectedRate, setSelectedRate, hoveredRate, setHoveredRate, sku_product_productID, sku_product_productName, sku_product_urlTitle, sku_skuID, images, showModal, setModal }) => {
   const productRouting = useSelector(getProductRoute)
   const user = useSelector(state => state.userReducer)
   const addProductReview = async values => {
-    SlatwalApiService.products.addProductReview({
-      "newProductReview": {
-          "product": {
-            "productID": sku_product_productID
+    SlatwalApiService.products
+      .addProductReview({
+        newProductReview: {
+          product: {
+            productID: sku_product_productID,
           },
-          "reviewTitle": formik.values.reviewTitle,
-          "reviewerName": user.firstName,
-          "rating": selectedRate,
-          "review": formik.values.review
+          reviewTitle: formik.values.reviewTitle,
+          reviewerName: user.firstName,
+          rating: selectedRate,
+          review: formik.values.review,
         },
-    }).then(response => {
-      if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
-      if (response.isSuccess()) {
-        setModal(false)
-        setSelectedRate(0)
-        setHoveredRate(0)
-        formik.resetForm()
-        toast.success(t('frontend.product.review.success'))
-      }
-    })
+      })
+      .then(response => {
+        if (response.isSuccess() && Object.keys(response.success()?.errors || {}).length) toast.error(getErrorMessage(response.success().errors))
+        if (response.isSuccess()) {
+          setModal(false)
+          setSelectedRate(0)
+          setHoveredRate(0)
+          formik.resetForm()
+          toast.success(t('frontend.product.review.success'))
+        }
+      })
   }
   const { t } = useTranslation()
   const formik = useFormik({
     enableReinitialize: false,
     initialValues: {
       reviewTitle: '',
-      review: ''
+      review: '',
     },
     initialStatus: { showForm: true, review: '' },
     onSubmit: values => {
       if (selectedRate) {
         addProductReview(values)
-      }else {
+      } else {
         toast.error(t('frontend.product.review.validationRating'))
       }
     },
@@ -85,7 +87,7 @@ const AddReview = ({ selectedRate , setSelectedRate, hoveredRate, setHoveredRate
             <div className="col-md-8 align-self-center d-flex">
               <div className="col-md-2">
                 <Link to={`/${productRouting}/${sku_product_urlTitle}?skuid=${sku_skuID}`} className="mx-auto mr-sm-4">
-                  {images && images?.length > 0 && <SimpleImage className="img-fluid  m-auto image_container productImage" src={images[0]} alt={sku_product_productName} style={{ width: '86px', height: '86px' }} type="product" />}
+                  {images && images?.length > 0 && <SimpleImage className="img-fluid  m-auto image_container productImage" src={images?.at(0)} alt={sku_product_productName} style={{ width: '86px', height: '86px' }} type="product" />}
                 </Link>
               </div>
               <div className="col-md-10">

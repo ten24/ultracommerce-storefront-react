@@ -4,17 +4,17 @@ import { useTranslation } from 'react-i18next'
 import * as Yup from 'yup'
 import { toast } from 'react-toastify'
 import queryString from 'query-string'
-import { useLocation, useHistory } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { errorLogin } from '../../../actions/'
 import { SlatwalApiService } from '../../../services'
 import { getErrorMessage } from '../../../utils'
 import { Button } from '../../../components'
 import { useState } from 'react'
 
-const ForgotPasswordReset = () => {
+const ForgotPasswordReset = ({ title }) => {
   const loc = useLocation()
   const [shouldRedirect, setRedirect] = useState(false)
-  const history = useHistory()
+  const navigate = useNavigate()
   const dispatch = useDispatch()
   const { t } = useTranslation()
   let { swprid } = queryString.parse(loc.search, { arrayFormat: 'separator', arrayFormatSeparator: ',' })
@@ -51,14 +51,14 @@ const ForgotPasswordReset = () => {
       })
     },
   })
-  if (!swprid || shouldRedirect) history.replace('/my-account/Login')
+  if (!swprid || shouldRedirect) navigate('/my-account/Login')
   return (
     <div className="container py-4 py-lg-5 my-4">
       <div className="row d-flex justify-content-center">
         <div className="mb-5 bg-white col-md-7">
           <div className="container container-custom-xs">
             <div className="text-center">
-              <h1 className="display-3">{t('frontend.account.forgot.heading')}</h1>
+              <h1 className="display-3">{title || t('frontend.account.forgot.heading')}</h1>
             </div>
             <hr />
 

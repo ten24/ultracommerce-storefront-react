@@ -1,7 +1,6 @@
-import authReducer from './authReducer'
-import userReducer from './userReducer'
-import cart from './cartReducer'
-import content from './contentReducer'
-import configuration from './configReducer'
-import subscriptionCart from './subscriptionCartReducer'
-export { authReducer, userReducer, cart, content, configuration, subscriptionCart }
+export { default as authReducer } from './authReducer'
+export { default as userReducer } from './userReducer'
+export { default as cart } from './cartReducer'
+export { default as content } from './contentReducer'
+export { default as configuration } from './configReducer'
+export { default as subscriptionCart } from './subscriptionCartReducer'

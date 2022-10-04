@@ -37,7 +37,7 @@ const ListingSidebar = ({ isFetching, hide, filtering, updateAttribute, recordsC
       {!isFetching && (
         <div className="filter-block p-4">
           <h4 className="border-bottom pb-2 mb-3">{t('frontend.product.filterBy')}</h4>
-          <SearchBar />
+          <SearchBar redirectToSearchPage={false} />
 
           {productType &&
             productType.options &&

@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { logout } from '../../../actions/'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { getMyAccountMenu } from '../../../selectors/'
+import { useContentBodyContext } from '../../../contexts/ContentContext'
 
 const isSelectedClass = 'active'
 
@@ -11,11 +11,9 @@ const isSelectedClass = 'active'
  * TODO: Fix content menu
  */
 const AccountSidebar = () => {
-  const { t } = useTranslation()
-  const accountMenu = useSelector(getMyAccountMenu)
+  const pageBody = useContentBodyContext()
   let loc = useLocation()
-  const content = useSelector(state => state.content[loc.pathname.substring(1)])
-
+  const menu = pageBody?.innerElements?.filter(child => child.systemCode === 'cetMenu')?.at(0)
   return (
     <>
       <div className="col-md-4 col-lg-3">
@@ -25,22 +23,17 @@ const AccountSidebar = () => {
           </button>
           <div className="collapse navbar-collapse w-100" id="navbarNav">
             <ul className="navbar-nav flex-column w-100">
-              <li key="/my-account/overview" className="nav-item">
-                <Link to="/my-account/overview" className={`nav-link ${loc.pathname === `/my-account` && isSelectedClass}`}>
-                  <i className="far pr-2" /> {t('frontend.account.overview')}
-                </Link>
-              </li>
-              {content?.menu?.menuItems?.length > 0 &&
-                content.menu.menuItems.map(({ contentID, slug, title }) => {
-                  return (
-                    <li key={contentID} className="nav-item">
-                      <Link to={`/${slug}`} className={`nav-link  ${loc.pathname.startsWith(`/${slug}`) && isSelectedClass}`}>
-                        <i className="far pr-2" /> {title}
-                      </Link>
-                    </li>
-                  )
-                })}
-              {accountMenu.length > 0 &&
+              {menu?.innerElements?.map(props => {
+                const { contentID, slug = '', title } = props
+                return (
+                  <li key={contentID} className="nav-item">
+                    <Link to={slug} className={`nav-link  ${loc.pathname === slug && isSelectedClass}`}>
+                      <i className="far pr-2" /> {title}
+                    </Link>
+                  </li>
+                )
+              })}
+              {/* {accountMenu.length > 0 &&
                 accountMenu.map(({ contentID, urlTitlePath, title }) => {
                   return (
                     <li key={contentID} className="nav-item">
@@ -49,7 +42,7 @@ const AccountSidebar = () => {
                       </Link>
                     </li>
                   )
-                })}
+                })} */}
             </ul>
           </div>
         </nav>
@@ -61,6 +54,7 @@ const AccountSidebar = () => {
 const AccountHeader = () => {
   const { t } = useTranslation()
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const [disableButton, setdisableButton] = useState(false)
 
   return (
@@ -71,7 +65,11 @@ const AccountHeader = () => {
         disabled={disableButton}
         onClick={() => {
           setdisableButton(true)
-          dispatch(logout(t('frontend.account.logout_success'), t('frontend.account.logout_failure')))
+          dispatch(logout(t('frontend.account.logout_success'), t('frontend.account.logout_failure'))).then(() => {
+            navigate({
+              pathname: '/',
+            })
+          })
         }}
         className="btn link-btn btn-link"
       >
