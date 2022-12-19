@@ -1,21 +1,19 @@
 const ContentColumns = props => {
-  const { children, title } = props
+  const { children, columnsTotal = '12', contentHeading = '', columnWidthMedium = '6', columnWidthLarge = '4', columnWidthSmall = '12' } = props
   return (
-    <section className="my-5 py-5 content-columns-sec">
-      {title?.trim()?.length > 0 && (
-        <header className="section-title">
-          <h2>{title}</h2>
-        </header>
-      )}
+    <section className="my-5 content-columns-sec cetColumns">
+      {contentHeading?.trim()?.length > 0 && <h3 className="text-center section-title">{contentHeading}</h3>}
       <div className="container">
-        <div className="row justify-content-center">
-          {children?.map((el, idx) => {
-            return (
-              <div key={idx} className={`col-lg-${12 / children.length} pr-4-lg`}>
-                {el}
-              </div>
-            )
-          })}
+        <div className=" justify-content-center">
+          <div className="grid " style={{ '--bs-columns': columnsTotal }}>
+            {children?.map((el, idx) => {
+              return (
+                <div key={idx} className={`cetColumnsItem g-col-${columnWidthSmall} g-col-md-${columnWidthMedium} g-col-lg-${columnWidthLarge}`}>
+                  {el}
+                </div>
+              )
+            })}
+          </div>
         </div>
       </div>
     </section>

@@ -1,16 +1,14 @@
 import * as Sentry from '@sentry/react'
+import { useTranslation } from 'react-i18next'
 import { Navigate, Route, Routes as RouterRoutes, useNavigate, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
+import { toast } from 'react-toastify'
 import { PageHeader, OrderTemplateCheckoutSideBar, OrderTemplateCheckoutStepsHeader, getOrderTemplateCurrentStep, OrderTemplateShippingSlide, OrderTemplatePaymentSlide, OrderTemplateReviewSlide, ThreeDSRedirect, AccountLogin, CreateGuestAccount, OrderTemplateConfig, RedirectWithReplace } from '../../components'
-
 import './checkout.css'
 import { isAuthenticated, getErrorMessage } from '../../utils'
 import { useEffect, useState } from 'react'
 import { clearUser, requestLogOut, requestSubscriptionCart, receiveSubscriptionCart } from '../../actions'
-import { useTranslation } from 'react-i18next'
 import { axios, sdkURL } from '../../services'
-
-import { toast } from 'react-toastify'
 import { clearSubscriptionCart } from '../../actions/subscriptionCartActions'
 import DynamicPage from '../DynamicPage/DynamicPage'
 

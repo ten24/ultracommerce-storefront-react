@@ -3,11 +3,9 @@ import { Layout } from '../../components'
 import { createElement } from 'react'
 import { useLocation } from 'react-router-dom'
 import NotFound from '../NotFound/NotFound'
-import BasicPageWithSidebar from '../BasicPageWithSidebar/BasicPageWithSidebar'
 import BasicPage from '../BasicPage/BasicPage'
 
 const pageComponents = {
-  BasicPageWithSidebar,
   BasicPage,
   NotFound,
   default: BasicPage,

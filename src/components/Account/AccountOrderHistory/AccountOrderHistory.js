@@ -11,7 +11,7 @@ const OrderListItem = props => {
   const [formatCurrency] = useFormatCurrency({})
   const [formateDate] = useFormatDateTime()
 
-  const { orderNumber, orderID, createdDateTime, orderStatusType_typeName, calculatedTotal } = props
+  const { orderNumber, orderID, orderOpenDateTime, orderStatusType_typeName, calculatedTotal } = props
   return (
     <tr>
       <th>
@@ -21,7 +21,7 @@ const OrderListItem = props => {
         }
         <br />
       </th>
-      <td>{formateDate(createdDateTime)}</td>
+      <td>{formateDate(orderOpenDateTime)}</td>
       <td>
         <OrderStatus text={orderStatusType_typeName} />
       </td>

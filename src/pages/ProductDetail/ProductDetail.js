@@ -1,20 +1,21 @@
 import { RedirectWithReplace, BreadCrumb, SkuSelector, RelatedProductsSlider, ProductReview, ProductPageHeader, ProductDetailGallery, ProductAdditionalInformation, ProductDetails, ProductPagePanels, SkuOptions, HeartButton, ProductForm, Spinner, ProductTypeRadioList, ProductBundle, ProductTypeQuote } from '../../components'
-import { useGetEntityByUrlTitleAdvanced, useProductDetail, useReview } from '../../hooks'
+import { useProductDetail, useReview } from '../../hooks'
 import { Helmet } from 'react-helmet'
 import { useSelector } from 'react-redux'
 import { disableInteractionSelector, getProductTypeRoute } from '../../selectors'
 import queryString from 'query-string'
 import { useLocation } from 'react-router'
 import { ProductOutOfStock, validateProductOutOfStock } from '../../components'
-import DynamicPage from '../DynamicPage/DynamicPage'
 import { useState } from 'react'
+import { ProductContextProvider, useProductContext } from '../../contexts'
 
-const ProductDetail = () => {
+const ProductDetailDisplayDetail = () => {
+  const [lastSelection, setLastSelection] = useState({ optionGroupCode: '', optionCode: '' })
   let location = useLocation()
   const productTypeRoute = useSelector(getProductTypeRoute)
   const productTypeBase = useSelector(state => state.configuration.filtering.productTypeBase)
   const cart = useSelector(disableInteractionSelector)
-  const { filterSkusBySelectedOptions, calculateAvaliableOptions, calculateAdditionalParamters, selectionToSku } = useProductDetail()
+  const { calculateAvaliableOptions, calculateAdditionalParamters, selectionToSku } = useProductDetail()
   // selection is an object of current paramters
   // optionGroupPairs is an array of current paramters key=value
   let params = queryString.parse(location.search, { arrayFormat: 'separator', arrayFormatSeparator: ',' })
@@ -25,8 +26,7 @@ const ProductDetail = () => {
   const urlTitle = location.pathname.split('/').reverse()
   const ratingData = useReview(urlTitle?.at(0))
   const [quantity, setQuantity] = useState(1)
-  let { isFetching, product, productOptions, skus, error, attributeSets, productBundle, productBundleBuildOnAccount } = useGetEntityByUrlTitleAdvanced(urlTitle?.at(0))
-  if (error.isError) return null
+  let { isFetching, product, productOptions, skus, attributeSets, productBundle, productBundleBuildOnAccount } = useProductContext()
 
   let selectedSKu = selectionToSku(product, skus, optionGroupPairs, productOptions)
   if (params?.skuid && productOptions?.length) {
@@ -53,8 +53,7 @@ const ProductDetail = () => {
     })
     .filter(crumb => crumb.urlTitle !== `/${productTypeRoute}/${productTypeBase}`)
 
-  const matchingSkus = filterSkusBySelectedOptions(skus, optionGroupPairs)
-  const updatedProductOptions = calculateAvaliableOptions(productOptions, params, matchingSkus)
+  const updatedProductOptions = calculateAvaliableOptions(productOptions, lastSelection, skus)
   let updateParams = calculateAdditionalParamters(optionGroupPairs, updatedProductOptions)
 
   if (updateParams.length) {
@@ -81,7 +80,7 @@ const ProductDetail = () => {
   const isOutOfStock = !isFetching && !cart.isFetching && validateProductOutOfStock(selectedSKu)
 
   return (
-    <DynamicPage ignoreLayout={true}>
+    <>
       {product?.productID && (
         <ProductPageHeader title={product.productName}>
           <BreadCrumb crumbs={crumbs} />
@@ -106,7 +105,7 @@ const ProductDetail = () => {
             <ProductOutOfStock isFetching={isFetching} sku={selectedSKu} />
             {!isOutOfStock && (
               <>
-                {!isFetching && <SkuOptions sku={selectedSKu} selection={params} productOptions={updatedProductOptions} skus={skus} />}
+                {!isFetching && <SkuOptions setLastSelection={setLastSelection} sku={selectedSKu} selection={params} productOptions={updatedProductOptions} skus={skus} />}
                 {!isFetching && product.skus.length > 1 && <SkuSelector sku={selectedSKu} selection={params} productOptions={updatedProductOptions} skus={skus} />}
                 <ProductForm sku={selectedSKu} quantity={quantity} setQuantity={setQuantity} isDisabled={isDisabled} isLoading={isFetching || cart.isFetching} />
                 <ProductTypeRadioList selectedSKu={selectedSKu} product={product} isDisabled={isDisabled} isLoading={isFetching || cart.isFetching} />
@@ -126,27 +125,35 @@ const ProductDetail = () => {
       </div>
       <RelatedProductsSlider productUrlTitle={urlTitle?.at(0)} />
       <ProductReview productUrlTitle={urlTitle?.at(0)} {...ratingData} />
-    </DynamicPage>
+    </>
+  )
+}
+const ProductDetailDisplay = () => {
+  let location = useLocation()
+  const urlTitle = location.pathname.split('/').reverse()
+
+  return (
+    <ProductContextProvider urlTitle={urlTitle}>
+      <ProductDetailDisplayDetail />
+    </ProductContextProvider>
   )
 }
 
 const ProductDetailLoading = () => {
   return (
-    <DynamicPage ignoreLayout={true}>
-      <div className="container mt-5">
-        <Spinner />
-        <div className="d-flex justify-content-end"></div>
-        <div className="row">
-          <div className="col-sm-6 col-md-4 mb-4 mb-md-0"></div>
-          <div className="col-sm-6 col-md-6 offset-md-1">
-            <div className="row mb-4">
-              <div className="col-md-12"></div>
-            </div>
+    <div className="container mt-5">
+      <Spinner />
+      <div className="d-flex justify-content-end"></div>
+      <div className="row">
+        <div className="col-sm-6 col-md-4 mb-4 mb-md-0"></div>
+        <div className="col-sm-6 col-md-6 offset-md-1">
+          <div className="row mb-4">
+            <div className="col-md-12"></div>
           </div>
         </div>
       </div>
-    </DynamicPage>
+    </div>
   )
 }
 
-export default ProductDetail
+export { ProductDetailDisplay }

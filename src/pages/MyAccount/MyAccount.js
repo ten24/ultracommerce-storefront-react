@@ -1,20 +1,23 @@
 import { useEffect } from 'react'
-import { Routes, Route, useLocation, useNavigate } from 'react-router-dom'
+import { Routes as RouterRoutes, Route, useLocation, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import queryString from 'query-string'
 import * as Sentry from '@sentry/react'
-import { CreateAccount, ForgotPassword, ForgotPasswordReset, AccountCarts, AccountLogin, AccountOverview, AccountProfile, AccountFavorites, AccountAddresses, CreateOrEditAccountAddress, AccountOrderDetail, AccountPaymentMethods, AccountOrderHistory, CreateOrEditAccountPaymentMethod, UpdatePassword, AccountSubscriptionOrders, AccountSubscriptionOrderDetail, AccountImpersonation, AccountQuotes, AccountQuoteDetail, GiftCardList, GiftCardView, RedirectWithReplace } from '../../components'
+import { RedirectWithReplace } from '../../components/RedirectWithReplace/RedirectWithReplace'
 import DynamicPage from '../DynamicPage/DynamicPage'
-import GuestOrderConfirmation from '../OrderConfirmation/GuestOrderConfirmation'
 import { isAuthenticated } from '../../utils'
-const SentryRoutes = Sentry.withSentryReactRouterV6Routing(Routes)
+import { useElementContext } from '../../contexts/ElementContextProvider'
+import GuestOrderConfirmation from '../OrderConfirmation/GuestOrderConfirmation'
+
+const Routes = Sentry.withSentryReactRouterV6Routing(RouterRoutes)
 
 const MyAccount = () => {
   let loc = useLocation()
   const { t } = useTranslation()
   const user = useSelector(state => state.userReducer)
   const navigate = useNavigate()
+  const { CreateOrEditAccountAddress, CreateAccount, ForgotPassword, ForgotPasswordReset, AccountCarts, AccountLogin, AccountOverview, AccountProfile, AccountFavorites, AccountAddresses, AccountOrderDetail, AccountPaymentMethods, AccountOrderHistory, CreateOrEditAccountPaymentMethod, UpdatePassword, AccountSubscriptionOrders, AccountSubscriptionOrderDetail, AccountImpersonation, AccountQuotes, AccountQuoteDetail, GiftCardList, GiftCardView } = useElementContext()
 
   useEffect(() => {
     if (isAuthenticated() && loc.search.includes('redirect=')) {
@@ -30,7 +33,7 @@ const MyAccount = () => {
   return (
     <DynamicPage ignoreLayout={true}>
       {isAuthenticated() && (
-        <SentryRoutes>
+        <Routes>
           <Route path={`addresses/:id`} element={<CreateOrEditAccountAddress path={path?.at(0)} />} />
           <Route path={`addresses`} element={<AccountAddresses />} />
           <Route path={`cards/:id`} element={<CreateOrEditAccountPaymentMethod path={path?.at(0)} />} />
@@ -52,11 +55,11 @@ const MyAccount = () => {
           <Route path={`impersonation`} element={<AccountImpersonation />} />
           <Route path={`order-detail`} element={<GuestOrderConfirmation path={path?.at(0)} />} />
           <Route path={`overview`} element={<AccountOverview />} />
-        </SentryRoutes>
+        </Routes>
       )}
 
       {!isAuthenticated() && (
-        <SentryRoutes>
+        <Routes>
           <Route path={`createAccount`} element={<CreateAccount />} />
           <Route path={`forgotPassword`} element={<ForgotPassword />} />
           <Route path={`updateForgottenPassword`} element={<ForgotPasswordReset />} />
@@ -64,7 +67,7 @@ const MyAccount = () => {
           <Route path={`order-detail`} element={<GuestOrderConfirmation path={path?.at(0)} />} />
           <Route path={`login`} element={<AccountLogin />} />
           <Route path={`*`} element={<RedirectWithReplace pathname={`../my-account/login`} search={`redirect=${loc.pathname}`} />} />
-        </SentryRoutes>
+        </Routes>
       )}
     </DynamicPage>
   )

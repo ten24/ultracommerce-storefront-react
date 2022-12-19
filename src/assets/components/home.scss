@@ -1,40 +1,49 @@
 .content-slider {
-   .carousel-inner {
-    background: $gray-900;
-  }
-
-  .carousel-image {
-    width: 100%;
-    position: relative;
-  }
   
-  @include media-breakpoint-up(lg) {
+  @include media-breakpoint-up(md) {
     .carousel-item {
-      height: 500px;
-      .carousel-image img {
-        opacity: .4;
+      min-height: 400px;
+      background: $gray-900;
+      .carousel-image {
+        opacity: 0.4;
         position: absolute;
-        object-fit: cover;
-        top: 0;
-        left: 0;
         width: 100%;
+        top: 0;
+        right: 0;
+        left: 0;
+        bottom: 0;
+        margin: auto;
         max-width: none;
-        min-height: 500px;
+        display: flex;
+        img {
+          object-fit: cover;
+          max-width: none;
+          width: auto;
+          min-width: 100%;
+        }
       }
     }
     .carousel-caption {
-      text-align: left;
-      transform: translateY(-50%);
-      bottom: initial;
-      top: 50%;
-      p {
-        font-size: 1.25rem;
-        font-weight: 300;
-      }
+      position: relative;
+      top: auto;
+      right: auto;
+      bottom: auto;
+      left: auto;
+      padding: 5rem 8rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 400px;
     }
   }
   
-  @include media-breakpoint-down(lg) {
+  @include media-breakpoint-up(lg) {
+    .carousel-item .carousel-caption {
+      padding: 5rem 15rem;
+    }
+  }
+  
+  @include media-breakpoint-down(md) {
     .carousel-caption {
       position: relative;
       text-align: left;
@@ -42,35 +51,17 @@
       right: 0;
       bottom: 0;
       top: 0;
-      margin: 20px 50px 50px 50px;
+      margin: 30px 70px 40px 70px;
+      padding: 0;
       color: $dark;
     }
     .carousel-inner {
       background: $gray-200;
     }
-    .carousel-image {
-      opacity: 1;
-      height: 30vh;
-      overflow: hidden;
-      img {
-        position: absolute;
-        width: 100%;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        margin: auto;
-      }
-    }
     .carousel-control-next,
     .carousel-control-prev,
     .carousel-indicators [data-bs-target] {
       filter: invert(100%);
-    }
-    .carousel-control-next,
-    .carousel-control-prev {
-      width: 50px;
-      top: 50%;
     }
   }
 
@@ -85,7 +76,23 @@
     color: $gray-middle-level;
   }
   
-} // End content-slider
+}
+@include media-breakpoint-down(md) {
+  .content-slider .carousel-image {
+    max-height: 30vh;
+    overflow: hidden;
+    display: flex;
+    img {
+      object-fit: cover;
+    }
+  }
+}
+
+.carousel-control-prev, .carousel-control-next {
+  width: 90px;
+}
+
+// End content-slider
 
 .slick-track {
   display: flex !important;

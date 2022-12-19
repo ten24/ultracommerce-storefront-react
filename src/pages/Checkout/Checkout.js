@@ -4,16 +4,23 @@ import { Navigate, Route, Routes as RouterRoutes, useNavigate, useLocation } fro
 import { toast } from 'react-toastify'
 import { useTranslation } from 'react-i18next'
 import * as Sentry from '@sentry/react'
-import { PageHeader, CheckoutSideBar, StepsHeader, getCurrentStep, ShippingSlide, PaymentSlide, ReviewSlide, ThreeDSRedirect, AccountLogin, CreateGuestAccount, RedirectWithReplace } from '../../components'
-import { clearUser, receiveCart, receiveUser, requestCart, requestLogOut } from '../../actions'
+import { getCurrentStep } from '../../components/Checkout/steps'
+import { PageHeader } from '../../components/PageHeader/PageHeader'
+import { ThreeDSRedirect } from '../../components/ThreeDSRedirect/ThreeDSRedirect'
+import { RedirectWithReplace } from '../../components/RedirectWithReplace/RedirectWithReplace'
+import { clearUser, receiveUser } from '../../actions/userActions'
+import { requestLogOut } from '../../actions/authActions'
+import { receiveCart, requestCart } from '../../actions/orderActions'
 import { getErrorMessage, isAuthenticated } from '../../utils'
-import { SlatwalApiService } from '../../services'
+import { SlatwalApiService } from '../../services/SlatwalApiService'
 import DynamicPage from '../DynamicPage/DynamicPage'
 import './checkout.css'
+import { useElementContext } from '../../contexts/ElementContextProvider'
 
 const Routes = Sentry.withSentryReactRouterV6Routing(RouterRoutes)
 
 const Checkout = () => {
+  const { AccountLogin, CheckoutSideBar, StepsHeader, ShippingSlide, PaymentSlide, ReviewSlide, CreateGuestAccount } = useElementContext()
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const path = pathname.split('/').reverse()?.at(0).toLowerCase()
@@ -58,7 +65,6 @@ const Checkout = () => {
       }
     })
   }
-
   useEffect(() => {
     if (!isAuthenticated()) {
       dispatch(clearUser())

@@ -2,6 +2,9 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { isBoolean, booleanToString } from '../../utils'
 
+const downloadFile = ({ fileID }) => {
+  window.open(`${process.env.REACT_APP_ADMIN_URL}api/scope/downloadFile?fileID=${fileID}`)
+}
 const ProductPagePanels = ({ product = {}, attributeSets = [] }) => {
   const { t } = useTranslation()
 
@@ -45,6 +48,65 @@ const ProductPagePanels = ({ product = {}, attributeSets = [] }) => {
             </div>
           )
         })}
+
+        {product.files.length > 0 && (
+          <div className="accordion-item">
+            <h2 className="accordion-header" id="filesHeader">
+              <button className="accordion-button " type="button" data-bs-toggle="collapse" data-bs-target="#filesPanel" aria-expanded="true" aria-controls="files">
+                {t('frontend.product.files.heading')}
+              </button>
+            </h2>
+
+            <div id="filesPanel" className="accordion-collapse collapse show" aria-labelledby="files">
+              <div className="accordion-body striped">
+                <table className="table table-striped align-middle">
+                  <tbody>
+                    {product.files.map(({ fileName, fileType, fileID }) => {
+                      return (
+                        <tr key={fileID}>
+                          <td>
+                            <button
+                              type="button"
+                              className="btn btn-link text-muted p-1"
+                              onClick={e => {
+                                e.preventDefault()
+                                downloadFile({ fileID })
+                              }}
+                            >
+                              {fileName}
+                            </button>
+                          </td>
+                          <td>
+                            {fileType.toLowerCase() === 'pdf' && (
+                              <i
+                                style={{ color: '#b0aeae', cursor: 'pointer' }}
+                                onClick={e => {
+                                  e.preventDefault()
+                                  downloadFile({ fileID })
+                                }}
+                                className=" float-end fs-2 mb-3 bi bi-file-earmark-pdf-fill"
+                              />
+                            )}
+                            {fileType.toLowerCase() !== 'pdf' && (
+                              <i
+                                style={{ color: '#b0aeae', cursor: 'pointer' }}
+                                onClick={e => {
+                                  e.preventDefault()
+                                  downloadFile({ fileID })
+                                }}
+                                className=" float-end fs-2 mb-3 bi bi-file-earmark-fill"
+                              />
+                            )}
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="accordion-item">
           <h2 className="accordion-header" id="questions">

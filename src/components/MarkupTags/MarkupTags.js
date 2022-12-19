@@ -59,9 +59,9 @@ const Column = ({ id = getContentID(), className = '', width, children, style })
   )
 }
 
-const Html = ({ id = getContentID(), className = '', contentBody }) => {
+const Html = ({ className = '', contentBody }) => {
   const { eventHandlerForWSIWYG } = useUtilities()
-  return <div onClick={eventHandlerForWSIWYG} className={className} id={id} dangerouslySetInnerHTML={{ __html: contentBody }} />
+  return <div onClick={eventHandlerForWSIWYG} className={className} dangerouslySetInnerHTML={{ __html: contentBody }} />
 }
 
 export { getContentID, Tag, Pre, Html, Container, Column, Div, Section, Article, Aside }

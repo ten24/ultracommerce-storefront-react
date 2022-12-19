@@ -9,7 +9,7 @@ export const getAllOrderFulfillments = state => {
 }
 const getAllAccountAddresses = state => state.userReducer.accountAddresses
 const getAllAccountPaymentMethods = state => state.userReducer.accountPaymentMethods
-export const getAllPickupLocationsSelector = state => state.cart.pickupLocations
+const getAllPickupLocationsSelector = state => state.cart.pickupLocations
 export const getAllOrderPayments = state => state.cart.orderPayments?.filter(({ creditCardType, orderPaymentStatusType }) => creditCardType !== 'Invalid' && orderPaymentStatusType.systemCode !== 'opstRemoved')
 export const getAllEligiblePaymentMethodDetails = state => state.cart.eligiblePaymentMethodDetails
 export const getAllEligibleFulfillmentMethods = state => state.cart.eligibleFulfillmentMethods
@@ -64,7 +64,9 @@ export const shippingAddressSelector = createSelector(fulfillmentSelector, order
 
 export const shippingMethodSelector = createSelector(getAllOrderFulfillments, orderFulfillments => {
   let selectedFulfillmentMethod = { shippingMethodID: '' }
-  if (orderFulfillments?.at(0) && orderFulfillments?.at(0).shippingMethod) {
+  if (orderFulfillments?.at(0) && orderFulfillments?.at(0).deliveryWindowIdentifier?.length){
+    selectedFulfillmentMethod.shippingMethodID = orderFulfillments?.at(0).deliveryWindowIdentifier
+  }else if (orderFulfillments?.at(0) && orderFulfillments?.at(0).shippingMethod) {
     selectedFulfillmentMethod = orderFulfillments?.at(0).shippingMethod
   }
   return selectedFulfillmentMethod

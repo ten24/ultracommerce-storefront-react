@@ -1,15 +1,16 @@
-import { CartLineItem, CartPromoBox, OrderSummary } from '../../components'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { getCart, clearCartData, removePromoCode } from '../../actions/cartActions'
 import { useEffect, useState } from 'react'
-import { disableInteractionSelector } from '../../selectors'
-import { applyPromoCode } from '../../actions/'
-import { updateItemQuantity, removeItem } from '../../actions/'
+import { disableInteractionSelector } from '../../selectors/orderSelectors'
+import { applyPromoCode, updateItemQuantity, removeItem } from '../../actions/cartActions'
 import DynamicPage from '../DynamicPage/DynamicPage'
+import { useElementContext } from '../../contexts/ElementContextProvider'
 
 const Cart = () => {
+  const { CartLineItem, CartPromoBox, OrderSummary } = useElementContext()
+
   const { t } = useTranslation()
   const dispatch = useDispatch()
   const disableInteraction = useSelector(disableInteractionSelector)
@@ -20,8 +21,10 @@ const Cart = () => {
   useEffect(() => {
     dispatch(getCart())
   }, [dispatch])
+
   return (
     <DynamicPage ignoreLayout={true}>
+      {/* <LoadDataTrackingScript /> */}
       <div className="page-header bg-light p-5 text-center">
         <h1 className="display-4">{t('frontend.cart.title')}</h1>
       </div>

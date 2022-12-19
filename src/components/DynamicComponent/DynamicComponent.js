@@ -1,5 +1,24 @@
 import React from 'react'
+import { ErrorBoundary } from 'react-error-boundary'
 import { useComponentContext } from '../../contexts/ComponentContext'
+
+/*
+ * This will allow each cms component to Error and us catch it
+ */
+
+const DynamicComponentErrorBoundary = props => {
+  const { componentID, componentCode, el } = props
+  return (
+    <ErrorBoundary
+      fallbackRender={() => <></>}
+      onError={(_, info) => {
+        console.log(`Error in - ${componentCode} - ${componentID}`, info.componentStack)
+      }}
+    >
+      {el}
+    </ErrorBoundary>
+  )
+}
 
 /*
  * This single function will build our whole page
@@ -9,15 +28,14 @@ import { useComponentContext } from '../../contexts/ComponentContext'
  * Another cool thing about this is client overrides
  * are easy to inject because it is just a list.
  */
-
 const DynamicComponent = ({ el }) => {
   const componentList = useComponentContext()
   //console.log('componentList', componentList)
   if (el?.contentElementTypeCode in componentList && !!componentList[el?.contentElementTypeCode]) {
     if (!!el?.innerElements?.length) {
-      return React.createElement(
+      const parentComponent = React.createElement(
         componentList[el?.contentElementTypeCode],
-        el,
+        { ...el, __DynamicComponent: DynamicComponent },
         el?.innerElements
           ?.filter((child, idx) => {
             if (child?.contentElementTypeCode in componentList && !!componentList[child?.contentElementTypeCode]) return child
@@ -26,11 +44,12 @@ const DynamicComponent = ({ el }) => {
           })
           ?.sort((a, b) => a?.sortOrder - b?.sortOrder)
           ?.map((child, idx) => {
-            return React.createElement(DynamicComponent, { el: child, key: idx })
+            return React.createElement(DynamicComponent, { el: { ...child, __DynamicComponent: DynamicComponent }, key: idx })
           })
       )
+      return <DynamicComponentErrorBoundary componentID={el?.contentElementID} componentCode={el?.contentElementTypeCode} el={parentComponent} />
     } else {
-      return React.createElement(componentList[el?.contentElementTypeCode], el)
+      return <DynamicComponentErrorBoundary componentID={el?.contentElementID} componentCode={el?.contentElementTypeCode} el={React.createElement(componentList[el?.contentElementTypeCode], { ...el, __DynamicComponent: DynamicComponent })} />
     }
   } else {
     console.log(`${el?.contentElementTypeCode} in not a supported component yet!`)
@@ -38,4 +57,4 @@ const DynamicComponent = ({ el }) => {
 
   return null
 }
-export { DynamicComponent }
+export { DynamicComponent, DynamicComponentErrorBoundary }

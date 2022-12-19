@@ -6,7 +6,7 @@ import { SimpleImage } from '..'
 import { getBlogRoute } from '../../selectors/configurationSelectors'
 import { useSelector } from 'react-redux'
 
-const RecentBlogs = () => {
+const RecentBlogs = ({ show = true }) => {
   let [request, setRequest] = useGetBlogPosts()
   const navigate = useNavigate()
   const { t } = useTranslation()
@@ -19,6 +19,7 @@ const RecentBlogs = () => {
       setRequest({ ...request, isFetching: true, isLoaded: false, params: { limit: countOnPage }, makeRequest: true })
     }
   }, [request, setRequest, countOnPage])
+  if (!show) return null
   return (
     <div className="filter-block recent-posts mt-3">
       <h3> {t('frontend.blog.recentPosts')}</h3>

@@ -1,5 +1,6 @@
 import { NoProductFound } from '..'
 import ContentLoader from 'react-content-loader'
+import { useElementContext } from '../../contexts/ElementContextProvider'
 
 const ListingGridLoader = props => (
   <ContentLoader viewBox="0 0 1200 500" className="listingGridLoader" {...props}>
@@ -17,7 +18,9 @@ const ListingGridLoader = props => (
   </ContentLoader>
 )
 
-const ListingListView = ({ isFetching, pageRecords, Card, config }) => {
+const ListingListView = ({ isFetching, pageRecords, config }) => {
+  const { SkuCard, ProductCard } = useElementContext()
+  const Card = config?.params?.productsListingFlag ? ProductCard : SkuCard
   return (
     <div className="col">
       {isFetching && (
@@ -42,7 +45,7 @@ const ListingListView = ({ isFetching, pageRecords, Card, config }) => {
         </tbody>
       </table>
 
-      {!isFetching && pageRecords.length === 0 && <NoProductFound />}
+      {!isFetching && pageRecords.length === 0 && <NoProductFound noProductFoundLink={config.noProductFoundLink} />}
     </div>
   )
 }

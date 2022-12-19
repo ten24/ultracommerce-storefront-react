@@ -17,5 +17,8 @@ const ProductOutOfStock = ({ isFetching, sku }) => {
 const validateProductOutOfStock = sku => {
   return !sku || sku?.calculatedQATS < 1
 }
+const validateProductInStock = sku => {
+  return !validateProductOutOfStock(sku)
+}
 
-export { ProductOutOfStock, validateProductOutOfStock }
+export { ProductOutOfStock, validateProductOutOfStock, validateProductInStock }

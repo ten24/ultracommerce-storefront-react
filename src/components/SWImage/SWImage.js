@@ -4,6 +4,7 @@ import defaultMissingBrand from '../../assets/images/missing-brand.png'
 import defaultMissingProductType from '../../assets/images/missing-product-type.png'
 import defaultMissingProduct from '../../assets/images/missing-product.png'
 import { useState } from 'react'
+import { useUtilities } from '../../hooks'
 
 const SimpleImage = ({ className = '', src = '', alt = '', style = {}, type = 'product' }) => {
   const { host } = useSelector(state => state.configuration.theme)
@@ -25,6 +26,8 @@ const SimpleImage = ({ className = '', src = '', alt = '', style = {}, type = 'p
       e.target.src = defaultMissingProductType
     } else if (type === 'brand') {
       e.target.src = defaultMissingBrand
+    } else if (type === 'none') {
+      e.target.src = null
     } else {
       e.target.src = defaultMissing
     }
@@ -45,6 +48,22 @@ const DefaultImage = ({ alt = '', style, type, className = '' }) => {
     return <img className={className} style={style} src={defaultMissingBrand} alt={alt} />
   }
   return <img className={className} style={style} src={defaultMissing} alt={alt} />
+}
+const AttributeImage = ({ alt = '', fileName = '', attributeName = 'imagePath', className = '' }) => {
+  const { buildAttributeImageUrl } = useUtilities()
+  const [imageIsMissing, setImageIsMissing] = useState(false)
+  if (imageIsMissing) return null
+  return (
+    <img
+      className={className}
+      src={buildAttributeImageUrl({ fileName, attributeName })}
+      alt={alt}
+      onError={() => {
+        setImageIsMissing(true)
+      }}
+    />
+  )
+  // <SimpleImage src={buildAttributeImageUrl({ fileName, attributeName })} className={className} alt={alt} type="" />
 }
 const SWImage = ({ className = '', customPath, src, alt = '', style = {}, type = 'product', fallbackPath = '' }) => {
   const { host, basePath } = useSelector(state => state.configuration.theme)
@@ -77,4 +96,4 @@ const SWImage = ({ className = '', customPath, src, alt = '', style = {}, type =
   return <DefaultImage className={className} style={style} type={type} />
 }
 
-export { SWImage, SimpleImage }
+export { SWImage, SimpleImage, AttributeImage }

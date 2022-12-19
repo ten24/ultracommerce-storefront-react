@@ -1,5 +1,4 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
 import { useUtilities } from '../../hooks'
 
 const ActionBanner = ({ title, contentBody = '', linkLabel = '', linkUrl = '', systemCode }) => {
@@ -17,9 +16,11 @@ const ActionBanner = ({ title, contentBody = '', linkLabel = '', linkUrl = '', s
               </header>
             )}
             <div onClick={eventHandlerForWSIWYG} dangerouslySetInnerHTML={{ __html: contentBody }} />
-            <Link className="btn btn-primary" to={linkUrl}>
-              {linkLabel}
-            </Link>
+            {!!linkLabel && (
+              <a className="btn btn-primary" href={linkUrl}>
+                {linkLabel}
+              </a>
+            )}
           </div>
           <div className="col-0 col-md-2" />
         </div>

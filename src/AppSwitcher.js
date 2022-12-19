@@ -5,7 +5,7 @@ import { evictAllPages, getConfiguration, getUser, getWishLists } from './action
 import { toast } from 'react-toastify'
 import { useTranslation } from 'react-i18next'
 import App from './App'
-import { Theme } from './components'
+import { DevTools, Theme } from './components'
 import { ContentContextProvider, ComponentContextProvider, ElementContextProvider } from './contexts'
 
 const AppSwitcher = () => {
@@ -46,6 +46,7 @@ const AppSwitcher = () => {
         <ComponentContextProvider>
           <ContentContextProvider>
             <Theme>
+              <DevTools />
               <App />
             </Theme>
           </ContentContextProvider>

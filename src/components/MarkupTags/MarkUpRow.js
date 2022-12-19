@@ -1,31 +1,22 @@
-import styled from 'styled-components'
-const StyledRow = styled.div`
-  color: ${props => props.stylingFontColor || '#eee'};
-  &:before, &:after {
-    background: ${props => props.stylingBackgroundColor || '#fff0'};
-  }
-  .btn {
-    color: ${props => props.stylingBackgroundColor || '#fff0'};
-    background: ${props => props.stylingFontColor || '#eee'};
-  }
-`
+import { toBoolean } from '../../utils'
+
 const Row = props => {
-  const { systemCode, stylingCustomClasses, children } = props
+  const { systemCode, stylingCustomClasses, children, forceColumnsFlag = true } = props
 
   return (
-    <StyledRow {...props} className={['arched-bg', systemCode, stylingCustomClasses].join(' ')}>
-      <div className="container text-center">
+    <div className={[systemCode, stylingCustomClasses].join(' ')}>
+      <div className="container-lg py-5">
         <div className="row">
           {children?.map((el, idx) => {
             return (
-              <div key={idx} className="col">
+              <div key={idx} className={toBoolean(forceColumnsFlag) ? 'col' : 'rowEl'}>
                 {el}
               </div>
             )
           })}
         </div>
       </div>
-    </StyledRow>
+    </div>
   )
 }
 export { Row }

@@ -6,6 +6,7 @@ import TagManager from 'react-gtm-module'
 import * as Sentry from '@sentry/react'
 import { BrowserTracing } from '@sentry/tracing'
 import { AnalyticsManager } from './components'
+
 import './i18n'
 import store from './createStore'
 import { AppSwitcher } from './AppSwitcher'
@@ -40,6 +41,7 @@ createRoot(document.getElementById('app')).render(
     </Router>
   </Provider>
 )
+
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals

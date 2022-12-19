@@ -4,8 +4,17 @@ import { cleanHTML, renameKeys, renameKeysInArrayOfObjects, isAuthenticated, con
 
 const useUtilities = () => {
   const navigate = useNavigate()
-  const { basePath, host } = useSelector(state => state.configuration.theme)
-
+  const { basePath } = useSelector(state => state.configuration.theme)
+  const baseFilePath = useSelector(state => state.configuration.global.baseFilePath)
+  const host = useSelector(state => state.configuration.theme.host)
+  const buildAttributeImageUrl = ({ fileName = '', attributeName = 'imagePath' }) => {
+    return `${host}${baseFilePath}/${attributeName.toLowerCase()}/${fileName}`
+  }
+  const array_chunks = (array, chunk_size) =>
+    Array(Math.ceil(array.length / chunk_size))
+      .fill()
+      .map((_, index) => index * chunk_size)
+      .map(begin => array.slice(begin, begin + chunk_size))
   const nestDataByKey = (data = [], parentKey = '', childKey = '') => {
     let dataResponse = data.sort((a, b) => a.sortOrder - b.sortOrder)
     if (dataResponse.length) {
@@ -74,6 +83,6 @@ const useUtilities = () => {
     }
   }
 
-  return { convertToFullPath, nestDataByKey, eventHandlerForWSIWYG, cleanHTML, renameKeys, renameKeysInArrayOfObjects, isAuthenticated, containsHTML, isString, isBoolean, booleanToString, skuIdsToSkuCodes, parseErrorMessages, organizeProductTypes, augmentProductType, groupBy, processQueryParameters, getContentByTypeCode }
+  return { array_chunks, buildAttributeImageUrl, convertToFullPath, nestDataByKey, eventHandlerForWSIWYG, cleanHTML, renameKeys, renameKeysInArrayOfObjects, isAuthenticated, containsHTML, isString, isBoolean, booleanToString, skuIdsToSkuCodes, parseErrorMessages, organizeProductTypes, augmentProductType, groupBy, processQueryParameters, getContentByTypeCode }
 }
 export { useUtilities }

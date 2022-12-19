@@ -1,57 +1,75 @@
 .content-grid {
-    background: #f2f2f2;
-    padding: 5rem 0 8rem;
-    .image {
-        height: 200px;
-        background-position: top center;
-        background-repeat: no-repeat;
-        background-size: cover;
-        background-blend-mode: multiply;
-        display: block;
-        -webkit-transition: all 350ms;
-        -moz-transition: all 350ms;
-        -ms-transition: all 350ms;
-        -o-transition: all 350ms;
-        transition: all 350ms;
+  background: #f2f2f2;
+  padding: 5rem 0 8rem;
+  .image {
+    height: 200px;
+    background-position: top center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-blend-mode: multiply;
+    display: block;
+    -webkit-transition: all 350ms;
+    -moz-transition: all 350ms;
+    -ms-transition: all 350ms;
+    -o-transition: all 350ms;
+    transition: all 350ms;
+  }
+  h4 {
+    padding: 15px 20px;
+    margin: 0;
+  }
+  .text {
+    background: #fff;
+    padding: 25px 20px;
+    flex: 1;
+  }
+  @include media-breakpoint-up(md) {
+    .vertical {
+      border-right: 1px solid #e5e5e5;
+      &:nth-of-type(3),
+      &:nth-of-type(4) {
+        border-right: 0;
+      }
     }
-    h4 {
-        padding: 15px 20px;
-        margin: 0;
+    .horizontal {
+      .text {
+        border-top: 1px solid #e5e5e5;
+      }
+      .image {
+        height: 100%;
+      }
     }
-    .text {
-        background: #fff;
-        padding: 25px 20px;
-        flex: 1;
+  }
+  .link-carrot {
+    position: relative;
+    &:after {
+      content: '>';
+      position: absolute;
+      top: -2px;
+      right: -15px;
     }
-    @include media-breakpoint-up(md) { 
-        .vertical {
-            border-right: 1px solid #E5E5E5;
-            &:nth-of-type(3),
-            &:nth-of-type(4) {
-                border-right: 0;
-            }
-        }
-        .horizontal {
-            .text {
-                border-top: 1px solid #E5E5E5;
-            }
-            .image {
-                height: 100%;
-            }
-        }
-    }
-    .link-carrot{
-        position: relative;
-        &:after {
-            content: ">";
-            position: absolute;
-            top: -2px;
-            right: -15px;
-        }
-    }
-    .image-text {
-        position: absolute;
-        left: 30px;
-        bottom: 30px;
-    }
+  }
+  .image-text {
+    position: absolute;
+    left: 30px;
+    bottom: 30px;
+  }
+}
+
+.sw-masonry-grid {
+  display: -webkit-box; /* Not needed if autoprefixing */
+  display: -ms-flexbox; /* Not needed if autoprefixing */
+  display: flex;
+  margin-left: -1rem; /* gutter size offset */
+  width: auto;
+}
+.sw-masonry-grid_column {
+  padding-left: 1rem; /* gutter size */
+  background-clip: padding-box;
+}
+
+/* Style your items */
+.sw-masonry-grid_column > div {
+  /* change div to reference your elements you put in <Masonry> */
+  margin-bottom: 1rem;
 }

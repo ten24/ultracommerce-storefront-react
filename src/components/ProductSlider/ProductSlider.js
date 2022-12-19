@@ -5,7 +5,7 @@ import { sorting } from '../../utils'
 import { useTranslation } from 'react-i18next'
 import { useElementContext } from '../../contexts/ElementContextProvider'
 
-const ProductSlider = ({ children, settings, title, slidesToShow = 4, products = [] }) => {
+const ProductSlider = ({ cardConfiguration, children, settings, title, slidesToShow = 4, products = [] }) => {
   const { SkuCard } = useElementContext()
   settings = settings
     ? settings
@@ -53,7 +53,7 @@ const ProductSlider = ({ children, settings, title, slidesToShow = 4, products =
                 <div className="repeater" key={slide.defaultSku_skuID}>
                   {/*Fixed the slider design issue */}
                   <div className="card-body h-100">
-                    <SkuCard {...slide} imageFile={slide.defaultSku_imageFile} skuID={slide.defaultSku_skuID} salePrice={slide.salePrice} listPrice={slide.listPrice} key={slide.defaultSku_skuID} />
+                    <SkuCard {...slide} cardConfiguration={cardConfiguration} imageFile={slide.defaultSku_imageFile} skuID={slide.defaultSku_skuID} salePrice={slide.salePrice} listPrice={slide.listPrice} key={slide.defaultSku_skuID} />
                   </div>
                 </div>
               )

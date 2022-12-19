@@ -2,9 +2,6 @@
   // Logo in header
   header .navbar-brand {
     max-width: 350px;
-    img {
-      max-height: 90px !important;
-    }
     @include media-breakpoint-down(sm) {
       max-width: 70px;
       padding: 0;
@@ -62,9 +59,6 @@
           border: none;
           width: auto;
         }
-        .card-footer {
-          display: none;
-        }
       }
     }
     .card-body {
@@ -102,14 +96,7 @@
     }
     padding-bottom: 0rem !important;
 
-    .section-title {
-      display: none;
-    }
     .card-body {
-      padding: 0 !important;
-      & > h3 {
-        display: none;
-      }
       div {
         h3 {
           font-weight: 400;
@@ -130,7 +117,6 @@
           font-weight: 400;
         }
       }
-      text-align: center;
     }
   }
   .brand-slider-sec {
@@ -181,27 +167,6 @@
       background: #fff;
       border: #fff;
       color: #4b566b !important;
-    }
-  }
-  .content-slider {
-    .carousel-caption {
-      text-align: center;
-      color: #fff;
-      h2 {
-        font-size: 2rem;
-        font-weight: 500;
-      }
-      p {
-        font-size: 1rem;
-      }
-      .btn-primary {
-        background: #fff;
-        border: #fff;
-        color: #4b566b !important;
-      }
-    }
-    .carousel-inner {
-      background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6));
     }
   }
   footer {
@@ -262,7 +227,6 @@
     [data-bs-target].active {
       background: #fff;
     }
-    bottom: 5%;
   }
   .carousel-control-prev-icon {
     background-color: #000;
@@ -337,7 +301,7 @@
     padding-bottom: 6rem !important;
 
     & + div.container {
-      margin-top:0 !important;
+      margin-top: 0 !important;
       & > .row {
         margin-top: -5rem;
         background: #fff;
@@ -377,7 +341,7 @@
     & + .toastify {
       & + .footer-height {
         .content-summary {
-            padding-top: .75rem;
+          padding-top: 0.75rem;
         }
         & > .bg-light {
           background-color: #eeeeee !important;
@@ -399,7 +363,7 @@
           }
 
           & + div.container {
-              margin-top:0 !important;
+            margin-top: 0 !important;
             > .row {
               margin-top: -5rem;
               background: #fff;
@@ -478,7 +442,6 @@
     }
   }
   .filter-block {
-    margin-top: -6.875rem;
     box-shadow: 0 0.3rem 1.525rem -0.375rem rgba(0, 0, 0, 0.1) !important;
     border: none;
     background: #fff;
@@ -525,9 +488,6 @@
       margin-left: 0.75rem;
       margin-right: 0.75rem;
       border: none;
-      .card-footer {
-        display: none;
-      }
     }
     & > div {
       .card {
@@ -800,7 +760,6 @@
   }
 }
 
-
 .page-title-overlap + * {
-    margin-top: -4rem;
+  margin-top: -4rem;
 }

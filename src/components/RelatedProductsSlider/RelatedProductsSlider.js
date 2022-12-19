@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react'
 import { SlatwalApiService } from '../../services'
 import { useTranslation } from 'react-i18next'
 import Slider from 'react-slick'
-import { SkuCard } from '..'
+import { useElementContext } from '../../contexts/ElementContextProvider'
 
 const RelatedProductsSlider = ({ productUrlTitle, slidesToShow = 4 }) => {
+  const { ProductCard } = useElementContext()
   const { t } = useTranslation()
   const [relatedProducts, setRelatedProducts] = useState({ products: [], isLoaded: false, err: '', productUrlTitle })
   if (relatedProducts.productUrlTitle !== productUrlTitle) {
@@ -79,7 +80,29 @@ const RelatedProductsSlider = ({ productUrlTitle, slidesToShow = 4 }) => {
               relatedProducts.products.map(product => {
                 return (
                   <div className="repeater" key={product.productCode}>
-                    <SkuCard {...product} />
+                    <ProductCard
+                      cardConfiguration={{
+                        input: {
+                          showCriteria: 'none',
+                          label: '',
+                        },
+                        showPrice: false,
+                        showBrand: false,
+                        showSkuCode: false,
+                        showProductCode: true,
+                        buttons: [
+                          {
+                            listingButtonLabel: 'View More',
+                            listingButtonDisplayCriteria: 'all',
+                            disableListingButton: false,
+                            showAuthenticationRequiredMessageFlag: false,
+                            hideListingButton: false,
+                            type: 'VIEW',
+                          },
+                        ],
+                      }}
+                      {...product}
+                    />
                   </div>
                 )
               })}

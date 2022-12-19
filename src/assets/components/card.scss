@@ -1,0 +1,11 @@
+.swBasicCard {
+  width: 100%;
+  &.card-center {
+    text-align: center !important;
+    img {
+      margin-right: auto !important;
+      margin-left: auto !important;
+      display: block !important;
+    }
+  }
+}

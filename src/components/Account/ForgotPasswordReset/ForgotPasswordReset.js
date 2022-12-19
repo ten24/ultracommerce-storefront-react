@@ -58,7 +58,7 @@ const ForgotPasswordReset = ({ title }) => {
         <div className="mb-5 bg-white col-md-7">
           <div className="container container-custom-xs">
             <div className="text-center">
-              <h1 className="display-3">{title || t('frontend.account.forgot.heading')}</h1>
+              <h1 className="display-4">{title || t('frontend.account.forgot.heading')}</h1>
             </div>
             <hr />
 

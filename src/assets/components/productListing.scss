@@ -79,11 +79,6 @@
   position: relative;
   @include media-breakpoint-up(md) {
     padding-top: 1rem;
-    .sort-options {
-      position: absolute;
-      top: -80px;
-      right: 10px;
-    }
   }
 }
 .product-grid {
@@ -165,4 +160,23 @@
 .product-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill,minmax(250px,1fr));
+}
+
+.product-card-img {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  img {
+    max-height: 200px;
+    object-fit: contain;
+  }
+}
+@include media-breakpoint-up(lg) {
+  .product-card-img {
+    height: 290px;
+    img {
+      max-height: 290px;
+    }
+  }
 }

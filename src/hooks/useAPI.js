@@ -151,6 +151,12 @@ export const useGetEntityByUrlTitleAdvanced = (urlTitle, params = {}) => {
         data.product?.skus?.forEach(sku => {
           sku.slug = sku.options.map(opt => `${opt.optionGroupCode}=${opt.optionCode}`).join('&')
         })
+        data?.product?.optionGroups
+          ?.map(group => {
+            group?.options?.sort((a, b) => a.sortOrder - b.sortOrder)
+            return group
+          })
+          ?.sort((a, b) => a.sortOrder - b.sortOrder)
         if (data.product?.defaultSku_skuID?.length && data.product?.skus?.length) {
           const defaultSku = data.product?.skus.filter(sku => sku.skuID === data.product?.defaultSku_skuID)
           if (defaultSku.length) {

@@ -3,7 +3,7 @@ import { useFormatCurrency, useProductPrice } from '../../hooks/'
 import { Link } from 'react-router-dom'
 import { isAuthenticated } from '../../utils'
 
-const ProductPrice = ({ salePrice = 0, listPrice = 0, type = 'product', ShowPriceForUserType = 'All', ignoreDisplayRules = false, salePriceSuffixKey, accentSalePrice = true, listPriceSuffixKey = 'frontend.core.list' }) => {
+const ProductPrice = ({ priceGroupLabel = '',salePrice = 0, listPrice = 0, type = 'product', ShowPriceForUserType = 'All', ignoreDisplayRules = false, salePriceSuffixKey, accentSalePrice = true, listPriceSuffixKey = 'frontend.core.list' }) => {
   const [formatCurrency] = useFormatCurrency({})
   const { t } = useTranslation()
   const { showMissingPrice, showSalePrice, showListPrice, isActionRequiredToShowPrice } = useProductPrice({ salePrice, listPrice, type, ShowPriceForUserType, ignoreDisplayRules })

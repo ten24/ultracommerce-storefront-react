@@ -5,7 +5,7 @@ import { useLocation } from 'react-router-dom'
 import queryString from 'query-string'
 import { SearchBar } from '../Header/SearchBar'
 
-function NoProductFound() {
+function NoProductFound({ noProductFoundLink = { label: 'No Products Found', link: '/contact' } }) {
   const { t } = useTranslation()
   const { search, pathname } = useLocation()
   const navigate = useNavigate()
@@ -42,8 +42,8 @@ function NoProductFound() {
       )}
       <p className="mt-4">
         {t('frontend.product.needAssistance')}
-        <Link className="mx-2" to="/contact">
-          <u>{t('frontend.nav.contact')}</u>
+        <Link className="mx-2" to={noProductFoundLink.link}>
+          <u>{noProductFoundLink.label}</u>
         </Link>
       </p>
     </div>

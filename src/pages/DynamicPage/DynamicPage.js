@@ -14,24 +14,28 @@ const DynamicPage = ({ children, customComponents = {}, ignoreLayout = false }) 
     <Layout>
       {!!pageData?.settings?.contentHTMLTitleString && <Helmet title={pageData.settings.contentHTMLTitleString} />}
       {!pageData?.settings?.contentHTMLTitleString && <Helmet title={[siteName, pageData?.title].filter(e => e).join(' | ')} />}
-
+      {pageData?.pagePrimaryColorOverride?.trim()?.length > 0 && <Helmet style={[{ type: 'text/css', cssText: `:root {\n--uc-primarycolor: ${pageData.pagePrimaryColorOverride}\n}` }]} />}
       {pageData?.contentElements?.map((pageEl, idx) => {
-        if (!!pageData?.is404 && pageEl?.systemCode === 'cetBody') {
-          return <NotFound />
+        if (pageEl?.systemCode === 'cetBody' && !!pageData?.is404) {
+          return (
+            <div className="DynamicPage" key={idx}>
+              <NotFound key={idx} />
+            </div>
+          )
         } else if (pageEl?.systemCode === 'cetBody' && !!pageEl?.innerElements?.length) {
           return (
-            <div key={idx}>
+            <div className="DynamicPage" key={idx}>
               <DynamicComponent el={pageEl} customComponents={customComponents} key={idx} />
               {children}
             </div>
           )
         } else if (pageEl?.systemCode === 'cetBody' && !pageEl?.innerElements?.length && !ignoreLayout) {
           return (
-            <div className="p-0" key={idx}>
+            <div className="DynamicPage p-0" key={idx}>
               <div className="page-title-overlap bg-lightgray pt-4">
                 <div className="container d-lg-flex justify-content-between py-2 py-lg-3">
                   <div className="order-lg-1 pr-lg-4 text-center">
-                    <h1 className="h3 text-dark mb-0 font-accent">{pageData.title}</h1>
+                    <h1 className="h3 text-dark mb-0 font-accent">{pageData?.contentHeading?.trim()}</h1>
                   </div>
                 </div>
               </div>
@@ -44,8 +48,7 @@ const DynamicPage = ({ children, customComponents = {}, ignoreLayout = false }) 
         } else if (pageEl?.systemCode === 'cetBody' && !pageEl?.innerElements?.length && ignoreLayout) {
           return (
             <div className="p-0" key={idx}>
-              <div onClick={eventHandlerForWSIWYG} dangerouslySetInnerHTML={{ __html: pageEl?.contentBody }} />
-              {children}
+              {pageData?.contentPageType_systemCode !== 'cptPost' && <div onClick={eventHandlerForWSIWYG} dangerouslySetInnerHTML={{ __html: pageEl?.contentBody }} />} {children}
             </div>
           )
         }

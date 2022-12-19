@@ -1,7 +1,7 @@
 import { useLocation } from 'react-router-dom'
 import { processQueryParameters } from '../../utils'
 
-const ListingToolBar = ({ sorting, orderBy, setSort, recordsCount }) => {
+const ListingToolBar = ({ config, sorting, orderBy, setSort, recordsCount }) => {
   const loc = useLocation()
   const qs = processQueryParameters(loc.search)
   if (qs.orderBy) {
@@ -14,17 +14,16 @@ const ListingToolBar = ({ sorting, orderBy, setSort, recordsCount }) => {
   if (recordsCount < 1) return null
 
   return (
-    <div className="d-flex justify-content-end sort-options">
+    <div className="d-flex justify-content-end sort-options py-4">
       <div className="text-right">
         <div className="btn-group">
           <button type="button" className="btn btn-secondary dropdown-toggle text-white" data-bs-toggle="dropdown" aria-expanded="false">
             {dropdownLabel.length > 0 ? dropdownLabel?.at(0).name : sorting?.name ? sorting.name : 'Sort By'}
           </button>
           <ul className="dropdown-menu dropdown-menu-end" value={orderBy}>
-            {sorting &&
-              sorting.options &&
-              sorting.options.length > 1 &&
-              sorting.options.map(({ name, value }) => {
+            {sorting?.options
+              ?.filter(opt => !config?.sortOptions?.exclude?.includes(opt.name))
+              .map(({ name, value }) => {
                 return (
                   <li
                     key={name}

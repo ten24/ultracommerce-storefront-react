@@ -1,0 +1,41 @@
+.uc-devtools-launcher {
+  position: fixed;
+  z-index: 2147483003;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none;
+  bottom: 20px;
+  right: 20px;
+  max-width: 60px;
+  width: 60px;
+  max-height: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--uc-primarybuttoncolor);
+  cursor: pointer;
+  box-shadow: 0 1px 6px 0 rgb(0 0 0 / 6%), 0 2px 32px 0 rgb(0 0 0 / 16%);
+  transition: transform 167ms cubic-bezier(0.33, 0, 0, 1);
+  box-sizing: content-box;
+
+  .uc-devtools-launcher-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 60px;
+    height: 60px;
+    transition: transform 100ms linear, opacity 80ms linear;
+    font-size: 30px;
+    color: var(--uc-primarybuttontextcolor);
+  }
+}
+
+.uc-devtools-menu {
+  li {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+}

@@ -1,10 +1,15 @@
 import { createContext, useContext } from 'react'
-import { ContentGrid, GoogleMap, Video, Row, Html, Ribbon, ContentBlock, DynamicProductListing, ListItemWithImage, ListItem, TabPanel, SimpleTabs, SignUpForm, Footer, MenuItem, MegaMenu, MultiSitePicker, LanguagePicker, MainNavBar, SearchBar, MiniCart, AccountBubble, Header, ContentSlider, BrandSlider, ContentColumns, Block, LatestNews, ActionBanner } from '../components'
+import { ImageGallery, BasicSidebar, ProductDetailDisplay, SearchListing, DynamicForm, ContentGrid, GoogleMap, Video, Row, Html, Ribbon, ContentBlock, DynamicProductListing, ListItemWithImage, ListItem, SimpleTabs, SignUpForm, Footer, MenuItem, MegaMenu, MultiSitePicker, LanguagePicker, MainNavBar, SearchBar, MiniCart, AccountBubble, Header, ContentSlider, BrandSlider, ContentColumns, Block, ActionBanner, BulkOrder, ContentCard, ContentLayout, ImageSlider, ReviewsIoWidget, LatestNews } from '../components'
 
 const coreComponents = {
+  cetImageSlider: ImageSlider,
+  cetContentCard: ContentCard,
+  cetContentLayout: ContentLayout,
   cetContentSlider: ContentSlider,
-  // cetSidebar: 'cetSidebar',
-  // cetContentSlide: 'cetContentSlide',
+  cetSidebar: BasicSidebar,
+  cetBulkOrderListing: BulkOrder,
+  cetProductDetail: ProductDetailDisplay,
+  cetSearchListing: SearchListing,
   cetContentGrid: ContentGrid,
   cetMap: GoogleMap,
   cetCallToCaction: ActionBanner,
@@ -16,7 +21,6 @@ const coreComponents = {
   cetColumn: ContentBlock,
   cetBlock: Block,
   cetTabs: SimpleTabs,
-  cetTab: TabPanel,
   cetListItem: ListItem,
   cetHeader: Header,
   cetMailChimpForm: SignUpForm,
@@ -27,16 +31,20 @@ const coreComponents = {
   cetLanguageSelector: LanguagePicker,
   cetSiteSelector: MultiSitePicker,
   cetHTML: Html,
+  cetHtml: Html,
   cetRow: Row,
   cetLink: 'cetLink',
   cetSearchBox: SearchBar,
   cetRibbon: Ribbon,
+  cetForm: DynamicForm,
+  cetReviewsioBlock: ReviewsIoWidget,
   // cetProductTypeListing: 'cetProductTypeListing',
   // cetProductTypeListingWithConfig: ProductSliderWithConfig,
   cetBrandListing: BrandSlider,
   // cetCategoryListing: 'cetCategoryListing',
   cetBlogListing: LatestNews,
   cetProductListing: DynamicProductListing,
+  cetImageGallery: ImageGallery,
 }
 const ComponentContext = createContext()
 

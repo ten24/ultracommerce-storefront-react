@@ -142,11 +142,13 @@ header .nav-link:hover {
 }
 
 .ribbon {
-  padding: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: wrap;
+  padding: 8px 0;
+  .container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
   ul,
   li,
   a,
@@ -164,13 +166,22 @@ header .nav-link:hover {
     display: flex;
     align-items: center;
     color: inherit;
+    padding: 0 0 0 1rem;
+    font-size: 14px;
+    i {
+      font-size: 16px !important;
+    }
+
     &:hover {
       color: inherit;
     }
   }
   i {
     margin-right: 5px;
-    @include media-breakpoint-down(md) {
+  }
+  @include media-breakpoint-down(md) {
+    i,
+    svg {
       display: none;
     }
   }
@@ -286,5 +297,24 @@ header .nav-link:hover {
     z-index: 100;
     top: 0;
     left: 0;
+  }
+}
+
+header {
+  .input-group {
+    background: #fff;
+    & > .form-control {
+      padding-right: 0;
+      @include media-breakpoint-up(lg) {
+        width: 160px;
+        &:focus {
+          width: 300px;
+          -webkit-transition: width 200ms ease-in-out;
+          -moz-transition: width 200ms ease-in-out;
+          -o-transition: width 200ms ease-in-out;
+          transition: width 200ms ease-in-out;
+        }
+      }
+    }
   }
 }

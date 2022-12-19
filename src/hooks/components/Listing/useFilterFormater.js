@@ -32,21 +32,21 @@ const useFilterFormater = ({ option, brand, attribute, category, priceRange, pro
     })
   }
 
-  if (option && option.subFacets) {
-    Object.keys(option.subFacets).map(subFact => {
-      option.subFacets[subFact].options = option.subFacets[subFact].options.map(option => {
+  if (option && option.sortedSubFacets) {
+    option.sortedSubFacets = option.sortedSubFacets.map(subFact => {
+      subFact.options = subFact.options.map(option => {
         return { ...option, displayName: option.name }
       })
-      return option.subFacets[subFact]
+      return subFact
     })
   }
 
-  if (attribute && attribute.subFacets) {
-    Object.keys(attribute.subFacets).map(subFact => {
-      attribute.subFacets[subFact].options = attribute.subFacets[subFact].options.map(option => {
+  if (attribute && attribute.sortedSubFacets) {
+    attribute.sortedSubFacets = attribute.sortedSubFacets.map(subFact => {
+      subFact.options = subFact.options.map(option => {
         return { ...option, displayName: option.name }
       })
-      return attribute.subFacets[subFact]
+      return subFact
     })
   }
 

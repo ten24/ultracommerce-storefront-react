@@ -2,19 +2,19 @@ import { useDispatch } from 'react-redux'
 import { useFormik } from 'formik'
 import { useTranslation } from 'react-i18next'
 import queryString from 'query-string'
+import { toast } from 'react-toastify'
+import { useLocation, useNavigate } from 'react-router'
 import * as Yup from 'yup'
 import { SlatwalApiService } from '../../../services'
-import { toast } from 'react-toastify'
 import { errorLogin, receiveLogin, receiveUser, receiveCart, getWishLists, requestLogin, requestUser, requestCart, evictAllPages } from '../../../actions/'
 import { getErrorMessage } from '../../../utils'
 import { receiveSubscriptionCart, requestSubscriptionCart } from '../../../actions/subscriptionCartActions'
-import { useLocation, useNavigate } from 'react-router'
 
 const useLoginForm = () => {
   const dispatch = useDispatch()
+  const { t } = useTranslation()
   let loc = useLocation()
   const navigate = useNavigate()
-  const { t } = useTranslation()
   const formik = useFormik({
     initialValues: {
       loginEmail: '',

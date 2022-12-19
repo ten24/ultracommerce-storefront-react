@@ -10,7 +10,8 @@
   border-color: var(--uc-primarybuttoncolor);
   color: var(--uc-primarybuttontextcolor);
   position: relative;
-  &:hover, &:active {
+  &:hover,
+  &:active {
     background-color: #fff;
     border-color: var(--uc-primarybuttoncolor);
     color: var(--uc-bodytextcolor);
@@ -21,7 +22,8 @@
   background-color: var(--uc-secondarybuttoncolor);
   border-color: var(--uc-secondarybuttoncolor);
   color: var(--uc-secondarybuttontextcolor);
-  &:hover, &:active {
+  &:hover,
+  &:active {
     border-color: var(--uc-secondarybuttoncolor);
   }
 }
@@ -77,4 +79,40 @@
     color: $color-white;
     @extend .bg-secondary;
   }
+}
+
+.btn {
+  &.skuOption {
+    color: $white;
+    background-color: white;
+    border-color: #666;
+    color: #666;
+    border-radius: unset;
+    padding: unset;
+
+    // &.available {
+    //   background-color: var(--uc-primarybuttoncolor);
+    //   &:hover {
+    //     background-color: red;
+    //   }
+    // }
+    &.active {
+      border-width: 2px;
+      border-color: black;
+      color: black;
+    }
+    &.nonavailable {
+      border: 1px solid #999999;
+      background-color: #cccccc;
+      color: #666666;
+    }
+  }
+}
+
+
+.btn-gray {
+  background-color: #D8D8D8;
+  border: 1px solid #CDCDCD;
+  border-radius: 4px;
+  min-width: 120px;
 }
