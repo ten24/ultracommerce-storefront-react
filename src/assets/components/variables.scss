@@ -1,7 +1,34 @@
-$primary: #027CBA; // ultra blue
-$brand-secondary: #CC122B; // ultra red
-$link-color: #2478cc;
-$primary-blue: #146cda;
+//** Start UC Specific **
+$theme-name: industrial;
+//** End UC Specific **
+
+//** Start UC Variables **
+:root {
+  --uc-primarycolor: #6c36fe; // default to ultra periwinkle
+  --uc-secondarycolor: #f3e500; // default to ultra yellow
+  --uc-textlinkcolor: #2ce2ed; // default to ultra indigo
+  --uc-bodybackgroundcolor: #ffffff;
+  --uc-bodytextcolor: #000000;
+  --uc-headerbarcolor: #6c36fe; // default to ultra periwinkle
+  --uc-headerbartextcolor: #ffffff;
+  --uc-headerbackgroundcolor: #ffffff;
+  --uc-headertextcolor: #000000;
+  --uc-footerbackgroundcolor: #ffffff;
+  --uc-footertextcolor: #000000;
+  --uc-primarybuttoncolor: #f3e500; // default to ultra yellow
+  --uc-primarybuttontextcolor: #000000;
+  --uc-secondarybuttoncolor: #a786fe;
+  --uc-secondarybuttontextcolor: #000000;
+  --uc-ribbonbackgroundcolor: #f6f8fa;
+  --uc-ribbontextcolor: #333333;
+
+  --uc-fontfamily: Arial, sans-serif;
+  --uc-fontsize: 16px;
+}
+//** End UC Variables **
+
+//** Start Boostrap Override **
+$enable-cssgrid: true;
 $color-white: #f7f7f7;
 $color-black: #000000;
 $fad-White: #ebebeb;
@@ -12,15 +39,18 @@ $gray-low-level: #b4aca8;
 $mixed-white: #dae1e7;
 $card-shadow: #eeeeee;
 $dark: #212529;
-$color-orange: $primary; // everywhere slatwall orange variable is used, use ultra blue (primary color variable)
 $color-red: #ff0000;
 $light-blue: #f2f8fb;
-$light-white: #fff;
+$light-white: #f8f9fa;
 $color-gray: #f3f3f3;
+$accordion-icon-active-color: #fff;
+$accordion-button-active-bg: var(--uc-primarycolor);
+$accordion-button-active-color: #fff;
 
 $font-size: 16px;
 $line-height: 1.4;
 $lines-to-show: 4;
+//** End Boostrap Override **
 
 $step-count-size: 1.625rem !default;
 

@@ -1,64 +1,82 @@
 import React, { useEffect } from 'react'
 import { useUtilities } from '../../hooks'
 import { useTranslation } from 'react-i18next'
-import { SimpleImage } from '..'
+import { AttributeImage } from '..'
 
 import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min'
 
-const ContentSlider = ({ slider }) => {
+const calculateViewMode = (parentMode, childMode) => (childMode?.trim()?.length > 0 ? childMode?.trim() : parentMode?.trim()?.length > 0 ? parentMode?.trim() : 'slider-overlay-full')
+
+const ContentSlider = ({ innerElements: slides, systemCode, ...parent }) => {
   const { t } = useTranslation()
   let { eventHandlerForWSIWYG } = useUtilities()
+  const generateUrlString = urlString => {
+    if (urlString !== undefined && urlString.length > 0) {
+      if (urlString.indexOf('http') === -1) {
+        return '/' + urlString
+      } else {
+        return urlString
+      }
+    } else {
+      return '/#'
+    }
+  }
 
   useEffect(() => {
-    if (slider) {
-      var carousel = new bootstrap.Carousel(document.getElementById('carousel'), {
+    if (!!slides?.length) {
+      var carousel = new bootstrap.Carousel(document.getElementById('carousel_' + parent?.contentElementID), {
         interval: 5000,
         ride: true,
-        pause: false,
+        pause: 'hover',
       })
       carousel.cycle()
     }
-  }, [slider])
-  if (!slider) return null
+    //eslint-disable-next-line
+  }, [slides?.length])
+  if (!slides?.length) return null
   return (
-    <div className="hero content-slider">
-      {slider?.slides && slider.slides.length > 0 && (
-        <div id="carousel" className="carousel slide" data-bs-ride="carousel">
-          {slider?.slides?.length > 1 && (
-            <div className="carousel-indicators">
-              {slider.slides.map(({ title }, idx) => {
-                return <button key={title} type="button" data-bs-target="#carousel" data-bs-slide-to={idx} className={idx === 0 ? 'active' : ''} aria-current="true" aria-label={`Slide ${idx}`}></button>
+    <div className={`hero content-slider ${systemCode}`}>
+      {!!slides?.length && (
+        <div id={`carousel_` + parent?.contentElementID} className="carousel slide" data-bs-ride={`carousel_` + parent?.contentElementID}>
+          <div className="carousel-indicators">
+            {slides?.length > 1 &&
+              slides?.map((_, idx) => {
+                return <button key={idx} type="button" data-bs-target={`#carousel_` + parent?.contentElementID} data-bs-slide-to={idx} className={idx === 0 ? 'active' : ''} aria-current="true" aria-label={`Slide ${idx}`}></button>
               })}
-            </div>
-          )}
+          </div>
           <div className="carousel-inner">
-            {slider.slides.map(({ contentBody, title, imagePath, linkUrl, linkLabel }, key) => {
+            {slides?.map(({ systemCode, contentBody, title, imagePath, linkUrl, linkLabel, slideLayoutMode }, key) => {
               return (
-                <div key={title} className={key === 0 ? 'carousel-item active' : 'carousel-item'}>
-                  <div className="carousel-image">
-                    <SimpleImage src={imagePath} alt="carouselImage" />
-                  </div>
-                  <div className="carousel-caption">
-                    <h2 className="display-3">{title}</h2>
-                    <p onClick={eventHandlerForWSIWYG} dangerouslySetInnerHTML={{ __html: contentBody }} />
-                    {linkLabel?.trim()?.length > 0 && (
-                      <a onClick={eventHandlerForWSIWYG} href={linkUrl ? `/${linkUrl}` : '/#'} className="btn btn-primary text-white px-4 rounded-pill">
-                        {linkLabel}
-                      </a>
+
+                <div key={key} className={['carousel-item', `${key === 0 ? 'active' : ''}`, systemCode, calculateViewMode(parent.slideLayoutMode, slideLayoutMode)].join(' ')}>
+                    <div className="carousel-image">
+                      <AttributeImage fileName={imagePath} alt="carouselImage" />
+                    </div>
+                    {(title?.trim()?.length > 0 || contentBody?.trim()?.length > 0) && (
+                      <div className="carousel-caption">
+                        <div className="caption-container">
+                          <h2>{title}</h2>
+                          <div onClick={eventHandlerForWSIWYG} dangerouslySetInnerHTML={{ __html: contentBody }} />
+                          {linkLabel?.trim()?.length > 0 && (
+                            <a onClick={eventHandlerForWSIWYG} href={generateUrlString(linkUrl)} className="btn btn-primary text-white px-4 rounded-pill">
+                              {linkLabel}
+                            </a>
+                          )}
+                        </div>
+                      </div>
                     )}
-                  </div>
                 </div>
               )
             })}
           </div>
 
-          {slider?.slides && slider.slides.length > 1 && (
+          {slides?.length > 1 && (
             <>
-              <button className="carousel-control-prev" type="button" data-bs-target="#carousel" data-bs-slide="prev">
+              <button className="carousel-control-prev" type="button" data-bs-target={`#carousel_` + parent?.contentElementID} data-bs-slide="prev">
                 <span className="carousel-control-prev-icon " aria-hidden="true"></span>
                 <span className="visually-hidden">{t('frontend.core.previous')}</span>
               </button>
-              <button className="carousel-control-next" type="button" data-bs-target="#carousel" data-bs-slide="next">
+              <button className="carousel-control-next" type="button" data-bs-target={`#carousel_` + parent?.contentElementID} data-bs-slide="next">
                 <span className="carousel-control-next-icon" aria-hidden="true"></span>
                 <span className="visually-hidden">{t('frontend.core.next')}</span>
               </button>

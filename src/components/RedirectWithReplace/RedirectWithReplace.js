@@ -1,13 +1,16 @@
 import { useEffect } from 'react'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router-dom'
 
 const RedirectWithReplace = ({ pathname, search }) => {
-  let history = useHistory()
+  const navigate = useNavigate()
   useEffect(() => {
-    history.replace({
-      pathname,
-      search,
-    })
+    navigate(
+      {
+        pathname,
+        search,
+      },
+      { replace: true }
+    )
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   return null

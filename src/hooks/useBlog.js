@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { ContentfulService, KontentService, SlatwallCMSService } from '../services'
 import { useSelector } from 'react-redux'
 import { getBlogRoute } from '../selectors/configurationSelectors'
+import { getCurrentSiteCode } from '../utils'
 
 export const useGetBlogPosts = () => {
   const { cmsProvider } = useSelector(state => state.configuration)
@@ -23,7 +24,7 @@ export const useGetBlogPosts = () => {
           })
           .catch(thrown => {})
       } else if (cmsProvider === 'slatwallCMS') {
-        SlatwallCMSService.getBlogPosts({ ...request.params, blogKey })
+        SlatwallCMSService.getBlogPosts({ ...request.params, blogKey, requestSiteCode: getCurrentSiteCode() })
           .then(response => {
             setRequest({ data: response, isFetching: false, isLoaded: true, makeRequest: false, params: {} })
           })

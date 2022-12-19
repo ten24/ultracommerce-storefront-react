@@ -1,38 +1,27 @@
-import React, { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { SimpleImage } from '..'
-import { useGetBlogPosts, useUtilities } from '../../hooks'
+import { useUtilities } from '../../hooks'
 import { useFormatDate } from '../../hooks/useFormatDate'
 import { getBlogRoute } from '../../selectors/configurationSelectors'
 
-function LatestNews() {
+const LatestNews = ({ relatedBlogs = [], systemCode }) => {
   const { t } = useTranslation()
   const [formateDate] = useFormatDate()
-  let [request, setRequest] = useGetBlogPosts()
   let { eventHandlerForWSIWYG } = useUtilities()
   const blogPath = useSelector(getBlogRoute)
 
-  useEffect(() => {
-    if (!request.isFetching && !request.isLoaded) {
-      setRequest({ ...request, isFetching: true, isLoaded: false, params: { limit: 3 }, makeRequest: true })
-    }
-  }, [request, setRequest])
-  if (!request.data?.items?.length) {
-    return null
-  }
-
   return (
-    <section className="content-spacer">
+    <section className={`content-spacer latest-news-sec ${systemCode}`}>
       <div className="container">
         <header className="section-title">
           <h2>{t('frontend.home.latest_news')}</h2>
         </header>
         <div className="row">
-          {request.data?.items?.map(data => {
+          {relatedBlogs?.slice(0, 3)?.map(data => {
             return (
-              <div key={data.postTitle} className="col-md-6 col-lg-4 d-flex">
+              <div key={data.title} className={`col-md-6 col-lg-4 d-flex`}>
                 <article className="blog-card card border-0 shadow m-3 w-100">
                   <figure className="blog-figure overflow-hidden m-0">{data.postImage ? <SimpleImage src={data.postImage.url} className="blog-image" alt={data.postTitle} /> : <div className="blog-image" />}</figure>
                   <div className="card-body p-4">
@@ -42,7 +31,7 @@ function LatestNews() {
                       </p>
                     )}
                     <h4>
-                      <Link to={`/${blogPath}/${data.slug}`}>{data.postTitle}</Link>
+                      <Link to={`/${blogPath}/${data.slug}`}>{data.title}</Link>
                     </h4>
                     <p className="text-secondary" onClick={eventHandlerForWSIWYG} dangerouslySetInnerHTML={{ __html: data.postSummary }} />
                   </div>

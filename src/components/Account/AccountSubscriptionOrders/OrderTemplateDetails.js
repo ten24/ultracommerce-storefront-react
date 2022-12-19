@@ -34,7 +34,7 @@ const OrderTemplateItem = ({ isDisabled = false, templateID, quantity, sku_skuID
     <div className="row border-bottom py-3">
       <div className="col-sm-2 col-3">
         <Link to={`/${productRouting}/${sku_product_urlTitle}?skuid=${sku_skuID}`} className="mx-auto mr-sm-4">
-          {images && images?.length > 0 && <SimpleImage className="img-fluid  m-auto image_container productImage" src={images[0]} alt={sku_product_productName} type="product" />}
+          {images && images?.length > 0 && <SimpleImage className="img-fluid  m-auto image_container productImage" src={images?.at(0)} alt={sku_product_productName} type="product" />}
         </Link>
       </div>
       <div className="col-sm-4 col-9">

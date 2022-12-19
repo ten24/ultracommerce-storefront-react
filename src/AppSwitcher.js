@@ -1,16 +1,19 @@
 import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { useLocation, useHistory } from 'react-router-dom'
-import { evictAllPages, getUser, getWishLists } from './actions'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { evictAllPages, getConfiguration, getUser, getWishLists } from './actions'
 import { toast } from 'react-toastify'
 import { useTranslation } from 'react-i18next'
 import App from './App'
+import { DevTools, Theme } from './components'
+import { ContentContextProvider, ComponentContextProvider, ElementContextProvider } from './contexts'
 
 const AppSwitcher = () => {
   const { t } = useTranslation()
   const { pathname, search } = useLocation()
   const [safeToLoad, setSafeToLoad] = useState(false)
-  const history = useHistory()
+  const [configurationLoaded, setConfigurationLoaded] = useState(false)
+  const navigate = useNavigate()
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -21,7 +24,7 @@ const AppSwitcher = () => {
       dispatch(evictAllPages())
       dispatch(getUser()).then(() => {
         dispatch(getWishLists())
-        history.push(redirect)
+        navigate(redirect)
         toast.success(t('frontend.account.auth.success'))
         setSafeToLoad(true)
       })
@@ -30,8 +33,26 @@ const AppSwitcher = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+  useEffect(() => {
+    dispatch(getConfiguration()).then(response => {
+      setConfigurationLoaded(true)
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
-  if (safeToLoad) return <App />
+  if (safeToLoad && configurationLoaded)
+    return (
+      <ElementContextProvider>
+        <ComponentContextProvider>
+          <ContentContextProvider>
+            <Theme>
+              <DevTools />
+              <App />
+            </Theme>
+          </ContentContextProvider>
+        </ComponentContextProvider>
+      </ElementContextProvider>
+    )
   return null
 }
 

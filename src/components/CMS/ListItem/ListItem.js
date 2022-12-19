@@ -1,9 +1,6 @@
-import { Blocks, SimpleImage } from '../..'
+// import { SimpleImage } from '../..'
 import { useUtilities } from '../../../hooks'
-
-const ListItemWithImage = props => {
-  return <ListItem {...props} showImage={true} />
-}
+import { SimpleImage } from '../../SWImage/SWImage'
 
 const ListItem = item => {
   let { eventHandlerForWSIWYG } = useUtilities()
@@ -32,9 +29,12 @@ const ListItem = item => {
             <SimpleImage src={item.imagePath} className="img-fluid " alt={item.title} />
           </div>
         )}
-        {item?.children?.length > 0 && <Blocks blocks={item.children} />}
+        {item?.children}
       </div>
     </div>
   )
+}
+const ListItemWithImage = props => {
+  return <ListItem {...props} showImage={true} />
 }
 export { ListItem, ListItemWithImage }

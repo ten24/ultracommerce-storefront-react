@@ -72,7 +72,7 @@ const ProductDetails = ({ sku, product }) => {
       )}
 
       <div className="my-4">
-        <strong className="display-6">{sku && <ProductPrice salePrice={sku.salePrice} listPrice={sku.listPrice} className="d-flex" showloginRequired={true} />}</strong>
+        <strong className="display-6">{sku && <ProductPrice priceGroupLabel={sku?.priceGroupLabel} salePrice={sku.salePrice} listPrice={sku.listPrice} className="d-flex" ShowPriceForUserType={sku?.settings?.skuShowPriceForUserType} />}</strong>
       </div>
 
       <div

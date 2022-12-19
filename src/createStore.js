@@ -1,6 +1,6 @@
 import { createStore, applyMiddleware } from 'redux'
 import thunkMiddleware from 'redux-thunk'
-import { composeWithDevTools } from 'redux-devtools-extension'
+import { composeWithDevTools } from '@redux-devtools/extension'
 import { content, authReducer, userReducer, cart, configuration, subscriptionCart } from './reducers'
 import devData from './preload'
 import { combineReducers } from 'redux'

@@ -1,7 +1,8 @@
-import { PromptLayout, SWForm, SWInput } from '../../'
-import { useCreateGuestAccount } from '../../../hooks/'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
+import { PromptLayout } from '../../Account/AccountLayout/AccountLayout'
+import { SWForm, SWInput } from '../../SWForm/SWForm'
+import { useCreateGuestAccount } from '../../../hooks/components/Account/useCreateGuestAccount'
 
 const CreateGuestAccount = () => {
   const { formik } = useCreateGuestAccount()

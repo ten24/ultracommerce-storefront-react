@@ -15,7 +15,7 @@ const ProductDetailGallery = ({ productUrlTitle, skuID, imageFile }) => {
         <Slider arrows={false} asNavFor={sliders.nav2} ref={slider => (slider1.current = slider)}>
           {!!filterImages &&
             filterImages.map(({ RESIZEDIMAGEPATHS, ORIGINALFILENAME }, index) => {
-              return <SWImage key={`${ORIGINALFILENAME}-${index}`} customPath="/" src={RESIZEDIMAGEPATHS[0]} className="image-zoom w-100 mx-auto" alt="Product" style={{ maxWidth: '500px' }} />
+              return <SWImage key={`${ORIGINALFILENAME}-${index}`} customPath="/" src={RESIZEDIMAGEPATHS?.at(0)} className="image-zoom w-100 mx-auto" alt="Product" style={{ maxWidth: '500px' }} />
             })}
         </Slider>
       </div>

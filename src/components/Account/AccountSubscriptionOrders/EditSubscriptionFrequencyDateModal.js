@@ -14,6 +14,7 @@ const EditSubscriptionFrequencyDateModal = ({ updateFrequency, frequencyTerm, se
       SlatwalApiService.orderTemplate.getFrequencyTermOptions({}).then(response => {
         if (response.isSuccess() && !didCancel && response.success().frequencyTermOptions) {
           setfrequencyTermOptions(response.success().frequencyTermOptions.map(({ name, value }) => ({ key: name, value: value })))
+          setFrequencyTerm(orderInfo?.frequencyTerm_termID)
           setLoaded(true)
         } else {
           setfrequencyTermOptions([])

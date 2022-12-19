@@ -17,7 +17,7 @@ const ProductTypeList = ({ data, onSelect, isFetching = true }) => {
                 let customImagePath = ''
                 let imageFileName = ''
                 if (imageFile !== '') {
-                  imageFileName = imageFile.split('/').reverse()[0]
+                  imageFileName = imageFile.split('/').reverse()?.at(0)
                   customImagePath = imageFile.split('/').slice(0, -1).join('/') + '/'
                 }
 

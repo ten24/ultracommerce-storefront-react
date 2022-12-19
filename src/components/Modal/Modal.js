@@ -9,14 +9,14 @@ import { useTranslation } from 'react-i18next'
 const modalSizes = {
   default: '',
   small: 'modal-sm',
-  medium : 'modal-md',
+  medium: 'modal-md',
   large: 'modal-lg',
   xLarge: 'modal-xl',
 }
 
-const Modal = ({ show = true, setShow, title = 'Modal Title', children, size = 'default', footer = false }) => {
+const Modal = ({ show = true, setShow, title = 'Modal Title', children, size = 'default', footer = false, backgroundstatic=false }) => {
   return (
-    <div className="modal" tabIndex="-1" aria-modal="true" role="dialog" style={{ display: show ? 'inline' : 'none' }} onClick={() => setShow(false)}>
+    <div className="modal" tabIndex="-1" aria-modal="true" role="dialog" style={{ display: show ? 'inline' : 'none' }} onClick={() => setShow(backgroundstatic)}>
       <div className={'modal-dialog modal-dialog-centered ' + modalSizes[size]} onClick={e => e.stopPropagation()}>
         <div className="modal-content">
           <div className="modal-header">
@@ -45,7 +45,9 @@ const ProductModalHeading = ({ title, skuCode = '', setShow }) => {
   return (
     <div>
       <div className="modal-header">
-        <h3 className="modal-title">{t('frontend.bulkorder.listview.modal.configuring')}: {title}</h3>
+        <h3 className="modal-title">
+          {t('frontend.bulkorder.listview.modal.configuring')}: {title}
+        </h3>
         <button
           type="button"
           className="btn-close"
@@ -57,7 +59,9 @@ const ProductModalHeading = ({ title, skuCode = '', setShow }) => {
         ></button>
       </div>
       <div className="modal-header">
-        <h5 className="modal-title">{t('frontend.bulkorder.listview.modal.sku')}: {skuCode}</h5>
+        <h5 className="modal-title">
+          {t('frontend.bulkorder.listview.modal.sku')}: {skuCode}
+        </h5>
       </div>
     </div>
   )
@@ -66,7 +70,7 @@ const ProductModalHeading = ({ title, skuCode = '', setShow }) => {
 const selectionSlugToObject = selectedOptions =>
   selectedOptions.reduce((acc, opt) => {
     opt = opt.split('=')
-    acc[opt[0]] = opt[1]
+    acc[opt?.at(0)] = opt[1]
     return acc
   }, {})
 
@@ -113,7 +117,7 @@ const updateSkusForBetterOptions = product => {
   })
   return product
 }
-const ProductModal = ({ show = true, setShow, product = {}, size = 'xLarge', footer = false, addToCart = () => { } }) => {
+const ProductModal = ({ show = true, setShow, product = {}, size = 'xLarge', footer = false, addToCart = () => {} }) => {
   let { eventHandlerForWSIWYG } = useUtilities()
   let { attributeSets, product: productWithAttributes } = useGetEntityByUrlTitleAdvanced(product.urlTitle, { includeAttributesMetadata: true, includeCategories: true, includeOptions: false, includeSkus: false, includeSettings: false })
   const { filterSkusBySelectedOptions, calculateAvaliableOptions, calculateAdditionalParamters, selectionToSku } = useProductDetail()
@@ -152,7 +156,7 @@ const ProductModal = ({ show = true, setShow, product = {}, size = 'xLarge', foo
   useEffect(() => {
     if (!selectedOptions.length && product.skus.length) {
       const defaultsku = product?.skus?.filter(sku => sku.skuID === product.skuID)
-      setOptionSelection(selectionSlugToObject(defaultsku[0]?.optionsList))
+      setOptionSelection(selectionSlugToObject(defaultsku?.at(0)?.optionsList))
       // set default options because no options selected yet but product has options
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

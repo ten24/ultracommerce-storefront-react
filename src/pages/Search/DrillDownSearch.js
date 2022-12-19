@@ -2,14 +2,14 @@ import { Helmet } from 'react-helmet'
 import { Layout, PageHeader, ProductTypeList, ListingToolBar, ListingSidebar, ListingGrid, ListingPagination } from '../../components'
 import { useListing, useSearch } from '../../hooks'
 import queryString from 'query-string'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
-import { useLocation } from 'react-router'
+import { useLocation } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
 const DrillDownSearch = () => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const { keyword, productTypeListRequest, productTypeData, params, pathname, crumbCalculator, productTypeUrl } = useSearch()
   const { t } = useTranslation()
   return (
@@ -23,7 +23,7 @@ const DrillDownSearch = () => {
         data={productTypeData}
         onSelect={urlTitle => {
           params['key'] = urlTitle
-          history.push(`${pathname}?${queryString.stringify(params, { arrayFormat: 'comma' })}`)
+          navigate(`${pathname}?${queryString.stringify(params, { arrayFormat: 'comma' })}`)
         }}
       />
       {!productTypeListRequest.isFetching && productTypeListRequest.isLoaded && Object.keys(productTypeListRequest.data).length === 0 && (

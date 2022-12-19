@@ -1,5 +1,6 @@
-export { sdkURL, SlatwalApiService } from './SlatwalApiService'
+export * from './SlatwalApiService'
 export * as SlatwallCMSService from './SlatwallCMSService'
-export { axios } from './AxiosService'
+export * from './AxiosService'
 export * as ContentfulService from './ContentfulService'
 export * as KontentService from './KontentService'
+export * as UltraCMSService from './UltraCMSService'

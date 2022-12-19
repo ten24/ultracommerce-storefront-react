@@ -1,9 +1,9 @@
 import { useTranslation } from 'react-i18next'
 import ContentLoader from 'react-content-loader'
-import { FacetFilter } from './Filters/FacetFilter'
 
 import { useFilterFormater } from '../../hooks'
 import { SearchBar } from '..'
+import { useElementContext } from '../../contexts/ElementContextProvider'
 
 const FilterLoader = props => (
   <ContentLoader speed={2} viewBox="0 0 400 200" className="listingSidebarLoader" {...props}>
@@ -18,12 +18,11 @@ const FilterLoader = props => (
   </ContentLoader>
 )
 
-const ListingSidebar = ({ isFetching, hide, filtering, updateAttribute, recordsCount }) => {
+const ListingSidebar = ({ config, isFetching, hide, filtering, updateAttribute, recordsCount }) => {
   const { t } = useTranslation()
-
+  const { FacetFilter } = useElementContext()
   const { option, brand, attribute, category, priceRange, productType } = useFilterFormater({ ...filtering })
   if (recordsCount < 1 && !isFetching) return null
-
   return (
     <div className="col-lg-3">
       {isFetching && (
@@ -37,52 +36,45 @@ const ListingSidebar = ({ isFetching, hide, filtering, updateAttribute, recordsC
       {!isFetching && (
         <div className="filter-block p-4">
           <h4 className="border-bottom pb-2 mb-3">{t('frontend.product.filterBy')}</h4>
-          <SearchBar />
-
-          {productType &&
-            productType.options &&
-            productType.options.length > 0 &&
-            !hide.includes(productType.facetKey) &&
-            [productType].map(filter => {
-              return <FacetFilter filter={filter} facetIdentifier="slug" facetKey={`productType_slug`} key={`productType_slug`} updateAttribute={updateAttribute} />
-            })}
-
-          {brand &&
-            brand !== {} &&
-            !hide.includes(brand.facetKey) &&
-            [brand].map(filter => {
-              return <FacetFilter filter={filter} facetIdentifier="slug" facetKey={`brand_slug`} key={`brand`} updateAttribute={updateAttribute} />
-            })}
-
-          {!isFetching &&
-            category &&
-            category.options &&
-            category.options.length > 0 &&
-            !hide.includes(category.facetKey) &&
-            [category].map(filter => {
-              return <FacetFilter filter={filter} facetIdentifier="slug" facetKey={`category_slug`} key={`category_slug`} updateAttribute={updateAttribute} />
-            })}
-
-          {priceRange &&
-            priceRange !== {} &&
-            [priceRange].map(filter => {
-              return <FacetFilter filter={filter} facetIdentifier="value" facetKey={`priceRange`} key={`priceRange`} updateAttribute={updateAttribute} />
-            })}
-
-          {attribute &&
-            attribute.subFacets &&
-            Object.keys(attribute.subFacets).map(facetKey => {
-              return [attribute.subFacets[facetKey]].map(filter => {
-                return <FacetFilter filter={filter} facetIdentifier="name" facetKey={`attribute_${facetKey}`} key={`attribute_${facetKey}`} updateAttribute={updateAttribute} />
-              })
-            })}
-          {option &&
-            option.subFacets &&
-            Object.keys(option.subFacets).map(facetKey => {
-              return [option.subFacets[facetKey]].map(filter => {
-                return <FacetFilter filter={filter} facetIdentifier="name" facetKey={`option_${facetKey}`} key={`option_${facetKey}`} updateAttribute={updateAttribute} />
-              })
-            })}
+          <SearchBar redirectToSearchPage={false} />
+          {config?.returnFacetListWithFilter?.split(',')?.map(facetKey => {
+            return (
+              <div key={facetKey}>
+                {facetKey === 'productType' &&
+                  productType?.options?.length > 0 &&
+                  !hide.includes(productType.facetKey) &&
+                  [productType].map(filter => {
+                    return <FacetFilter config={config} filter={filter} facetIdentifier="slug" facetKey={`productType_slug`} key={`productType_slug`} updateAttribute={updateAttribute} />
+                  })}
+                {facetKey === 'brand' &&
+                  brand &&
+                  brand?.options?.length > 0 &&
+                  !hide.includes(brand.facetKey) &&
+                  [brand].map(filter => {
+                    return <FacetFilter config={config} filter={filter} facetIdentifier="slug" facetKey={`brand_slug`} key={`brand`} updateAttribute={updateAttribute} />
+                  })}
+                {facetKey === 'category' &&
+                  category?.options?.length > 0 &&
+                  !hide.includes(category.facetKey) &&
+                  [category].map(filter => {
+                    return <FacetFilter config={config} filter={filter} facetIdentifier="slug" facetKey={`category_slug`} key={`category_slug`} updateAttribute={updateAttribute} />
+                  })}
+                {facetKey === 'priceRange' &&
+                  priceRange?.options?.length > 0 &&
+                  [priceRange].map(filter => {
+                    return <FacetFilter config={config} filter={filter} facetIdentifier="value" facetKey={`priceRange`} key={`priceRange`} updateAttribute={updateAttribute} />
+                  })}
+                {facetKey === 'attribute' &&
+                  attribute?.sortedSubFacets?.map(filter => {
+                    return <FacetFilter config={config} filter={filter} facetIdentifier="name" facetKey={`attribute_${filter.subFacetKey}`} key={`attribute_${filter.subFacetKey}`} updateAttribute={updateAttribute} />
+                  })}
+                {facetKey === 'option' &&
+                  option?.sortedSubFacets?.map(filter => {
+                    return <FacetFilter config={config} filter={filter} facetIdentifier="name" facetKey={`option_${filter.subFacetKey}`} key={`option_${filter.subFacetKey}`} updateAttribute={updateAttribute} />
+                  })}
+              </div>
+            )
+          })}
         </div>
       )}
     </div>

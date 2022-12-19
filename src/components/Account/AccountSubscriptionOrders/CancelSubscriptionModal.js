@@ -12,6 +12,8 @@ const CancelSubscriptionModal = ({ formik, cancel, setCancel, orderInfo, showCan
         if (response.isSuccess() && !didCancel && response.success().cancellationReasonTypeOptions) {
           var data = [{ name: '', value: '' }, ...response.success().cancellationReasonTypeOptions]
           setCancellationReasons(data.map(({ name, value }) => ({ key: name, value: value })))
+          setCancel('')
+          formik.resetForm()
           setLoaded(true)
         } else {
           setCancellationReasons([])

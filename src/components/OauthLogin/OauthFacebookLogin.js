@@ -1,4 +1,9 @@
-const redirectURL = process.env.REACT_APP_ADMIN_URL + '?slatAction=main.OAuthLoginStorefrontHandler&integrationName=facebooklogin'
+import { getCurrentSiteCode } from '../../utils'
+
+//get site code
+const siteCode = getCurrentSiteCode()
+//set redirect url
+const redirectURL = process.env.REACT_APP_ADMIN_URL + '?slatAction=main.OAuthLoginStorefrontHandler&integrationName=facebooklogin&siteCode=' + siteCode
 
 const OauthFacebookLogin = ({ buttonText }) => {
   return (

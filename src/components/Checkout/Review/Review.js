@@ -1,10 +1,10 @@
 import { useSelector } from 'react-redux'
-import { Redirect } from 'react-router'
-import { Link } from 'react-router-dom'
-import { SlideNavigation, CartLineItem, GiftCardDetails, PickupLocationDetails, ShippingAddressDetails, TermPaymentDetails, BillingAddressDetails, CCDetails, ExternalPaymentDetails, CashPaymentDetails } from '../..'
+import { Navigate, Link } from 'react-router-dom'
+import { SlideNavigation, CartLineItem, GiftCardDetails, PickupLocationDetails, ShippingAddressDetails, CheckPaymentDetails, TermPaymentDetails, BillingAddressDetails, CCDetails, ExternalPaymentDetails, CashPaymentDetails } from '../..'
 import { getAllOrderFulfillments, orderPayment } from '../../../selectors'
 import { useTranslation } from 'react-i18next'
 import { useCheckoutUtilities } from '../../../hooks'
+import { CHECK_PAYMENT_CODE } from '../../../hooks/components/Checkout/useCheckoutUtilities'
 
 const ReviewSlide = ({ currentStep }) => {
   const cart = useSelector(state => state.cart)
@@ -14,7 +14,7 @@ const ReviewSlide = ({ currentStep }) => {
   const { SHIPPING_CODE, PICKUP_CODE, CREDIT_CARD_CODE, GIFT_CARD_CODE, TERM_PAYMENT_CODE, CASH_PAYMENT_CODE, EXTERNAL_PAYMENT_CODE } = useCheckoutUtilities()
 
   if (cart.isPlaced) {
-    return <Redirect to={'/order-confirmation'} />
+    return <Navigate to={'order-confirmation'} />
   }
 
   return (
@@ -29,7 +29,7 @@ const ReviewSlide = ({ currentStep }) => {
           )
         })}
 
-        {payment?.billingAddress?.addressID?.length > 0 && (
+        {payment?.billingAddress?.addressID?.length > 0 && payment.paymentMethod.paymentMethodType !== CHECK_PAYMENT_CODE && (
           <div className="col">
             <BillingAddressDetails orderPayment={payment} />
           </div>
@@ -40,6 +40,7 @@ const ReviewSlide = ({ currentStep }) => {
           {payment.paymentMethod.paymentMethodType === GIFT_CARD_CODE && <GiftCardDetails />}
           {payment.paymentMethod.paymentMethodType === TERM_PAYMENT_CODE && <TermPaymentDetails termPayment={payment} />}
           {payment.paymentMethod.paymentMethodType === CASH_PAYMENT_CODE && <CashPaymentDetails cashPayment={payment} />}
+          {payment.paymentMethod.paymentMethodType === CHECK_PAYMENT_CODE && <CheckPaymentDetails payment={payment} />}
           {payment.paymentMethod.paymentMethodType === EXTERNAL_PAYMENT_CODE && <ExternalPaymentDetails payment={payment} />}
           <Link to="/checkout/payment" className="text-link link">
             {t('frontend.core.edit')}
@@ -49,9 +50,11 @@ const ReviewSlide = ({ currentStep }) => {
 
       <h2 className="h3 pt-1 pb-3 mb-3 border-bottom">{t('frontend.checkout.review.order')}</h2>
       {cart.orderItems &&
-        cart.orderItems.map((orderItem) => {
-          return <CartLineItem key={orderItem.orderItemID} orderItem={orderItem} isDisabled={true} /> // this cannot be index or it wont force a rerender
-        })}
+        cart.orderItems
+          .filter(item => item.parentOrderItemID === '')
+          .map(orderItem => {
+            return <CartLineItem key={orderItem.orderItemID} orderItem={orderItem} isDisabled={true} childBundleItems={cart.orderItems?.filter(item => item?.parentOrderItemID === orderItem.orderItemID)} /> // this cannot be index or it wont force a rerender
+          })}
 
       <SlideNavigation currentStep={currentStep} />
     </>

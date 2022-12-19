@@ -1,15 +1,17 @@
 import { useTranslation } from 'react-i18next'
-import { Button, CartLineItem, OrderSummary, CartPromoBox, FulfillmentList, OrderToolbar, SwRadioSelect, PaymentList, CreditCardPayment, TermPayment, PickupLocationDetails } from '../..'
-import { SlatwalApiService } from '../../../services'
 import { toast } from 'react-toastify'
-import { getErrorMessage, getFailureMessageOnSuccess } from '../../../utils'
 import { useState, useEffect } from 'react'
-import { useCheckoutUtilities } from '../../../hooks'
+import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { Button, FulfillmentList, OrderToolbar, SwRadioSelect, PaymentList, CreditCardPayment, TermPayment, PickupLocationDetails } from '../..'
+import { SlatwalApiService } from '../../../services/SlatwalApiService'
+import { getErrorMessage, getFailureMessageOnSuccess } from '../../../utils'
+import { useCheckoutUtilities } from '../../../hooks/components/Checkout/useCheckoutUtilities'
 import { clearCart, getEligibleOrderFulfillmentMethods, getAllPickupLocations, setPickupDateToOrderFulfillment, addPickupLocationToOrderFulfillment, clearOrderData, removeOrderItem, updateOrderItemQuantity, applyPromoCodeToOrder, removePromoCodeFromOrder, placeMyOrder, addPaymentToOrder, changeFulfillmentOnOrder, addShippingAddressUsingAccountAddressToOrderFulfillment, addNewAddressAndAttachAsShippingOnOrderFulfillment, addShippingMethodToOrderFulfillment, addShippingAddressToOrderFulfillment, removeOrderPayment } from '../../../actions'
 import { AddressCard } from '../../Checkout/Fulfilment/AddressCard'
 import { OrderItem } from '../AccountOrderDetail/OrderShipments'
-import { useDispatch } from 'react-redux'
-import { useHistory } from 'react-router'
+
+import { useElementContext } from '../../../contexts/ElementContextProvider'
 
 const QuoteDetail = ({ quoteDetail, updateQuote }) => {
   return (
@@ -23,12 +25,13 @@ const QuoteDetail = ({ quoteDetail, updateQuote }) => {
 
 const QuoteDetailDraft = ({ quoteDetail, updateQuote }) => {
   const { t } = useTranslation()
+  const { CartLineItem } = useElementContext()
   const dispatch = useDispatch()
   const [eligibleFulfillmentMethods, setEligibleMethods] = useState({})
   const [pickupLocations, setPickupLocations] = useState([])
   let selectedFulfillmentMethod = { fulfillmentMethodID: '' }
-  if (quoteDetail.orderFulfillments[0] && quoteDetail.orderFulfillments[0].fulfillmentMethod) {
-    selectedFulfillmentMethod = quoteDetail.orderFulfillments[0].fulfillmentMethod
+  if (quoteDetail.orderFulfillments?.at(0) && quoteDetail.orderFulfillments?.at(0).fulfillmentMethod) {
+    selectedFulfillmentMethod = quoteDetail.orderFulfillments?.at(0).fulfillmentMethod
   }
   useEffect(() => {
     dispatch(
@@ -40,14 +43,18 @@ const QuoteDetailDraft = ({ quoteDetail, updateQuote }) => {
         isQuote: true,
       })
     ).then(response => {
-      setEligibleMethods(response?.success()?.eligibleFulfillmentMethods)
+      if (response.isSuccess()) {
+        setEligibleMethods(response?.success()?.eligibleFulfillmentMethods)
+      }
     })
     dispatch(getAllPickupLocations({ isQuote: true })).then(response => {
-      setPickupLocations(
-        response?.success()?.locations.map(location => {
-          return { name: location['NAME'], value: location['VALUE'] }
-        })
-      )
+      if (response.isSuccess()) {
+        setPickupLocations(
+          response?.success()?.locations.map(location => {
+            return { name: location['NAME'], value: location['VALUE'] }
+          })
+        )
+      }
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quoteDetail.orderID])
@@ -231,7 +238,18 @@ const QuoteDetailDraft = ({ quoteDetail, updateQuote }) => {
                       params: {
                         orderID: quoteDetail.orderID,
                         fulfillmentID: orderFulfillmentID,
-                        accountAddressID: values,
+                        accountAddressName: values?.accountAddressName,
+                        city: values?.city,
+                        countryCode: values?.countryCode,
+                        emailAddress: values?.emailAddress,
+                        locality: values?.locality,
+                        name: values?.name,
+                        phoneNumber: values?.phoneNumber,
+                        postalCode: values?.postalCode,
+                        saveAddress: values?.saveAddress,
+                        stateCode: values?.stateCode,
+                        street2Address: values?.street2Address,
+                        streetAddress: values?.streetAddress,
                       },
                       returnQuote: true,
                       isQuote: true,
@@ -251,7 +269,18 @@ const QuoteDetailDraft = ({ quoteDetail, updateQuote }) => {
                       params: {
                         orderID: quoteDetail.orderID,
                         fulfillmentID: orderFulfillmentID,
-                        accountAddressID: values,
+                        accountAddressName: values?.accountAddressName,
+                        city: values?.city,
+                        countryCode: values?.countryCode,
+                        emailAddress: values?.emailAddress,
+                        locality: values?.locality,
+                        name: values?.name,
+                        phoneNumber: values?.phoneNumber,
+                        postalCode: values?.postalCode,
+                        saveAddress: values?.saveAddress,
+                        stateCode: values?.stateCode,
+                        street2Address: values?.street2Address,
+                        streetAddress: values?.streetAddress,
                       },
                       returnQuote: true,
                       isQuote: true,
@@ -511,6 +540,7 @@ const QuoteFulfillmentsViewOnly = ({ quoteDetail }) => {
 
 const QuoteSidebar = ({ quoteDetail, updateQuote }) => {
   const { t } = useTranslation()
+  const { OrderSummary, CartPromoBox } = useElementContext()
   const dispatch = useDispatch()
   return (
     <div className="col-lg-12 col-md-12">
@@ -573,7 +603,7 @@ const QuoteSidebar = ({ quoteDetail, updateQuote }) => {
 const QuoteActions = ({ quoteDetail }) => {
   const { t } = useTranslation()
   const dispatch = useDispatch()
-  const history = useHistory()
+  const navigate = useNavigate()
   return (
     <>
       {quoteDetail.orderStatusType.typeCode === 'qstApproved' && (
@@ -597,7 +627,7 @@ const QuoteActions = ({ quoteDetail }) => {
                   if (response.isSuccess() && response.success()?.successfulActions.length > 0) {
                     toast.success(t('frontend.order.placed'))
                     setTimeout(() => {
-                      history.push('/my-account/quotes')
+                      navigate('/my-account/quotes')
                     }, 2000)
                   }
                 })

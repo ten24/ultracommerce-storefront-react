@@ -102,7 +102,7 @@ export const augmentProductType = (parent, data) => {
   parents = organizeProductTypes(parents, data)
 
   if (parents.length > 0) {
-    parents = parents[0]
+    parents = parents?.at(0)
   }
   return parents
 }
@@ -139,7 +139,7 @@ export const getOptionByCode = (filteredOptions, optionGroupCode, optionCode) =>
     .flat()
     .shift()
 }
-export const getContentByType = (content = [], code = '') => {
+export const getContentByTypeCode = (content = [], code = '') => {
   return content.filter(con => code.split(',').includes(con?.contentElementType_systemCode)).sort((a, b) => a.sortOrder - b.sortOrder)
 }
 export const getContentPages = (content = []) => {
@@ -181,3 +181,24 @@ export const unflattenObject = (obj, delimiter = '_') =>
     k.split(delimiter).reduce((acc, e, i, keys) => acc[e] || (acc[e] = isNaN(Number(keys[i + 1])) ? (keys.length - 1 === i ? obj[k] : {}) : []), res)
     return res
   }, {})
+
+export const formatXml = (xml, tab = '    ', nl = '\n') => {
+  let formatted = '',
+    indent = ''
+  const nodes = xml.slice(1, -1).split(/>\s*</)
+  if (nodes[0][0] === '?') formatted += '<' + nodes.shift() + '>' + nl
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i]
+    if (node[0] === '/') indent = indent.slice(tab.length) // decrease indent
+    formatted += indent + '<' + node + '>' + nl
+    if (node[0] !== '/' && node[node.length - 1] !== '/' && node.indexOf('</') === -1) indent += tab // increase indent
+  }
+  return formatted
+}
+
+export const getCurrentSiteCode = () => {
+  let localSiteCode = JSON.parse(localStorage.getItem('appConfiguration') || '{}')?.currentSite
+  if (!!localSiteCode) return localSiteCode
+  localStorage.setItem('appConfiguration', JSON.stringify({ currentSite: process.env.REACT_APP_SITE_CODE, sites: [] }))
+  return process.env.REACT_APP_SITE_CODE
+}

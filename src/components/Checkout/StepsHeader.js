@@ -1,4 +1,4 @@
-import { useHistory, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { checkOutSteps, getCurrentStep } from '../'
 
@@ -11,9 +11,9 @@ import { checkOutSteps, getCurrentStep } from '../'
 const StepsHeader = () => {
   const { t } = useTranslation()
   const loc = useLocation()
-  let history = useHistory()
+  const navigate = useNavigate()
 
-  const path = loc.pathname.split('/').reverse()[0].toLowerCase()
+  const path = loc.pathname.split('/').reverse()?.at(0).toLowerCase()
   const current = getCurrentStep(path)
   return (
     <ul className="nav nav-pills border nav-fill mb-4 p-2 rounded">
@@ -32,7 +32,7 @@ const StepsHeader = () => {
               className={`nav-link link text-decoration-none ${progressSate}`}
               key={step.progress}
               onClick={e => {
-                history.push(step.link)
+                navigate(step.link)
               }}
             >
               {t(step.name)}

@@ -21,7 +21,7 @@
 		border-width: 0;
 		border-bottom-width: 5px;
 		background: $white !important;
-		border-color: $white $white $primary !important;
+		border-color: $white $white var(--uc-primarycolor) !important;
 	}
 }
 

@@ -14,7 +14,7 @@ const QuotesListItem = ({ quoteName, orderID, calculatedTotalItemQuantity, order
   return (
     <tr>
       <th>
-        <Link className="nav-link-style font-weight-medium font-size-sm" to={`/my-account/quote/${orderID}`}>
+        <Link className="nav-link-style font-weight-medium font-size-sm" to={`/my-account/quotes/${orderID}`}>
           {quoteName}
         </Link>
         <br />

@@ -1,4 +1,5 @@
-import { Layout, SimpleTabs } from '../../components'
+import { SimpleTabs } from '../../components'
+import DynamicPage from '../DynamicPage/DynamicPage'
 
 const Testing = props => {
   let tabData = [
@@ -8,7 +9,7 @@ const Testing = props => {
   ]
 
   return (
-    <Layout>
+    <DynamicPage ignoreLayout={true}>
       <div className="page-title-overlap bg-lightgray pt-4 pb-5">
         <div className="container d-lg-flex justify-content-between py-2 py-lg-3">
           <div className="order-lg-1 pr-lg-4 text-center text-lg-start">
@@ -25,7 +26,7 @@ const Testing = props => {
           </section>
         </div>
       </div>
-    </Layout>
+    </DynamicPage>
   )
 }
 

@@ -3,14 +3,29 @@
   padding: 0.5rem 1.5rem;
 }
 
-.btn-primary {
+.btn-primary,
+.btn-secondary {
   color: $white;
-  background-color: $color-orange;
-  border-color: $color-orange;
+  background-color: var(--uc-primarybuttoncolor);
+  border-color: var(--uc-primarybuttoncolor);
+  color: var(--uc-primarybuttontextcolor);
+  position: relative;
+  &:hover,
+  &:active {
+    background-color: #fff;
+    border-color: var(--uc-primarybuttoncolor);
+    color: var(--uc-bodytextcolor);
+  }
 }
 
-.btn-primary:hover {
-  color: $white;
+.btn-secondary {
+  background-color: var(--uc-secondarybuttoncolor);
+  border-color: var(--uc-secondarybuttoncolor);
+  color: var(--uc-secondarybuttontextcolor);
+  &:hover,
+  &:active {
+    border-color: var(--uc-secondarybuttoncolor);
+  }
 }
 
 .link-button {
@@ -21,11 +36,7 @@
   display: inline;
   margin: 0;
   padding: 0;
-  color: $link-color;
-}
-
-.link-button:hover {
-  color: $color-orange;
+  color: var(--uc-textlinkcolor);
 }
 
 .btn-wishlist {
@@ -38,22 +49,17 @@
   font-size: 22px;
 }
 
-.btn-primary:hover {
-  background-color: $link-color;
-  border-color: $link-color;
-}
-
 .btn-dark {
   color: $card-shadow;
   background-color: $dark;
   border-color: $dark;
 }
 .link-btn {
-  color: $link-color;
+  color: var(--uc-textlinkcolor);
 }
 .btn.link-btn:hover,
 .btn.link-btn:focus {
-  color: $color-orange;
+  color: var(--uc-primarycolor);
 }
 
 .form-control:focus,
@@ -73,4 +79,40 @@
     color: $color-white;
     @extend .bg-secondary;
   }
+}
+
+.btn {
+  &.skuOption {
+    color: $white;
+    background-color: white;
+    border-color: #666;
+    color: #666;
+    border-radius: unset;
+    padding: unset;
+
+    // &.available {
+    //   background-color: var(--uc-primarybuttoncolor);
+    //   &:hover {
+    //     background-color: red;
+    //   }
+    // }
+    &.active {
+      border-width: 2px;
+      border-color: black;
+      color: black;
+    }
+    &.nonavailable {
+      border: 1px solid #999999;
+      background-color: #cccccc;
+      color: #666666;
+    }
+  }
+}
+
+
+.btn-gray {
+  background-color: #D8D8D8;
+  border: 1px solid #CDCDCD;
+  border-radius: 4px;
+  min-width: 120px;
 }

@@ -1,7 +1,6 @@
-import { useHistory, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import queryString from 'query-string'
 import { getErrorMessage, processQueryParameters } from '../../../utils'
-import { useSelector } from 'react-redux'
 import { useDeepCompareEffect } from 'react-use'
 import { SlatwalApiService, axios } from '../../../services'
 import { useState } from 'react'
@@ -14,7 +13,8 @@ const useReconcile = ({ option, brand, attribute, category, priceRange, productT
   const loc = useLocation()
   let core = queryString.parse(loc.search, { arrayFormat: 'separator', arrayFormatSeparator: ',' })
   let queryStringParams = queryString.parse(loc.search, { arrayFormat: 'separator', arrayFormatSeparator: ',' })
-  const evaluation = ({ qs, facetKey, facetIdentifier, filter }) => {
+  const evaluation = props => {
+    const { qs, facetKey, facetIdentifier, filter } = props
     if (qs[facetKey] && qs[facetKey].length) {
       let params = Array.isArray(qs[facetKey]) ? qs[facetKey] : [qs[facetKey]]
       const missingFilter = params.filter(optionToValidate => (!filter.options.filter(opt => opt[facetIdentifier] === optionToValidate).map(data => data).length ? optionToValidate : false)).filter(data => data)
@@ -52,11 +52,9 @@ const useReconcile = ({ option, brand, attribute, category, priceRange, productT
       queryStringParams = evaluation({ filter, qs: queryStringParams, facetIdentifier: 'value', facetKey: `priceRange` })
     })
 
-  if (attribute && attribute.subFacets) {
-    Object.keys(attribute.subFacets).forEach(facetKey => {
-      return [attribute.subFacets[facetKey]].forEach(filter => {
-        queryStringParams = evaluation({ filter, qs: queryStringParams, facetIdentifier: 'name', facetKey: `attribute_${facetKey}` })
-      })
+  if (attribute && attribute.sortedSubFacets) {
+    attribute.sortedSubFacets.forEach(filter => {
+      queryStringParams = evaluation({ filter, qs: queryStringParams, facetIdentifier: 'name', facetKey: `attribute_${filter.subFacetKey}` })
     })
   } else {
     Object.keys(queryStringParams)
@@ -66,11 +64,9 @@ const useReconcile = ({ option, brand, attribute, category, priceRange, productT
       })
   }
 
-  if (option && option.subFacets) {
-    Object.keys(option.subFacets).forEach(facetKey => {
-      return [option.subFacets[facetKey]].forEach(filter => {
-        queryStringParams = evaluation({ filter, qs: queryStringParams, facetIdentifier: 'name', facetKey: `option_${facetKey}` })
-      })
+  if (option && option.sortedSubFacets) {
+    option.sortedSubFacets.forEach(filter => {
+      queryStringParams = evaluation({ filter, qs: queryStringParams, facetIdentifier: 'name', facetKey: `option_${filter.subFacetKey}` })
     })
   } else {
     Object.keys(queryStringParams)
@@ -79,11 +75,30 @@ const useReconcile = ({ option, brand, attribute, category, priceRange, productT
         delete queryStringParams[keyToDelete]
       })
   }
-
   return { shouldUpdate: JSON.stringify(queryStringParams) !== JSON.stringify(core), queryStringParams }
 }
 
-const useListing = (preFilter, type = 'productListing') => {
+const paramsIncludesForcedFilter = (searchConfig, params) => {
+  if (searchConfig?.forcedFilterOptions?.length) {
+    let resetFilters = false
+    Object.keys(params).forEach(param => {
+      const [paramType] = param.split('_')
+
+      // test for exact match brand_slug
+      if (searchConfig.forcedFilterOptions.includes(param) && params[param]?.length) resetFilters = true
+
+      // test for for forced prefix like brand
+      searchConfig.forcedFilterOptions.forEach(ffo => {
+        if (ffo.startsWith(paramType) && params[param]?.length) resetFilters = true
+      })
+      return param
+    })
+    return resetFilters
+  }
+  return true
+}
+
+const useListing = (preFilter, searchConfig) => {
   let [isFetching, setFetching] = useState(true)
   let [records, setRecords] = useState([])
   let [total, setTotal] = useState(0)
@@ -93,24 +108,16 @@ const useListing = (preFilter, type = 'productListing') => {
   let [error, setError] = useState({ isError: false, message: '' })
 
   const loc = useLocation()
-  let listings = useSelector(state => state.configuration.listings)
-  const listing = listings[type]
-  let productSearch = listing.params
-  let initialData = listing.filters
-  let initialForcedFilterOptions = listing.forcedFilterOptions
+  // let listings = useSelector(state => state.configuration.listings)
+  let productSearch = searchConfig.params
+  let initialData = searchConfig.filters
 
-  let history = useHistory()
+  const navigate = useNavigate()
   let params = processQueryParameters(loc.search)
   params = { ...initialData, ...params, ...preFilter }
-  const hasValidFilter =
-    !initialForcedFilterOptions?.length ||
-    initialForcedFilterOptions.reduce((result, filterKey) => {
-      if (params[filterKey]?.length) return true
-      return result
-    }, false)
-  const returnFacetList = hasValidFilter ? 'brand,option,category,attribute,sorting,priceRange,productType' : 'category,brand,sorting,productType'
-
-  const payload = { ...params, ...productSearch, returnFacetList }
+  const returnFacetList = paramsIncludesForcedFilter(searchConfig, params) ? searchConfig.returnFacetListWithFilter : [...new Set(searchConfig.forcedFilterOptions.map(filteropt => filteropt.split('_').at(0)))].join(',')
+  const selectedLocale = { lang: localStorage.getItem('i18nextLng') ? localStorage.getItem('i18nextLng') : 'en_us' }
+  const payload = { ...params, ...productSearch, ...selectedLocale, returnFacetList }
 
   useDeepCompareEffect(() => {
     let source = axios.CancelToken.source()
@@ -123,12 +130,46 @@ const useListing = (preFilter, type = 'productListing') => {
           const products = data.products.map(sku => {
             return { ...sku, salePrice: sku.skuPrice, productName: sku.product_productName, urlTitle: sku.product_urlTitle, productCode: sku.product_productCode, imageFile: sku.sku_imageFile, skuID: sku.sku_skuID, skuCode: sku.sku_skuCode }
           })
+
           setRecords(products)
         } else {
           setRecords([])
         }
+        if (data.potentialFilters) {
+          let cleanFilters = {}
+          const complexFacets = ['option', 'attribute']
+          const simpleFacets = ['brand', 'productType', 'category', 'sorting', 'priceRange']
+          simpleFacets.forEach(key => {
+            if (key in data.potentialFilters) {
+              cleanFilters[key] = { ...data.potentialFilters[key] }
+              cleanFilters[key].options.sort((a, b) => {
+                return a.sortOrder - b.sortOrder
+              })
+            }
+          })
+          complexFacets.forEach(key => {
+            if (key in data.potentialFilters) {
+              cleanFilters[key] = { ...data.potentialFilters[key] }
+              Object.keys(cleanFilters[key].subFacets).forEach(subfacetKey => {
+                cleanFilters[key].subFacets[subfacetKey].options.sort((a, b) => {
+                  return a.sortOrder - b.sortOrder
+                })
+              })
+              cleanFilters[key].sortedSubFacets = Object.keys(cleanFilters[key].subFacets)
+                .map(subFacet => {
+                  return cleanFilters[key].subFacets[subFacet]
+                })
+                .sort((a, b) => {
+                  return a.sortOrder - b.sortOrder
+                })
+              delete cleanFilters[key].subFacets
+            }
+          })
+          setPotentialFilters(cleanFilters)
+        } else {
+          setPotentialFilters({})
+        }
 
-        setPotentialFilters(data.potentialFilters)
         setTotal(data.total)
         setTotalPages(Math.ceil(data.total / data.pageSize))
         setError({ isError: false, message: '' })
@@ -151,14 +192,14 @@ const useListing = (preFilter, type = 'productListing') => {
   const { shouldUpdate, queryStringParams } = useReconcile({ ...potentialFilters })
   const setPage = pageNumber => {
     params['currentPage'] = pageNumber
-    history.push({
+    navigate({
       pathname: loc.pathname,
       search: buildPath(params, { arrayFormat: 'comma' }),
     })
   }
   const setKeyword = keyword => {
     params = { ...initialData, ...preFilter, orderBy: params.orderBy, keyword: keyword }
-    history.push({
+    navigate({
       pathname: loc.pathname,
       search: buildPath(params, { arrayFormat: 'comma' }),
     })
@@ -166,7 +207,7 @@ const useListing = (preFilter, type = 'productListing') => {
   const setSort = orderBy => {
     params['orderBy'] = orderBy
     params['currentPage'] = 1
-    history.push({
+    navigate({
       pathname: loc.pathname,
       search: buildPath(params, { arrayFormat: 'comma' }),
     })
@@ -182,17 +223,11 @@ const useListing = (preFilter, type = 'productListing') => {
     params[attribute.filterName] = attributeFilters
     params['currentPage'] = 1
 
-    // This is a check for if we deselct a brand or Product type and need to reset other checked params
-    const hasValidFilter =
-      !attributeFilters?.length ||
-      attributeFilters.reduce((result, filterKey) => {
-        if (params[filterKey]?.length) return true
-        return result
-      }, false)
-    if (hasValidFilter) {
+    if (!paramsIncludesForcedFilter(searchConfig, params)) {
       params = { ...initialData, ...preFilter, orderBy: params.orderBy, keyword: params.keyword }
     }
-    history.push({
+
+    navigate({
       pathname: loc.pathname,
       search: buildPath(params, { arrayFormat: 'comma' }),
     })
@@ -201,13 +236,13 @@ const useListing = (preFilter, type = 'productListing') => {
   if (shouldUpdate && !isFetching) {
     const path = queryString.stringify(queryStringParams, { arrayFormat: 'comma' })
     params = processQueryParameters(path)
-    history.replace({
+    navigate({
       pathname: loc.pathname,
       search: path,
     })
   }
 
-  return { records, pageSize, potentialFilters, isFetching, total, totalPages, error, setSort, updateAttribute, setPage, setKeyword, params, config: listing }
+  return { records, pageSize, potentialFilters, isFetching, total, totalPages, error, setSort, updateAttribute, setPage, setKeyword, params }
 }
 
 export { useListing }

@@ -8,14 +8,14 @@ import { receiveUser, requestUser } from '../../../actions'
 import { SlatwalApiService } from '../../../services'
 import { toast } from 'react-toastify'
 import { getErrorMessage } from '../../../utils'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router-dom'
 import { getDefaultCountry } from '../../../selectors'
 
 const CreateOrEditAccountAddress = ({ path, heading, action = 'Account Address' }) => {
   const dispatch = useDispatch()
   const [billingAddressErrors, setBillingAddressErrors] = useState({})
   let [isFetching, setFetching] = useState(false)
-  const history = useHistory()
+  const navigate = useNavigate()
   const countryCode = useSelector(getDefaultCountry)
 
   const { t } = useTranslation()
@@ -29,7 +29,7 @@ const CreateOrEditAccountAddress = ({ path, heading, action = 'Account Address' 
         toast.success('Account Address Save Successful')
         dispatch(receiveUser(response.success().account))
         setTimeout(() => {
-          history.push('/my-account/addresses')
+          navigate('/my-account/addresses')
         }, 2000)
       } else {
         dispatch(receiveUser({}))
@@ -48,7 +48,7 @@ const CreateOrEditAccountAddress = ({ path, heading, action = 'Account Address' 
         toast.success('Update Successful')
         dispatch(receiveUser(response.success().account))
         setTimeout(() => {
-          history.push('/my-account/addresses')
+          navigate('/my-account/addresses')
         }, 2000)
       } else {
         dispatch(receiveUser({}))
