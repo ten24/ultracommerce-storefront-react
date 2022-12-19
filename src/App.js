@@ -3,14 +3,13 @@ import { Routes as RouterRoutes, Route, useLocation } from 'react-router-dom'
 import * as Sentry from '@sentry/react'
 import { useSelector } from 'react-redux'
 import { ErrorBoundary } from 'react-error-boundary'
-import { useScrollToTop, Loading, getBlogRoute, useContentContext, DynamicPage, AffiliateUser, Blog, Cart, MyAccount, Search, ProductSearch, Checkout, ThreeDSHandover, Brand, Product, ProductType, Category, OrderConfirmation, GuestOrderConfirmation, BlogPost, Manufacturer, ErrorFallback, Contact, BulkOrder, OrderTemplateCart, OrderTemplateCheckout } from '@ultracommerce/ultracommerce-storefront-react/global'
+import { useScrollToTop, Loading, getBlogRoute, useContentContext, DynamicPage, AffiliateUser, Blog, Cart, MyAccount, Checkout, ThreeDSHandover, OrderConfirmation, GuestOrderConfirmation, BlogPost, Manufacturer, ErrorFallback,  BulkOrder, OrderTemplateCart } from '@ultracommerce/ultracommerce-storefront-react/global'
 const Routes = Sentry.withSentryReactRouterV6Routing(RouterRoutes)
 
 const pageComponents = {
-  Product: <Product />,
-  ProductType: <ProductType />,
-  Category: <Category />,
-  Brand: <Brand />,
+  ProductType: <DynamicPage />,
+  Category: <DynamicPage />,
+  Brand: <DynamicPage />,
 }
 
 //https://itnext.io/react-router-transitions-with-lazy-loading-2faa7a1d24a
@@ -34,11 +33,8 @@ export default function App() {
           // reset the state of your app so the error doesn't happen again
         }}
       >
-        {/* <SEO /> */}
-
         <Routes>
           <Route path="/404" element={<DynamicPage />} />
-          <Route path="/contact" element={<Contact />} />
           <Route path={`/${blogUrlTitle}`}>
             <Route index element={<Blog />} />
             <Route path={`*`} element={<BlogPost />} />
@@ -47,20 +43,15 @@ export default function App() {
           {routing?.map(({ URLKey, URLKeyType }, index) => {
             return !!pageComponents[URLKeyType] && <Route key={index} path={`/${URLKey}/:id`} element={pageComponents[URLKeyType]} />
           })}
-
-          <Route path="/affiliate" element={<AffiliateUser />} />
-          <Route path="/shop" element={<Search />} />
-          <Route path="/productSearch" element={<ProductSearch />} />
           <Route path="/bulkorder" element={<BulkOrder />} />
+          <Route path="/affiliate" element={<AffiliateUser />} />
           <Route path="/my-account/*" element={<MyAccount />} />
           <Route path="/shopping-cart" element={<Cart />} />
           <Route path="/checkout/*" element={<Checkout />} />
           <Route path="/threeDSHandover" element={<ThreeDSHandover />} />
           <Route path="/order-confirmation" element={<OrderConfirmation />} />
           <Route path="/guest-order-confirmation" element={<GuestOrderConfirmation />} />
-
           <Route path="/scheduled-delivery-cart" element={<OrderTemplateCart />} />
-          <Route path="/scheduled-delivery-checkout/*" element={<OrderTemplateCheckout />} />
           <Route path={'*'} element={<DynamicPage />} />
           <Route index element={<DynamicPage />} />
         </Routes>
