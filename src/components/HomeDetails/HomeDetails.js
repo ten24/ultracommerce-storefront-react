@@ -1,6 +1,6 @@
 import React from 'react'
 import { SimpleImage } from '..'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 //        local.homeContentColumns.addFilter("urlTitlePath","%content-columns/%","LIKE")
 
@@ -12,7 +12,7 @@ function HomeDetails() {
       homeContent.push(content[key])
     }
   })
-  let history = useHistory()
+  const navigate = useNavigate()
 
   return (
     <div className="container">
@@ -28,7 +28,7 @@ function HomeDetails() {
                   onClick={event => {
                     event.preventDefault()
                     if (event.target.getAttribute('href')) {
-                      history.push(event.target.getAttribute('href'))
+                      navigate(event.target.getAttribute('href'))
                     }
                   }}
                   dangerouslySetInnerHTML={{ __html: section.contentBody }}

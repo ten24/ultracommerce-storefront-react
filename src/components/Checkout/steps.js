@@ -5,7 +5,7 @@ const REVIEW = 'review'
 
 const getCurrentStep = path => {
   const currentList = checkOutSteps.filter(step => step.key === path)
-  return currentList.length ? currentList[0] : checkOutSteps[1]
+  return currentList.length ? currentList?.at(0) : checkOutSteps[1]
 }
 
 const checkOutSteps = [

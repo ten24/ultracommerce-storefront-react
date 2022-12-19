@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { getAllAccountPaymentMethods } from '../../../selectors/orderSelectors'
+import { getAllAccountPaymentMethods } from '../../../selectors'
 
 const CCDetails = ({ creditCardPayment, hideHeading = false }) => {
   const { paymentMethod, creditCardType, nameOnCreditCard, creditCardLastFour, accountPaymentMethod } = creditCardPayment
@@ -15,7 +15,7 @@ const CCDetails = ({ creditCardPayment, hideHeading = false }) => {
             return method.accountPaymentMethodID === accountPaymentMethod?.accountPaymentMethodID ? <em key={accountPaymentMethod?.accountPaymentMethodID}>{method?.accountPaymentMethodName}</em> : null
           })}
         <br />
-        <em>{paymentMethod.paymentMethodName}</em>
+        <em>{paymentMethod?.paymentMethodName}</em>
         <br />
         {nameOnCreditCard} <br />
         {`${creditCardType} ending in ${creditCardLastFour}`}

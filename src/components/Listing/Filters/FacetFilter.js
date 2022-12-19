@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-const AttributeList = ({ appliedFilters, facetKeyName = 'name', facet, filterName, facetKey, updateAttribute }) => {
+const AttributeList = ({ appliedFilters, showCounts = true, facetKeyName = 'name', facet, filterName, facetKey, updateAttribute }) => {
   const token = filterName.replace(/\s/g, '') + facet.name.replace(/\s/g, '') + 'input'
   const name = facet[facetKeyName] || facet.name
   const isSelected = appliedFilters.includes(name)
@@ -21,7 +21,7 @@ const AttributeList = ({ appliedFilters, facetKeyName = 'name', facet, filterNam
         </label>
       </div>
       <div className="pt-1">
-        {facet.count && (
+        {showCounts && facet.count && (
           <span style={{ fontSize: 12 }} className="text-muted ml-3 text-right">
             {facet.count}
           </span>
@@ -31,12 +31,13 @@ const AttributeList = ({ appliedFilters, facetKeyName = 'name', facet, filterNam
   )
 }
 
-const FacetFilter = ({ filter, updateAttribute, facetIdentifier = '', facetKey = '' }) => {
+const FacetFilter = ({ config, filter, updateAttribute, facetIdentifier = '', facetKey = '' }) => {
   const { searchTerm, setSearchTerm, searchResults, appliedFilters } = useListingFilter(filter.options, filter.selectType, facetKey)
   const filterData = useSelector(state => state.configuration.filtering.filterDataShowCounts)
   const [updateCount, setUpdateCount] = useState(filterData)
   const { t } = useTranslation()
   if (!filter.options.length) return null
+  if (config?.excludeFacets?.includes(facetKey)) return null
 
   return (
     <div className="filter-list-container mt-4">
@@ -47,7 +48,7 @@ const FacetFilter = ({ filter, updateAttribute, facetIdentifier = '', facetKey =
         {searchResults &&
           searchResults.map((facet, index) => {
             if (index + 1 > updateCount) return null
-            return <AttributeList appliedFilters={appliedFilters} facetKeyName={facetIdentifier} filterName={filter.name} facet={facet} key={facet.id || facet.name} facetKey={facetKey} updateAttribute={updateAttribute} />
+            return <AttributeList showCounts={!config?.params?.productsListingFlag} appliedFilters={appliedFilters} facetKeyName={facetIdentifier} filterName={filter.name} facet={facet} key={facet.id || facet.name} facetKey={facetKey} updateAttribute={updateAttribute} />
           })}
 
         {searchResults.length > updateCount && (

@@ -19,9 +19,9 @@ const AccountOrderDetail = props => {
   let orderFulfillmentGroups = formatOrderDetails(order.data)
 
   return (
-    <AccountLayout title={`Order: ${(order.isLoaded && order.data.orderInfo[0].orderNumber) || ''}`}>
-      {order.isLoaded && <OrderToolbar delivered={order.data.orderInfo[0]} orderPayments={order.data.orderPayments[0]} />}
-      {order.isLoaded && <OrderDetails orderInfo={order.data.orderInfo[0]} orderFulfillments={orderFulfillmentGroups} orderPayments={order.data.orderPayments[0]} />}
+    <AccountLayout title={`Order: ${(order.isLoaded && order.data.orderInfo?.at(0).orderNumber) || ''}`}>
+      {order.isLoaded && <OrderToolbar delivered={order.data.orderInfo?.at(0)} orderPayments={order.data.orderPayments?.at(0)} />}
+      {order.isLoaded && <OrderDetails orderInfo={order.data.orderInfo?.at(0)} orderFulfillments={orderFulfillmentGroups} orderPayments={order.data.orderPayments?.at(0)} />}
       {order.isLoaded && <OrderFulfilments fulfilments={orderFulfillmentGroups} files={order.data?.files} />}
     </AccountLayout>
   )

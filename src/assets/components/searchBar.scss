@@ -1,0 +1,27 @@
+.search-text-span:hover {
+  white-space: unset;
+  background-color: #c6ccc8;
+  cursor: pointer;
+  border-radius: 5px;
+  width: 100%;
+  color: black;
+  transition: 0.4s;
+}
+
+.search-text-span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-top: 0.3em;
+  padding-bottom: 0.3em;
+  width: 100%;
+  transition: 0.5s;
+}
+
+.predictive-search-container {
+  position: absolute;
+  background-color: white;
+  border-radius: 0 0 5px 5px;
+  z-index: 10;
+  top: 2.5rem;
+}

@@ -1,27 +1,35 @@
 import { useTranslation } from 'react-i18next'
 import { useFormatCurrency, useProductPrice } from '../../hooks/'
 import { Link } from 'react-router-dom'
+import { isAuthenticated } from '../../utils'
 
-const ProductPrice = ({ salePrice = 0, listPrice = 0, type = 'product', salePriceSuffixKey, accentSalePrice = true, listPriceSuffixKey = 'frontend.core.list', showloginRequired = false }) => {
+const ProductPrice = ({ priceGroupLabel = '',salePrice = 0, listPrice = 0, type = 'product', ShowPriceForUserType = 'All', ignoreDisplayRules = false, salePriceSuffixKey, accentSalePrice = true, listPriceSuffixKey = 'frontend.core.list' }) => {
   const [formatCurrency] = useFormatCurrency({})
   const { t } = useTranslation()
-  const { showMissingPrice, showSalePrice, showListPrice, loginRequiredForPrice } = useProductPrice({ salePrice, listPrice, type, showloginRequired })
+  const { showMissingPrice, showSalePrice, showListPrice, isActionRequiredToShowPrice } = useProductPrice({ salePrice, listPrice, type, ShowPriceForUserType, ignoreDisplayRules })
   return (
     <>
       <div className="product-price">
         {showMissingPrice && <small>{t('frontend.product.missingprice')}</small>}
-        {showListPrice && ( // show list price only when list price is more than sale price
-          <small className="text-muted">
-            <s>{`${formatCurrency(listPrice)}`}</s>
-          </small>
-        )}
+        {showListPrice &&
+          ShowPriceForUserType === 'All' && ( // show list price only when list price is more than sale price
+            <small className="text-muted">
+              <s>{`${formatCurrency(listPrice)}`}</s>
+            </small>
+          )}
         {showSalePrice && <span className="d-block">{formatCurrency(salePrice)}</span>}
       </div>
-      {loginRequiredForPrice && showloginRequired && (
+      {(isActionRequiredToShowPrice && ShowPriceForUserType === 'Authenticated') ||
+        (!isAuthenticated() && isActionRequiredToShowPrice && ShowPriceForUserType === 'Verified' && (
+          <div className="alert alert-warning fs-6" role="alert">
+            {t('frontend.product.loginToView')}
+            <br />
+            <Link to="/my-account/login"> {t('frontend.account.login')} </Link>
+          </div>
+        ))}
+      {isAuthenticated() && isActionRequiredToShowPrice && ShowPriceForUserType === 'Verified' && (
         <div className="alert alert-warning fs-6" role="alert">
-          Login to view price
-          <br />
-          <Link to="/my-account/login"> Login or Create Account </Link>
+          {t('frontend.product.verifyForPricing')}
         </div>
       )}
     </>

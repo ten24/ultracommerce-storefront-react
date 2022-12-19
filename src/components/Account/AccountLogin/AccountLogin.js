@@ -2,10 +2,10 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
-import { useLoginForm } from '../../../hooks'
+import { useLoginForm } from '../../../hooks/components/Account/useLoginForm'
 import { OauthGoogleLogin } from '../../OauthLogin/OauthGoogleLogin'
 import { OauthFacebookLogin } from '../../OauthLogin/OauthFacebookLogin'
-import { getSocialLogins } from '../../../selectors'
+import { getSocialLogins } from '../../../selectors/configurationSelectors'
 
 const LoginForm = ({ isCheckout = false }) => {
   const { t } = useTranslation()
@@ -13,13 +13,13 @@ const LoginForm = ({ isCheckout = false }) => {
   const location = useLocation()
   const allowGuestCheckout = useSelector(state => state.configuration.allowGuestCheckout)
   const socialLogins = useSelector(getSocialLogins)
-  
+
   return (
     <>
-      <div className="mb-5 bg-white col-md-7">
+      <div className="mb-5 py-3 bg-white col-md-7">
         <div className="container container-custom-xs">
           <div className="text-center">
-            <h1 className="display-3">{t('frontend.account.myAccount')}</h1>
+            <h1 className="display-4">{t('frontend.account.myAccount')}</h1>
           </div>
           <hr />
           <h2>{t('frontend.account.sign_in')}</h2>

@@ -1,6 +1,5 @@
 import { useSelector } from 'react-redux'
-import { Redirect } from 'react-router'
-import { Link } from 'react-router-dom'
+import { Navigate, Link } from 'react-router-dom'
 import { SlideNavigation, OrderTemplateCartLineItem, BillingAddressDetails } from '../..'
 import { useTranslation } from 'react-i18next'
 import { ShippingAddressDetails } from '../../Checkout/Review/ShippingAddressDetails'
@@ -11,7 +10,7 @@ const OrderTemplateReviewSlide = ({ currentStep }) => {
   const { t } = useTranslation()
 
   if (cart.isPlaced) {
-    return <Redirect to={'/order-confirmation'} />
+    return <Navigate to={'/order-confirmation'} />
   }
   return (
     <>

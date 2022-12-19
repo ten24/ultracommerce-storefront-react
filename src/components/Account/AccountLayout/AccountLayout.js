@@ -1,9 +1,6 @@
-import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { logout } from '../../../actions/'
-import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { getMyAccountMenu } from '../../../selectors/'
+import { useContentBodyContext } from '../../../contexts/ContentContext'
 
 const isSelectedClass = 'active'
 
@@ -11,36 +8,29 @@ const isSelectedClass = 'active'
  * TODO: Fix content menu
  */
 const AccountSidebar = () => {
-  const { t } = useTranslation()
-  const accountMenu = useSelector(getMyAccountMenu)
+  const pageBody = useContentBodyContext()
   let loc = useLocation()
-  const content = useSelector(state => state.content[loc.pathname.substring(1)])
-
+  const menu = pageBody?.innerElements?.filter(child => child.systemCode === 'cetMenu')?.at(0)
   return (
     <>
       <div className="col-md-4 col-lg-3">
-        <nav className="navbar flex-column align-items-start navbar-expand-md navbar-light bg-light p-2 mb-5 text-left">
+        <nav className="navbar flex-column align-items-start navbar-expand-md navbar-light bg-white p-2 mb-5 text-left shadow-sm">
           <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span className="navbar-toggler-icon"></span>
           </button>
           <div className="collapse navbar-collapse w-100" id="navbarNav">
             <ul className="navbar-nav flex-column w-100">
-              <li key="/my-account/overview" className="nav-item">
-                <Link to="/my-account/overview" className={`nav-link ${loc.pathname === `/my-account` && isSelectedClass}`}>
-                  <i className="far pr-2" /> {t('frontend.account.overview')}
-                </Link>
-              </li>
-              {content?.menu?.menuItems?.length > 0 &&
-                content.menu.menuItems.map(({ contentID, slug, title }) => {
-                  return (
-                    <li key={contentID} className="nav-item">
-                      <Link to={`/${slug}`} className={`nav-link  ${loc.pathname.startsWith(`/${slug}`) && isSelectedClass}`}>
-                        <i className="far pr-2" /> {title}
-                      </Link>
-                    </li>
-                  )
-                })}
-              {accountMenu.length > 0 &&
+              {menu?.innerElements?.map(props => {
+                const { contentID, slug = '', title } = props
+                return (
+                  <li key={contentID} className="nav-item">
+                    <Link to={slug} className={`nav-link  ${loc.pathname === slug && isSelectedClass}`}>
+                      <i className="far pr-2" /> {title}
+                    </Link>
+                  </li>
+                )
+              })}
+              {/* {accountMenu.length > 0 &&
                 accountMenu.map(({ contentID, urlTitlePath, title }) => {
                   return (
                     <li key={contentID} className="nav-item">
@@ -49,7 +39,7 @@ const AccountSidebar = () => {
                       </Link>
                     </li>
                   )
-                })}
+                })} */}
             </ul>
           </div>
         </nav>
@@ -60,23 +50,10 @@ const AccountSidebar = () => {
 
 const AccountHeader = () => {
   const { t } = useTranslation()
-  const dispatch = useDispatch()
-  const [disableButton, setdisableButton] = useState(false)
 
   return (
-    <div className="bg-light p-3 pt-4 mb-4 text-center no-print">
-      <h1 className="display-4">{t('frontend.account.myAccount')}</h1>
-      <button
-        type="button"
-        disabled={disableButton}
-        onClick={() => {
-          setdisableButton(true)
-          dispatch(logout(t('frontend.account.logout_success'), t('frontend.account.logout_failure')))
-        }}
-        className="btn link-btn btn-link"
-      >
-        {t('frontend.core.logout')}
-      </button>
+    <div className="p-3 pt-4 mb-4 text-center no-print">
+      <h1 className="h3 m-0">{t('frontend.account.myAccount')}</h1>
     </div>
   )
 }
@@ -100,10 +77,10 @@ const PromptLayout = ({ children }) => {
   return (
     <div className="container py-4 py-lg-5 my-4">
       <div className="row d-flex justify-content-center">
-        <div className="mb-5   bg-white col-md-6 ">
+        <div className="mb-5 bg-white col-md-6 py-3">
           <div className="container container-custom-xs">
             <div className="text-center">
-              <h1 className="display-3">{t('frontend.account.myAccount')}</h1>
+              <h1 className="display-4">{t('frontend.account.myAccount')}</h1>
             </div>
             <hr />
             <div className="card-body">{children}</div>

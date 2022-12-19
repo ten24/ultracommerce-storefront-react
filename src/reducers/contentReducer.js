@@ -19,7 +19,6 @@ const content = (state = initState, action) => {
       return {
         ...Object.keys(state)
           .filter(key => {
-            console.log(`${key}`, state[key])
             return !state[key]?.isPageFlag || state[key]?.permissions?.nonRestrictedFlag
           })
           .reduce((acc, curr) => {

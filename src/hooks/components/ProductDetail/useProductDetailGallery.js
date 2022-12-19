@@ -31,17 +31,19 @@ const useProductDetailGallery = ({ productUrlTitle, skuID = '', imageFile }) => 
         return TYPE === 'skuDefaultImage' || TYPE === 'productAlternateImage' || (ASSIGNEDSKUIDLIST && ASSIGNEDSKUIDLIST.includes(skuID))
       })
       .filter(({ RESIZEDIMAGEPATHS = [] }) => {
-        return RESIZEDIMAGEPATHS[0] && !RESIZEDIMAGEPATHS[0].includes('missingimage')
+        return RESIZEDIMAGEPATHS?.at(0) && !RESIZEDIMAGEPATHS?.at(0).includes('missingimage')
       })
   }
   if (filterImages?.length === 0) {
     filterImages = [{ ORIGINALPATH: '', NAME: '', RESIZEDIMAGEPATHS: ['', '', ''] }]
   }
   filterImages?.unshift(
-    filterImages.splice(
-      filterImages.findIndex(item => item.ORIGINALFILENAME === imageFile),
-      1
-    )[0]
+    filterImages
+      .splice(
+        filterImages.findIndex(item => item.ORIGINALFILENAME === imageFile),
+        1
+      )
+      ?.at(0)
   )
   filterImages = filterImages?.reverse()
   return { imageGallery, sliders, slider1, slider2, filterImages, isFetching }

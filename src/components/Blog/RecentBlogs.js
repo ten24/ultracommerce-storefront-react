@@ -1,14 +1,14 @@
 import React, { useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useGetBlogPosts, useFormatDate } from '../../hooks'
 import { SimpleImage } from '..'
 import { getBlogRoute } from '../../selectors/configurationSelectors'
 import { useSelector } from 'react-redux'
 
-const RecentBlogs = () => {
+const RecentBlogs = ({ show = true }) => {
   let [request, setRequest] = useGetBlogPosts()
-  let history = useHistory()
+  const navigate = useNavigate()
   const { t } = useTranslation()
   const [formateDate] = useFormatDate()
   const countOnPage = 3
@@ -19,6 +19,7 @@ const RecentBlogs = () => {
       setRequest({ ...request, isFetching: true, isLoaded: false, params: { limit: countOnPage }, makeRequest: true })
     }
   }, [request, setRequest, countOnPage])
+  if (!show) return null
   return (
     <div className="filter-block recent-posts mt-3">
       <h3> {t('frontend.blog.recentPosts')}</h3>
@@ -32,7 +33,7 @@ const RecentBlogs = () => {
                   <div
                     className="link"
                     onClick={() =>
-                      history.push({
+                      navigate({
                         pathname: `/${blogPath}/${feed.slug}`,
                       })
                     }

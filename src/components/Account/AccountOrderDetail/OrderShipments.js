@@ -13,10 +13,11 @@ import { axios, sdkURL } from '../../../services'
 import { ShippingAddressDetails } from '../../Checkout/Review/ShippingAddressDetails'
 import { PickupLocationDetails } from '../../Checkout/Review/PickupLocationDetails'
 
-const OrderItem = ({ quantity, sku_skuID, sku_product_productName, sku_product_urlTitle, images, BrandName, isSeries, ProductSeries, calculatedExtendedPriceAfterDiscount, sku_calculatedSkuDefinition, sku_imageFile, price, sku_product_productID, files, showActions = true }) => {
+const OrderItem = ({ quantity, sku_skuID, sku_product_productName, sku_product_urlTitle, images, BrandName, isSeries, ProductSeries, calculatedExtendedPriceAfterDiscount, sku_calculatedSkuDefinition, sku_imageFile, price, sku_product_productID, orderItemID, files, orderChildItems, showActions = true }) => {
   const [formatCurrency] = useFormatCurrency({})
   const dispatch = useDispatch()
   const { t } = useTranslation()
+  const childBundleItems = orderChildItems?.filter(item => item?.parentOrderItem_orderitemID === orderItemID)
 
   const productRouting = useSelector(getProductRoute)
   const [showModal, setModal] = useState(false)
@@ -27,7 +28,7 @@ const OrderItem = ({ quantity, sku_skuID, sku_product_productName, sku_product_u
     <div className="row border-bottom py-3">
       <div className="col-sm-2 col-3">
         <Link to={`/${productRouting}/${sku_product_urlTitle}?skuid=${sku_skuID}`} className="mx-auto mr-sm-4">
-          {images && images?.length > 0 && <SimpleImage className="img-fluid  m-auto image_container productImage" src={images[0]} alt={sku_product_productName} type="product" />}
+          {images && images?.length > 0 && <SimpleImage className="img-fluid  m-auto image_container productImage" src={images?.at(0)} alt={sku_product_productName} type="product" />}
         </Link>
       </div>
       <div className="col-sm-4 col-9">
@@ -133,6 +134,30 @@ const OrderItem = ({ quantity, sku_skuID, sku_product_productName, sku_product_u
           <AddReview setModal={setModal} showModal={showModal} selectedRate={selectedRate} setSelectedRate={setSelectedRate} hoveredRate={hoveredRate} setHoveredRate={setHoveredRate} sku_product_productID={sku_product_productID} sku_product_productName={sku_product_productName} sku_product_urlTitle={sku_product_urlTitle} sku_skuID={sku_skuID} images={images} />
         </div>
       </Modal>
+      <div className="row">
+        {childBundleItems &&
+          childBundleItems.length > 0 &&
+          childBundleItems.map((childBundleItem, key) => {
+            return key !== 0 ? (
+              <>
+                <i className="bi bi-plus-circle col-1 align-self-center"></i>
+                <Link key={childBundleItem.OrderItemID} className="col-2" to={`/${productRouting}/${childBundleItem.sku_product_urlTitle}`}>
+                  <SimpleImage className="img-fluid  m-auto image_container productImage border border-light" src={childBundleItem.images?.at(0)} alt={childBundleItem?.sku_product_productName} type="product" />
+                  <span className="text-dark"> {`${formatCurrency(childBundleItem.price)} x ${childBundleItem.quantity}`}</span>
+                  <p>{childBundleItem?.sku_product_productName}</p>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link key={childBundleItem.OrderItemID} className="col-2" to={`/${productRouting}/${childBundleItem.sku_product_urlTitle}`}>
+                  <SimpleImage className="img-fluid  m-auto image_container productImage border border-light" src={childBundleItem.images?.at(0)} alt={childBundleItem?.sku_product_productName} type="product" />
+                  <span className="text-dark"> {`${formatCurrency(childBundleItem.price)} x ${childBundleItem.quantity}`}</span>
+                  <p>{childBundleItem?.sku_product_productName}</p>
+                </Link>
+              </>
+            )
+          })}
+      </div>
     </div>
   )
 }
@@ -243,9 +268,11 @@ const OrderFulfilments = ({ fulfilments, files }) => {
               </div>
               <div className="card-body py-0">
                 {fulfilment.orderFulfillmentItems &&
-                  fulfilment.orderFulfillmentItems.map(item => {
-                    return <OrderItem key={item.orderItemID} {...item} files={files} />
-                  })}
+                  fulfilment.orderFulfillmentItems
+                    .filter(item => !item.parentOrderItem_orderitemID)
+                    .map(item => {
+                      return <OrderItem key={item.orderItemID} {...item} files={files} orderChildItems={fulfilment.orderFulfillmentItems.filter(item => item.parentOrderItem_orderitemID)} />
+                    })}
               </div>
             </div>
           )

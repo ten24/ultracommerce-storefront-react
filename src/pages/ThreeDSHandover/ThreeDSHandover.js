@@ -1,7 +1,7 @@
 import queryString from 'query-string'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory, useLocation } from 'react-router'
+import { useNavigate, useLocation } from 'react-router-dom'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import { Layout } from '../../components'
@@ -19,7 +19,7 @@ const ThreeDSHandover = () => {
 
   let qParams = queryString.parse(loc.search, { arrayFormat: 'separator', arrayFormatSeparator: ',' })
   const { action, status } = qParams
-  const history = useHistory()
+  const navigate = useNavigate()
   const { t } = useTranslation()
 
   useEffect(() => {
@@ -41,10 +41,10 @@ const ThreeDSHandover = () => {
         clearInterval(timerInterval)
       },
     }).then(result => {
-      if (action === ACCOUNT) history.push('/my-account/cards')
-      if (action === CHECKOUT_PLACE_ORDER && status === SUCCESS) history.push('/order-confirmation')
-      if (action === CHECKOUT_PLACE_ORDER && status === ERROR) history.push('/checkout/review')
-      if (action === CHECKOUT_PAYMENT) history.push('/checkout/payment')
+      if (action === ACCOUNT) navigate('/my-account/cards')
+      if (action === CHECKOUT_PLACE_ORDER && status === SUCCESS) navigate('/order-confirmation')
+      if (action === CHECKOUT_PLACE_ORDER && status === ERROR) navigate('/checkout/review')
+      if (action === CHECKOUT_PAYMENT) navigate('/checkout/payment')
     })
 
     return () => {

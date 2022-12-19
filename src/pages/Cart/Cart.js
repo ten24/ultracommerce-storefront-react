@@ -1,26 +1,30 @@
-import { CartLineItem, CartPromoBox, Layout, OrderSummary } from '../../components'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { getCart, clearCartData, removePromoCode } from '../../actions/cartActions'
 import { useEffect, useState } from 'react'
-import { disableInteractionSelector } from '../../selectors'
-import { applyPromoCode } from '../../actions/'
-import { updateItemQuantity, removeItem } from '../../actions/'
+import { disableInteractionSelector } from '../../selectors/orderSelectors'
+import { applyPromoCode, updateItemQuantity, removeItem } from '../../actions/cartActions'
+import DynamicPage from '../DynamicPage/DynamicPage'
+import { useElementContext } from '../../contexts/ElementContextProvider'
 
 const Cart = () => {
+  const { CartLineItem, CartPromoBox, OrderSummary } = useElementContext()
+
   const { t } = useTranslation()
   const dispatch = useDispatch()
   const disableInteraction = useSelector(disableInteractionSelector)
   const [removeitem, setRemoveitem] = useState(false)
-  let history = useHistory()
+  const navigate = useNavigate()
   const cart = useSelector(state => state.cart)
   const { orderItems, isFetching } = cart
   useEffect(() => {
     dispatch(getCart())
   }, [dispatch])
+
   return (
-    <Layout>
+    <DynamicPage ignoreLayout={true}>
+      {/* <LoadDataTrackingScript /> */}
       <div className="page-header bg-light p-5 text-center">
         <h1 className="display-4">{t('frontend.cart.title')}</h1>
       </div>
@@ -58,16 +62,26 @@ const Cart = () => {
                   </div>
                   <div className="card-body py-0">
                     {orderItems &&
-                      orderItems.map(orderItem => {
-                        return <CartLineItem key={orderItem.orderItemID} orderItem={orderItem} setRemoveitem={setRemoveitem} onUpdateQty={(itemCount) => {
-                          dispatch(updateItemQuantity(orderItem.orderItemID, itemCount))
-                        }}
-                        onRemoveItem={(event)=>{
-                          setRemoveitem(true)
-                          event.preventDefault()
-                          dispatch(removeItem(orderItem.orderItemID))
-                        }}/>
-                      })}
+                      orderItems
+                        .filter(item => item.parentOrderItemID === '')
+                        .map((orderItem, key) => {
+                          return (
+                            <CartLineItem
+                              key={`${orderItem.orderItemID}-${key}`}
+                              orderItem={orderItem}
+                              setRemoveitem={setRemoveitem}
+                              childBundleItems={orderItems?.filter(item => item?.parentOrderItemID === orderItem.orderItemID)}
+                              onUpdateQty={itemCount => {
+                                dispatch(updateItemQuantity(orderItem.orderItemID, itemCount))
+                              }}
+                              onRemoveItem={event => {
+                                setRemoveitem(true)
+                                event.preventDefault()
+                                dispatch(removeItem(orderItem.orderItemID))
+                              }}
+                            />
+                          )
+                        })}
                   </div>
                 </div>
                 <div className="white-background">
@@ -82,23 +96,29 @@ const Cart = () => {
             <div className="col-lg-4 col-md-12">
               <div className="row">
                 <div className="col-sm-12">
-                  <OrderSummary cart={cart} disabled={disableInteraction} onRemovePromoCode={(event,promotionCode)=>{
-           event.preventDefault()
-           dispatch(removePromoCode(promotionCode, undefined, t('frontend.cart.promo_code_removed')))
-          }
-        }/>
+                  <OrderSummary
+                    cart={cart}
+                    disabled={disableInteraction}
+                    onRemovePromoCode={(event, promotionCode) => {
+                      event.preventDefault()
+                      dispatch(removePromoCode(promotionCode, undefined, t('frontend.cart.promo_code_removed')))
+                    }}
+                  />
                 </div>
-                <CartPromoBox disabledInteraction={disableInteraction} onApplyCode={(promoCode,setPromoCode)=>{
-                  dispatch(applyPromoCode(promoCode, t('frontend.cart.promo_code_applied')))
-                  setPromoCode('')
-                }}/>
+                <CartPromoBox
+                  disabledInteraction={disableInteraction}
+                  onApplyCode={(promoCode, setPromoCode) => {
+                    dispatch(applyPromoCode(promoCode, t('frontend.cart.promo_code_applied')))
+                    setPromoCode('')
+                  }}
+                />
                 <div className="ps-2 pe-2">
                   <button
                     className="col-md-12 btn btn-primary w-100 mt-2 "
                     disabled={disableInteraction}
                     onClick={e => {
                       e.preventDefault()
-                      history.push('/checkout')
+                      navigate('/checkout')
                     }}
                   >
                     {t('frontend.order.to_checkout')}
@@ -109,7 +129,7 @@ const Cart = () => {
           )}
         </div>
       </div>
-    </Layout>
+    </DynamicPage>
   )
 }
 

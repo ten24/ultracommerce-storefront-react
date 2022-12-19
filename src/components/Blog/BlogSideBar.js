@@ -32,7 +32,7 @@ const CategoryList = ({ categories, selectedCategory }) => {
   )
 }
 
-const BlogSidebar = ({ blogPost = false }) => {
+const BlogSidebar = ({ show = true, blogPost = false }) => {
   let [request, setRequest] = useGetBlogCatagories()
   const blogKey = useSelector(getBlogRoute)
   const loc = useLocation()
@@ -47,6 +47,7 @@ const BlogSidebar = ({ blogPost = false }) => {
       didCancel = true
     }
   }, [request, blogKey, setRequest])
+  if (!show) return null
 
   return (
     <div className={blogPost ? 'col-lg-12' : 'col-lg-4'}>

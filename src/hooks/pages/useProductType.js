@@ -2,12 +2,12 @@ import { useGetEntity } from '../../hooks/useAPI'
 import { useSelector } from 'react-redux'
 import { getProductTypeRoute } from '../../selectors/configurationSelectors'
 import { useEffect } from 'react'
-import { useHistory, useParams } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import { useUtilities } from '../useUtilities'
 
 const useProductType = () => {
   const { id } = useParams()
-  const history = useHistory()
+  let { pathname } = useLocation()
   const { augmentProductType } = useUtilities()
   const productTypeRoute = useSelector(getProductTypeRoute)
   const productTypeBase = useSelector(state => state.configuration.filtering.productTypeBase)
@@ -27,19 +27,15 @@ const useProductType = () => {
       })
   }
   useEffect(() => {
-    const unload = history.listen(location => {
-      const urlTitle = location.pathname.split('/').reverse()[0]
-      const hasData = !!productTypeListRequest.data.filter(pt => pt.urlTitle === urlTitle).length
-      if (!hasData && productTypeListRequest.data.length > 0) {
-        setProductTypeRequest({ ...productTypeRequest, data: {}, isFetching: false, isLoaded: false, params: { urlTitle }, makeRequest: true })
-        setProductTypeListRequest({ ...productTypeListRequest, data: [], isFetching: false, isLoaded: false, params: {}, makeRequest: false })
-      } else {
-      }
-    })
-    return () => {
-      unload()
+    const urlTitle = pathname.split('/').reverse()?.at(0)
+    const hasData = !!productTypeListRequest.data.filter(pt => pt.urlTitle === urlTitle).length
+    if (!hasData && productTypeListRequest.data.length > 0) {
+      setProductTypeRequest({ ...productTypeRequest, data: {}, isFetching: false, isLoaded: false, params: { urlTitle }, makeRequest: true })
+      setProductTypeListRequest({ ...productTypeListRequest, data: [], isFetching: false, isLoaded: false, params: {}, makeRequest: false })
+    } else {
     }
-  }, [history, setProductTypeRequest, productTypeRequest, setProductTypeListRequest, productTypeListRequest])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname])
 
   if (!productTypeRequest.isFetching && !productTypeRequest.isLoaded) {
     setProductTypeRequest({ ...productTypeRequest, isFetching: true, isLoaded: false, entity: 'productType', params: { urlTitle: id }, makeRequest: true })

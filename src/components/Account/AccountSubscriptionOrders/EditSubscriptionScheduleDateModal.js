@@ -15,6 +15,8 @@ const EditSubscriptionScheduleDateModal = ({ apply, scheduleDateValue, setSchedu
         if (response.isSuccess() && !didCancel && response.success().scheduleDateChangeReasonTypeOptions) {
           var data = [{ name: '', value: '' }, ...response.success().scheduleDateChangeReasonTypeOptions]
           setScheduleDateChangeReasonTypeOptions(data.map(({ name, value }) => ({ key: name, value: value })))
+          setOtherScheduleDateChangeReasonNote('')
+          setScheduleDateChangeReasonType('')
           setLoaded(true)
         } else {
           setScheduleDateChangeReasonTypeOptions([])

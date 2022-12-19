@@ -1,42 +1,39 @@
-import React, { useEffect } from 'react'
-import { useHistory, useRouteMatch } from 'react-router-dom'
-import { Layout, BlogSidebar, BlogPostBody, BlogPostHeader, RecentBlogs } from '../../components'
-import { useGetBlogPost } from '../../hooks'
+import { useContentContext } from '../../contexts'
+import { useElementContext } from '../../contexts/ElementContextProvider'
+// import { useGetBlogPost } from '../../hooks/useBlog'
+import DynamicPage from '../DynamicPage/DynamicPage'
 
-const BlogPost = () => {
-  let [request, setRequest] = useGetBlogPost()
-  let loc = useRouteMatch()
-  let history = useHistory()
-
-  useEffect(() => {
-    let didCancel = false
-    if (!request.isFetching && !request.isLoaded && !didCancel) {
-      setRequest({ ...request, isFetching: true, isLoaded: false, params: { slug: loc.params.id }, makeRequest: true })
+const BlogPost = ({ config = { showSidebar: false } }) => {
+  const pageData = useContentContext()
+  const { BlogSidebar, BlogPostBody, BlogPostHeader, RecentBlogs } = useElementContext()
+  let postBody = {
+    authorName: pageData?.contentAuthor?.trim(),
+    publicationDate: pageData?.contentPublicationDate?.trim(),
+    postTitle: pageData?.contentHeading?.trim() || pageData?.title?.trim(),
+    postContent: pageData?.contentBody?.trim(),
+  }
+  if (pageData?.contentImage?.length > 0) {
+    postBody.postImage = {
+      url: `/custom/assets/images/content/${pageData.contentImage}`,
     }
-    const unload = history.listen(location => {
-      let slug = location.pathname.split('/')
-      slug = slug[2]
-      setRequest({ ...request, isFetching: true, isLoaded: false, params: { slug }, makeRequest: true })
-    })
-    return () => {
-      unload()
-      didCancel = true
-    }
-  }, [request, history, loc, setRequest])
-
+  }
   return (
-    <Layout>
+    <DynamicPage ignoreLayout={true}>
       <BlogPostHeader />
       <div className="container my-5">
         <div className="row">
-          <div className="col-lg-8 entries">{request.isLoaded && Object.keys(request.data).length > 0 && <BlogPostBody blogPostData={request.data} />}</div>
-          <div className="col-lg-4">
-            <BlogSidebar blogPost={true} />
-            <RecentBlogs />
+          <div className={`col-lg-${config.showSidebar ? '8' : '12'} entries`}>
+            <BlogPostBody blogPostData={postBody} />
           </div>
+          {config.showSidebar && (
+            <div className="col-lg-4">
+              <BlogSidebar show={config.showSidebar} blogPost={true} />
+              <RecentBlogs show={config.showSidebar} />
+            </div>
+          )}
         </div>
       </div>
-    </Layout>
+    </DynamicPage>
   )
 }
 export { BlogPost }

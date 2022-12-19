@@ -6,7 +6,7 @@ const REVIEW = 'review'
 
 const getOrderTemplateCurrentStep = path => {
   const currentList = orderTemplateCheckOutSteps.filter(step => step.key === path)
-  return currentList.length ? currentList[0] : orderTemplateCheckOutSteps[1]
+  return currentList.length ? currentList?.at(0) : orderTemplateCheckOutSteps[1]
 }
 
 const orderTemplateCheckOutSteps = [
@@ -61,4 +61,4 @@ const orderTemplateCheckOutSteps = [
   },
 ]
 
-export { orderTemplateCheckOutSteps, ORDERTEMPLATECART, SUBSCRIPTION, SHIPPING, PAYMENT, REVIEW, getOrderTemplateCurrentStep }
+export { orderTemplateCheckOutSteps, ORDERTEMPLATECART, getOrderTemplateCurrentStep }

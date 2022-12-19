@@ -10,7 +10,7 @@ const useAccountProfile = () => {
   const dispatch = useDispatch()
   const MySwal = withReactContent(Swal)
   const user = useSelector(state => state.userReducer)
-  
+
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
@@ -28,7 +28,7 @@ const useAccountProfile = () => {
           lastName: values.accountLastName,
           primaryEmailAddress: {
             emailAddress: values.accountEmailAddress,
-            accountEmailAddressID : user.primaryEmailAddress.accountEmailAddressID,
+            accountEmailAddressID: user.primaryEmailAddress.accountEmailAddressID,
           },
           company: values.accountCompany,
           returnJSONObjects: 'account',
@@ -50,10 +50,10 @@ const useAccountProfile = () => {
       },
     }).then(data => {
       if (data.isConfirmed) {
-        if (data.value.length === 2 && data.value[0] === data.value[1]) {
+        if (data.value.length === 2 && data.value?.at(0) === data.value[1]) {
           SlatwalApiService.account
             .changePassword({
-              password: data.value[0],
+              password: data.value?.at(0),
               passwordConfirm: data.value[1],
             })
             .then(response => {

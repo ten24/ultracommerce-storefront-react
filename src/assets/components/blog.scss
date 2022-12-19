@@ -1,11 +1,10 @@
 .blog-list:hover {
-  color: $link-color;
+  color: var(--uc-textlinkcolor);
 }
 
 .filter-block .selected-categories {
-  color: $orange;
+  color: var(--uc-textlinkcolor);
   text-decoration-line: underline;
-  text-decoration-color: $orange;
 }
 
 

@@ -1,54 +1,15 @@
-import React from 'react'
-import { useSelector } from 'react-redux'
-import { SignUpForm } from '..'
-import styles from './Footer.module.css'
-import { useUtilities } from '../../hooks'
-import { useTranslation } from 'react-i18next'
-
-function Footer() {
-  const formLink = useSelector(state => state.configuration.footer.formLink)
-  const content = useSelector(state => state.content)
-  let { eventHandlerForWSIWYG } = useUtilities()
-  const footer = content['footer']
-  const { t } = useTranslation()
-
+const Footer = props => {
+  const { children } = props
+  const ribbons = children?.filter(child => child.props.el.contentElementTypeCode === 'cetRibbon')
+  const copyrights = children?.filter(child => child.props.el.contentElementTypeCode === 'cetCopyright')
+  const contentStack = children?.filter(child => !['cetRibbon', 'cetCopyright'].includes(child.props.el.contentElementTypeCode))
   return (
     <footer className="footer no-print">
-      <div className="container pt-5">
-        <div className="row justify-content-between pt-2">
-          {footer?.children?.map(column => {
-            if (column.urlTitle === 'stay-informed') return null
-            return (
-              <div key={column.urlTitle} className="col-md-2 col-sm-6">
-                <h5>{column?.title}</h5>
-                <div className="pb-2 mb-4 small" onClick={eventHandlerForWSIWYG} dangerouslySetInnerHTML={{ __html: column?.contentBody }} />
-                {column.urlTitle === 'stay-informed' && <SignUpForm url={formLink} />}
-              </div>
-            )
-          })}
-
-          {footer?.children?.map(column => {
-            if (column.urlTitle !== 'stay-informed') return null
-            return (
-              <div key={column.urlTitle} className="col-md-3">
-                <div className="pb-2 mb-4">
-                  <h5>{column?.title}</h5>
-                  <small className={`${styles.stayInformed}`} onClick={eventHandlerForWSIWYG} dangerouslySetInnerHTML={{ __html: column?.contentBody }} />
-                  <SignUpForm url={formLink} />
-                </div>
-              </div>
-            )
-          })}
-
-          <div className={`${styles.bgFooter} p-4`}>
-            <div className="container">
-              <div className="row">
-                <div className="text-center text-secondary small">{`@${new Date().getFullYear()} ${t('frontend.copywrite')}`}</div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div className="container pt-3">
+        <div className="uc-grid pt-2">{contentStack}</div>
       </div>
+      {copyrights}
+      {ribbons}
     </footer>
   )
 }

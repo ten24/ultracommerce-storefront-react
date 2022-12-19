@@ -1,5 +1,6 @@
 import { NoProductFound } from '..'
 import ContentLoader from 'react-content-loader'
+import { useElementContext } from '../../contexts/ElementContextProvider'
 
 const ListingGridLoader = props => (
   <ContentLoader viewBox="0 0 1200 500" className="listingGridLoader" {...props}>
@@ -17,7 +18,9 @@ const ListingGridLoader = props => (
   </ContentLoader>
 )
 
-const ListingListView = ({ isFetching, pageRecords }) => {
+const ListingListView = ({ isFetching, pageRecords, config }) => {
+  const { SkuCard, ProductCard } = useElementContext()
+  const Card = config?.params?.productsListingFlag ? ProductCard : SkuCard
   return (
     <div className="col">
       {isFetching && (
@@ -28,29 +31,21 @@ const ListingListView = ({ isFetching, pageRecords }) => {
       <table className="table">
         <thead>
           <tr>
-            <th scope="col">Product Name</th>
-            <th scope="col">Sku Code</th>
             <th scope="col"></th>
+            <th scope="col">Product Name</th>
+            <th scope="col">Price</th>
+            {config?.showInput && <th scope="col">Quantity</th>} <th scope="col"></th>
           </tr>
         </thead>
         <tbody>
           {!isFetching &&
-            pageRecords.length > 0 &&
-            pageRecords.map((product, index) => {
-              return (
-                <tr key={`${product.productName}${index}`}>
-                  <td>{product.productName}</td>
-                  <td>{product.skuCode}</td>
-                  <td>
-                    <button>View</button>
-                  </td>
-                </tr>
-              )
+            pageRecords?.map((product, index) => {
+              return <Card config={config} key={`${product.skuID}=${index}`} product={product} showInput={config?.showInput} />
             })}
         </tbody>
       </table>
 
-      {!isFetching && pageRecords.length === 0 && <NoProductFound />}
+      {!isFetching && pageRecords.length === 0 && <NoProductFound noProductFoundLink={config.noProductFoundLink} />}
     </div>
   )
 }

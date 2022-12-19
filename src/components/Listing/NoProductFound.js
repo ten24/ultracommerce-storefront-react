@@ -1,14 +1,14 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { useLocation, useHistory } from 'react-router'
+import { useLocation } from 'react-router-dom'
 import queryString from 'query-string'
 import { SearchBar } from '../Header/SearchBar'
 
-function NoProductFound() {
+function NoProductFound({ noProductFoundLink = { label: 'No Products Found', link: '/contact' } }) {
   const { t } = useTranslation()
   const { search, pathname } = useLocation()
-  const history = useHistory()
+  const navigate = useNavigate()
   const query = queryString.parse(search)
 
   const isFilterApplied = Object.keys(query).find(filter => {
@@ -34,7 +34,7 @@ function NoProductFound() {
         <button
           className="btn btn-primary btn-sm "
           onClick={() => {
-            history.push(pathname)
+            navigate(pathname)
           }}
         >
           {t('frontend.product.removeFilter')}
@@ -42,8 +42,8 @@ function NoProductFound() {
       )}
       <p className="mt-4">
         {t('frontend.product.needAssistance')}
-        <Link className="mx-2" to="/contact">
-          <u>{t('frontend.nav.contact')}</u>
+        <Link className="mx-2" to={noProductFoundLink.link}>
+          <u>{noProductFoundLink.label}</u>
         </Link>
       </p>
     </div>

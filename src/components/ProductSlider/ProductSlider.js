@@ -1,10 +1,12 @@
 import Slider from 'react-slick'
-import { ProductCard } from '../'
 import { useGetProductsByEntityModified } from '../../hooks/'
 import { useEffect } from 'react'
 import { sorting } from '../../utils'
+import { useTranslation } from 'react-i18next'
+import { useElementContext } from '../../contexts/ElementContextProvider'
 
-const ProductSlider = ({ children, settings, title, slidesToShow = 4, products = [] }) => {
+const ProductSlider = ({ cardConfiguration, children, settings, title, slidesToShow = 4, products = [] }) => {
+  const { SkuCard } = useElementContext()
   settings = settings
     ? settings
     : {
@@ -38,26 +40,28 @@ const ProductSlider = ({ children, settings, title, slidesToShow = 4, products =
       }
 
   return (
-    <div className="container">
-      <header className="section-title">
-        <h2>{title}</h2>
-      </header>
-      <div className="card border-0 bg-transparent">
-        {children}
-        <Slider {...settings}>
-          {products.map(slide => {
-            return (
-              <div className="repeater" key={slide.defaultSku_skuID}>
-                {/*Fixed the slider design issue */}
-                <div className="card-body h-100">
-                  <ProductCard {...slide} imageFile={slide.defaultSku_imageFile} skuID={slide.defaultSku_skuID} salePrice={slide.salePrice} listPrice={slide.listPrice} key={slide.defaultSku_skuID} />
+    <section className="content-spacer product-slider-sec">
+      <div className="container">
+        <header className="section-title">
+          <h2>{title}</h2>
+        </header>
+        <div className="card border-0 bg-transparent">
+          {children}
+          <Slider {...settings}>
+            {products?.map(slide => {
+              return (
+                <div className="repeater" key={slide.defaultSku_skuID}>
+                  {/*Fixed the slider design issue */}
+                  <div className="card-body h-100">
+                    <SkuCard {...slide} cardConfiguration={cardConfiguration} imageFile={slide.defaultSku_imageFile} skuID={slide.defaultSku_skuID} salePrice={slide.salePrice} listPrice={slide.listPrice} key={slide.defaultSku_skuID} />
+                  </div>
                 </div>
-              </div>
-            )
-          })}
-        </Slider>
+              )
+            })}
+          </Slider>
+        </div>
       </div>
-    </div>
+    </section>
   )
 }
 
@@ -94,7 +98,7 @@ const ProductSliderWithList = ({ children, params = {}, settings, title, slidesT
 
 const ProductSliderWithConfig = ({ children, params = {}, settings, title, slidesToShow }) => {
   let [request, setRequest] = useGetProductsByEntityModified()
-
+  const { t } = useTranslation()
   useEffect(() => {
     let didCancel = false
     if (!didCancel && !request.isFetching && !request.isLoaded) {
@@ -111,12 +115,10 @@ const ProductSliderWithConfig = ({ children, params = {}, settings, title, slide
       didCancel = true
     }
   }, [request, setRequest, params])
-  if (!request.data.length) {
-    return null
-  }
+  if (!request.data.length) return null
 
   return (
-    <ProductSlider products={request.data} settings={settings} title={title} slidesToShow={slidesToShow}>
+    <ProductSlider products={request.data} settings={settings} title={title || t('frontend.home.popular_products')} slidesToShow={slidesToShow}>
       {children}
     </ProductSlider>
   )

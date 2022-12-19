@@ -1,4 +1,4 @@
-import { BreadCrumb } from '../'
+import { BreadCrumb } from '../BreadCrumb/BreadCrumb'
 
 const PageHeader = ({ title, subHeading, children, ...props }) => {
   return (

@@ -1,7 +1,7 @@
 import { OrderTemplateCartLineItem, OrderTemplateCartPromoBox, Layout, OrderTemplateSummary } from '../../components'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { sdkURL, axios } from '../../services'
 import { requestSubscriptionCart, clearSubscriptionCart } from '../../actions'
 import { useState } from 'react'
@@ -13,7 +13,7 @@ const OrderTemplateCart = () => {
   const { orderTemplateItems, isFetching, orderTemplateID } = useSelector(state => state.subscriptionCart)
   const [removeitem, setRemoveitem] = useState(false)
   const dispatch = useDispatch()
-  let history = useHistory()
+  const navigate = useNavigate()
   const clearSubscriptionCartData = orderTemplateID => {
     dispatch(requestSubscriptionCart())
     axios({
@@ -97,7 +97,7 @@ const OrderTemplateCart = () => {
                     disabled={disableInteraction}
                     onClick={e => {
                       e.preventDefault()
-                      history.push('/scheduled-delivery-checkout')
+                      navigate('/scheduled-delivery-checkout')
                     }}
                   >
                     {t('frontend.order.to_checkout')}

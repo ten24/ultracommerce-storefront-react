@@ -1,29 +1,26 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
 import { useUtilities } from '../../hooks'
 
-const ActionBanner = ({ data }) => {
+const ActionBanner = ({ title, contentBody = '', linkLabel = '', linkUrl = '', systemCode }) => {
   let { eventHandlerForWSIWYG } = useUtilities()
-
-  if (!data || !Object.keys(data)?.length) {
-    return null
-  }
-
+  if (!title && !contentBody) return null
   return (
-    <div className="bg-light-blue p-5">
+    <div className={`${systemCode} bg-light-blue p-5 action-banner-sec`}>
       <div className="container">
         <div className="row">
           <div className="col-0 col-md-2" />
           <div className="col-md-8 text-center">
-            {data.title && (
+            {!!title && (
               <header className="section-title">
-                <h2>{data.title}</h2>
+                <h2>{title}</h2>
               </header>
             )}
-            <div onClick={eventHandlerForWSIWYG} dangerouslySetInnerHTML={{ __html: data.contentBody }} />
-            <Link className="btn btn-primary" to={data.linkUrl}>
-              {data.linkLabel}
-            </Link>
+            <div onClick={eventHandlerForWSIWYG} dangerouslySetInnerHTML={{ __html: contentBody }} />
+            {!!linkLabel && (
+              <a className="btn btn-primary" href={linkUrl}>
+                {linkLabel}
+              </a>
+            )}
           </div>
           <div className="col-0 col-md-2" />
         </div>

@@ -1,5 +1,6 @@
-import { ProductCard, NoProductFound } from '../'
+import { NoProductFound } from '../'
 import ContentLoader from 'react-content-loader'
+import { useElementContext } from '../../contexts/ElementContextProvider'
 
 const ListingGridLoader = props => (
   <ContentLoader viewBox="0 0 1200 500" className="listingGridLoader" {...props}>
@@ -17,7 +18,14 @@ const ListingGridLoader = props => (
   </ContentLoader>
 )
 
-const ListingGrid = ({ isFetching, pageRecords }) => {
+const ListingGrid = ({ cardDisplayConfigurations, isFetching, pageRecords, config }) => {
+  const { SkuCard, ProductCard } = useElementContext()
+  let Card = SkuCard
+  let cardConfig = cardDisplayConfigurations.skuCardConfiguration
+  if (config?.params?.productsListingFlag) {
+    Card = ProductCard
+    cardConfig = cardDisplayConfigurations.productCardConfiguration
+  }
   return (
     <div className="col">
       {isFetching && (
@@ -27,16 +35,15 @@ const ListingGrid = ({ isFetching, pageRecords }) => {
       )}
       <div className="product-grid">
         {!isFetching &&
-          pageRecords.length > 0 &&
-          pageRecords.map((product, index) => {
+          pageRecords?.map((product, index) => {
             return (
               <div key={`${product.productName}${index}`} className="mb-4">
-                <ProductCard {...product} />
+                <Card cardConfiguration={cardConfig} config={config} showInputLabel={false} showInput={cardConfig?.showInput} {...product} />
               </div>
             )
           })}
       </div>
-      {!isFetching && pageRecords.length === 0 && <NoProductFound />}
+      {!isFetching && pageRecords.length === 0 && <NoProductFound noProductFoundLink={config.noProductFoundLink} />}
     </div>
   )
 }

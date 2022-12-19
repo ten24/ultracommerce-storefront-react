@@ -27,26 +27,26 @@ const useFilterFormater = ({ option, brand, attribute, category, priceRange, pro
       if (ranges.length !== 2) {
         return { ...option, displayName: option.name }
       }
-      const name = formatCurrency(parseFloat(ranges[0])) + ' - ' + formatCurrency(parseFloat(ranges[1]))
+      const name = formatCurrency(parseFloat(ranges?.at(0))) + ' - ' + formatCurrency(parseFloat(ranges[1]))
       return { displayName: name, name: option.name, value: option.value, legacyName: option.name }
     })
   }
 
-  if (option && option.subFacets) {
-    Object.keys(option.subFacets).map(subFact => {
-      option.subFacets[subFact].options = option.subFacets[subFact].options.map(option => {
+  if (option && option.sortedSubFacets) {
+    option.sortedSubFacets = option.sortedSubFacets.map(subFact => {
+      subFact.options = subFact.options.map(option => {
         return { ...option, displayName: option.name }
       })
-      return option.subFacets[subFact]
+      return subFact
     })
   }
 
-  if (attribute && attribute.subFacets) {
-    Object.keys(attribute.subFacets).map(subFact => {
-      attribute.subFacets[subFact].options = attribute.subFacets[subFact].options.map(option => {
+  if (attribute && attribute.sortedSubFacets) {
+    attribute.sortedSubFacets = attribute.sortedSubFacets.map(subFact => {
+      subFact.options = subFact.options.map(option => {
         return { ...option, displayName: option.name }
       })
-      return attribute.subFacets[subFact]
+      return subFact
     })
   }
 
