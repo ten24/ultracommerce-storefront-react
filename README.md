@@ -32,5 +32,5 @@ https://publicapi.ultracommerce.co/
 
 ### CMS Plugins
 
-1. Contentful (https://github.com/ten24/slatwall-plugin-contentful)
-2. Kentico Kontent (https://github.com/ten24/slatwall-plugin-kontent)
+1. Contentful (https://github.com/ten24/ultracommerce-plugin-contentful)
+2. Kontent.ai (https://github.com/ten24/ultracommerce-plugin-kontent)
