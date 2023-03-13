@@ -842,3 +842,17 @@ iframe {
     display: block !important;
   }
 }
+
+form.search-bar {
+  position: relative;
+  .search-results-container {
+    position: absolute;
+    z-index: 1;
+    background: #fff;
+    width: 100%;
+  }
+}
+
+.search-product-name {
+  font-size: 14px;
+}

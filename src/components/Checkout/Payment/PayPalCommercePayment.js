@@ -12,6 +12,7 @@ const PayPalCommercePayment = ({ method, cartState }) => {
   const dispatch = useDispatch()
   const { t } = useTranslation()
   const { currencyCode } = useSelector(getSiteConfig)
+  const { settings } = useSelector(getSiteConfig)
   const { firstName, lastName } = useSelector(state => state.userReducer)
   const integrations = useSelector(getPaymentIntegrations)
   const paypalIntegration = integrations.filter(integration => integration.key === 'paypalCommerce')
@@ -22,6 +23,9 @@ const PayPalCommercePayment = ({ method, cartState }) => {
     'client-id': paypalIntegration?.at(0)?.settings?.clientID,
     intent: 'authorize',
     currency: currencyCode,
+    'buyer-country': settings.siteDefaultCountry,
+    components: "funding-eligibility,buttons",
+    "enable-funding": paypalIntegration?.at(0)?.settings?.payOptions,
     'merchant-id': paypalIntegration?.at(0)?.settings?.partnerID,
     'data-partner-attribution-id': paypalIntegration?.at(0)?.settings?.bnCode,
   }
@@ -45,7 +49,7 @@ const PayPalCommercePayment = ({ method, cartState }) => {
       <Overlay active={isLoading} spinner>
         <PayPalScriptProvider options={options}>
           <PayPalButtons
-            style={{ color: 'silver', layout: 'horizontal', height: 48, shape: 'pill', width: 30 }}
+            style={{ color: 'gold', layout: 'horizontal', height: 48, shape: 'pill', width: 30 }}
             createOrder={(data, actions) => {
               var orderPayload = {
                 intent: 'AUTHORIZE',

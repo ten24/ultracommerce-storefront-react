@@ -50,9 +50,9 @@ export const logout = (success = '', failure = '') => {
       if (response?.status === 200) {
         dispatch(receiveUser(response.data.account))
         dispatch(receiveCart(response.data.cart))
-        toast.success(success)
+        if (success !== '') toast.success(success)
       } else {
-        toast.error(failure)
+        if (failure !== '') toast.error(failure)
       }
       return response
     })

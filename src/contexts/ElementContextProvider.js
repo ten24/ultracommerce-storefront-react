@@ -25,6 +25,9 @@ import { PaymentSlide } from '../components/Checkout/Payment/Payment'
 import { ReviewSlide } from '../components/Checkout/Review/Review'
 import { CartLineItem } from '../components/Cart/CartLineItem'
 import { CartPromoBox } from '../components/Cart/CartPromoBox'
+import { OrderNotes } from '../components/Cart/OrderNotes'
+import { PromotionalMessaging } from '../components/Cart/PromotionalMessaging'
+
 import { OrderSummary } from '../components/Checkout/OrderSummary'
 
 import { CreateGuestAccount } from '../components/Account/CreateGuestAccount/CreateGuestAccount'
@@ -62,7 +65,7 @@ import { RecentBlogs } from '../components/Blog/RecentBlogs'
 import { ListingPagination } from '../components/Listing/ListingPagination'
 import { BasicCard, OverlayCard, HorizontalCard } from '../components/CMS/ContentCard/ContentCardTypes'
 // import LoadDataTrackingScript from '../../components/ActivityMonitorScripts/LoadDataTrackingScript'
-const coreComponents = {
+const coreComponents = () => ({
   // Pages
   // Manufacturer,
   // Blog,
@@ -106,6 +109,8 @@ const coreComponents = {
   CartPromoBox,
   CartLineItem,
   OrderSummary,
+  OrderNotes,
+  PromotionalMessaging,
   // Checkout
   ShippingSlide,
   PaymentSlide,
@@ -135,11 +140,16 @@ const coreComponents = {
   BasicCard,
   OverlayCard,
   HorizontalCard,
+})
+
+const UndefinedComponent = ({ name }) => {
+  console.error('Caught initialization of undefined component ', name)
+  return <div></div>
 }
 const ElementContext = createContext()
 
 const ElementContextProvider = ({ children, customComponents = {} }) => {
-  return <ElementContext.Provider value={{ ...coreComponents, ...customComponents }}>{children}</ElementContext.Provider>
+  return <ElementContext.Provider value={{ ...coreComponents(), ...customComponents }}>{children}</ElementContext.Provider>
 }
 
 const useElementContext = () => {
@@ -150,7 +160,13 @@ const useElementContext = () => {
     throw new Error('useElementContext was used outside of its Provider')
   }
 
-  return context
+  // return proxy to context to prevent hard errors from being thrown if an element is missing from the context
+  return new Proxy(context, {
+    get(target, prop, receiver) {
+      if (target[prop]) return Reflect.get(...arguments)
+      return () => <UndefinedComponent name={prop} />
+    },
+  })
 }
 
 /*

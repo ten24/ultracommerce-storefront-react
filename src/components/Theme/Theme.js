@@ -26,14 +26,24 @@ const Theme = ({ children }) => {
     setSafeToLoad(true)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [theme?.themeID])
+
+  let helmetStyles = [
+    { type: 'text/css', cssText: `:root {\n${stylesToLoad}\n}` },
+    { type: 'text/css', cssText: dynamicCSS },
+  ]
+  let helmetLinks = []
+  if (theme?.favicon?.trim()?.length > 0) {
+    helmetLinks.push(  {"rel": "icon", 
+    "type": "image/png", 
+    "href": `${process.env.REACT_APP_HOST_URL}${theme.favicon}`
+   })
+  }
   if (safeToLoad) {
     return (
       <div className={[siteCode, theme?.themeName].filter(a => a).join(' ')}>
         <Helmet
-          style={[
-            { type: 'text/css', cssText: `:root {\n${stylesToLoad}\n}` },
-            { type: 'text/css', cssText: dynamicCSS },
-          ]}
+          style={helmetStyles}
+          link={helmetLinks}
         />
         {children}
       </div>

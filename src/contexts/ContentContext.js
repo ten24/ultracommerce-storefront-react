@@ -73,7 +73,7 @@ const usePageTypeContext = () => {
     throw new Error('useContentContext was used outside of its Provider')
   }
 
-  return context.contentPageType_systemCode
+  return context?.contentPageType_systemCode
 }
 const useContentBodyContext = () => {
   // get the context
@@ -83,7 +83,7 @@ const useContentBodyContext = () => {
   if (!context === undefined) {
     throw new Error('useContentContext was used outside of its Provider')
   }
-  return context.contentElements?.filter(child => child.systemCode === 'cetBody')?.at(0)
+  return context?.contentElements?.filter(child => child.systemCode === 'cetBody')?.at(0)
 }
 
 /*

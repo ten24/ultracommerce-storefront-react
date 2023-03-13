@@ -308,7 +308,6 @@ header {
       @include media-breakpoint-up(lg) {
         width: 160px;
         &:focus {
-          width: 300px;
           -webkit-transition: width 200ms ease-in-out;
           -moz-transition: width 200ms ease-in-out;
           -o-transition: width 200ms ease-in-out;

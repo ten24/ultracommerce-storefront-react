@@ -7,6 +7,7 @@ import queryString from 'query-string'
 import { AccountImpersonationBanner } from '../../components'
 import { useUtilities } from '../../hooks'
 import { useSelector } from 'react-redux'
+import { SearchBar } from './SearchBar'
 
 const MenuItem = props => {
   const { eventHandlerForWSIWYG } = useUtilities()
@@ -142,6 +143,9 @@ const Header = ({ children }) => {
               </button>
             </div>
             <div className="text-center text-md-start mb-3 mb-lg-0 order-xl-3 d-none d-lg-block">{menus}</div>
+            <div className="col-xl-3 order-xl-2">
+              <SearchBar redirectToSearchPage={true} />
+            </div>
           </div>
         </div>
       </nav>
